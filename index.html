@@ -43,14 +43,14 @@
       </div>
       <div>
         <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-400 bg-clip-text text-transparent">FinanControl Pro</h2>
-        <p class="text-xs text-slate-400 mt-2">Acesse suas finanças sincronizadas no seu Google Drive com segurança total.</p>
+        <p class="text-xs text-slate-400 mt-2">Aceda às suas finanças sincronizadas no seu Google Drive com segurança total.</p>
       </div>
 
       <div class="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-100 dark:border-slate-700/60 text-xs text-slate-400 text-left space-y-2">
         <div class="flex items-center gap-2 text-slate-300 font-semibold">
           <i class="fa-solid fa-shield-halved text-emerald-400"></i> Armazenamento Seguro
         </div>
-        <p>Seus dados financeiros ficam gravados exclusivamente na pasta privada da sua conta Google Drive pessoal.</p>
+        <p>Os seus dados financeiros ficam gravados exclusivamente na pasta privada da sua conta Google Drive pessoal.</p>
       </div>
 
       <button onclick="handleAuthClick()" class="w-full py-3.5 px-4 rounded-xl bg-white text-slate-800 font-semibold text-sm shadow-md hover:bg-slate-100 transition flex items-center justify-center gap-3 border border-slate-300">
@@ -58,7 +58,7 @@
         <span>Entrar com Conta Google</span>
       </button>
 
-      <p id="authStatusMsg" class="text-xs text-slate-500">Faça login para desbloquear o painel.</p>
+      <p id="authStatusMsg" class="text-xs text-slate-500">Inicie sessão para desbloquear o painel.</p>
     </div>
   </div>
 
@@ -72,7 +72,7 @@
           </div>
           <div>
             <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-indigo-500 to-purple-400 bg-clip-text text-transparent">FinanControl Pro</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Controle Financeiro na Nuvem</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Controlo Financeiro na Nuvem</p>
           </div>
         </div>
 
@@ -82,7 +82,7 @@
           </button>
           <button id="calendarTriggerBtn" onclick="toggleDatePicker(event)" title="Escolher Mês/Ano" class="px-3 py-1.5 flex items-center gap-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition cursor-pointer group">
             <i class="fa-regular fa-calendar-days text-indigo-500 group-hover:scale-110 transition-transform"></i>
-            <span id="currentMonthLabel" class="font-semibold text-sm min-w-[125px] text-center capitalize">Carregando...</span>
+            <span id="currentMonthLabel" class="font-semibold text-sm min-w-[125px] text-center capitalize">A carregar...</span>
             <i class="fa-solid fa-caret-down text-xs text-slate-400"></i>
           </button>
           <button onclick="changeMonth(1)" title="Próximo Mês" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300">
@@ -110,8 +110,8 @@
         <div class="flex items-center gap-2">
           <div id="googleUserSection" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
             <span id="syncIndicator" title="Sincronizado com Google Drive" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span id="userEmailLabel" class="text-xs font-medium max-w-[130px] truncate text-slate-600 dark:text-slate-300">Conectado ao Drive</span>
-            <button onclick="handleSignoutClick()" title="Desconectar e Bloquear" class="text-slate-400 hover:text-rose-500 text-xs ml-1"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <span id="userEmailLabel" class="text-xs font-medium max-w-[130px] truncate text-slate-600 dark:text-slate-300">Ligado ao Drive</span>
+            <button onclick="handleSignoutClick()" title="Terminar sessão" class="text-slate-400 hover:text-rose-500 text-xs ml-1"><i class="fa-solid fa-right-from-bracket"></i></button>
           </div>
 
           <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" title="Alternar Tema Claro/Escuro">
@@ -127,10 +127,10 @@
                 <i class="fa-solid fa-arrows-rotate w-4 text-emerald-500"></i> Sincronizar Agora
               </button>
               <button onclick="exportData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5">
-                <i class="fa-solid fa-download text-indigo-500 w-4"></i> Exportar Arquivo Local
+                <i class="fa-solid fa-download text-indigo-500 w-4"></i> Exportar Ficheiro Local
               </button>
               <label class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 cursor-pointer">
-                <i class="fa-solid fa-upload text-emerald-500 w-4"></i> Importar Arquivo
+                <i class="fa-solid fa-upload text-emerald-500 w-4"></i> Importar Ficheiro
                 <input type="file" accept=".json" class="hidden" onchange="importData(event)">
               </label>
               <button onclick="loadSampleData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-amber-500">
@@ -204,7 +204,7 @@
             </div>
             <div class="mt-4 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between text-xs">
               <span class="text-indigo-600 dark:text-indigo-300 font-medium flex items-center gap-1.5">
-                <i class="fa-solid fa-plus-minus"></i> Saldo c/ Extras & Rendimentos:
+                <i class="fa-solid fa-plus-minus"></i> Saldo c/ Extras:
               </span>
               <strong id="cardRemainingWithExtras" class="text-indigo-600 dark:text-indigo-300 font-bold">R$ 0,00</strong>
             </div>
@@ -245,15 +245,15 @@
             <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Para onde foi seu dinheiro
+                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Para onde foi o seu dinheiro
                 </h3>
-                <span class="text-[11px] text-slate-400">Clique na fatia para filtrar</span>
+                <span class="text-[11px] text-slate-400">Clique para filtrar</span>
               </div>
               <div class="relative h-60 flex items-center justify-center">
                 <canvas id="categoryDoughnutChart" class="cursor-pointer"></canvas>
                 <div id="emptyChartMsg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-slate-400 text-xs text-center p-4">
                   <i class="fa-solid fa-chart-pie text-3xl mb-2 opacity-30"></i>
-                  Nenhum gasto pago registrado neste mês.
+                  Nenhum gasto pago registado neste mês.
                 </div>
               </div>
             </div>
@@ -273,7 +273,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div class="flex items-center gap-2 flex-wrap">
                 <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                  <i class="fa-solid fa-list-check text-indigo-500"></i> Seus Gastos e Entradas
+                  <i class="fa-solid fa-list-check text-indigo-500"></i> Os seus Gastos e Entradas
                 </h3>
                 <button id="activeChartFilterBadge" onclick="clearCategoryFilter()" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-400 hover:bg-rose-500/15 hover:text-rose-400 transition">
                   <span id="activeChartFilterText">Filtrado</span>
@@ -286,7 +286,7 @@
                   <input type="text" id="searchTxInput" oninput="renderAll()" placeholder="Procurar conta..." class="w-full sm:w-44 pl-8 pr-3 py-1.5 text-xs rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-indigo-500">
                 </div>
                 <select id="filterCatSelect" onchange="onFilterCatSelectChange()" class="text-xs py-1.5 px-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none">
-                  <option value="all">Todas Categorias</option>
+                  <option value="all">Todas as Categorias</option>
                 </select>
               </div>
             </div>
@@ -295,7 +295,7 @@
               <table class="w-full text-left border-collapse">
                 <thead>
                   <tr class="border-b border-slate-200 dark:border-slate-700/70 text-[11px] uppercase tracking-wider text-slate-400">
-                    <th class="py-3 px-2">Status</th>
+                    <th class="py-3 px-2">Situação</th>
                     <th class="py-3 px-2">Data</th>
                     <th class="py-3 px-2">Descrição</th>
                     <th class="py-3 px-2">Categoria</th>
@@ -353,9 +353,9 @@
         <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 flex items-center gap-2">
-              <i class="fa-solid fa-sliders text-indigo-500"></i> Suas Categorias
+              <i class="fa-solid fa-sliders text-indigo-500"></i> As suas Categorias
             </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Edite cores, nomes, limites mensais ou crie novas categorias.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Edite cores, nomes, limites mensais ou adicione novas categorias.</p>
           </div>
           <button onclick="openCategoryModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-500/20 transition flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Criar Nova Categoria
@@ -380,30 +380,28 @@
             </div>
             <div>
               <h4 class="font-bold text-sm leading-tight">Consultor Gemini</h4>
-              <p class="text-[10px] text-white/80">Análise Financeira em Tempo Real</p>
+              <p class="text-[10px] text-white/80">Análise Financeira Inteligente</p>
             </div>
           </div>
-          <div class="flex items-center gap-1">
-            <button onclick="toggleChatbot()" class="p-1.5 hover:bg-white/20 rounded-lg text-xs transition"><i class="fa-solid fa-xmark"></i></button>
-          </div>
+          <button onclick="toggleChatbot()" class="p-1.5 hover:bg-white/20 rounded-lg text-xs transition"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
         <div id="chatMessagesContainer" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-3 text-xs">
           <div class="p-3 bg-indigo-50 dark:bg-slate-800/80 rounded-2xl rounded-tl-none border border-indigo-100 dark:border-slate-700 space-y-1">
-            <p class="font-semibold text-indigo-500">Olá! Eu sou seu consultor financeiro.</p>
-            <p class="text-slate-600 dark:text-slate-300">Posso analisar seus lançamentos deste mês, projetar economia ou avaliar o impacto de novos gastos. O que deseja saber?</p>
+            <p class="font-semibold text-indigo-500">Olá! Sou o seu consultor financeiro.</p>
+            <p class="text-slate-600 dark:text-slate-300">Posso analisar os seus lançamentos deste mês, projetar poupança ou avaliar gastos. Como posso ajudar?</p>
           </div>
         </div>
 
         <!-- ATALHOS RÁPIDOS DE PERGUNTAS -->
         <div class="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700/60 flex items-center gap-1.5 overflow-x-auto custom-scroll text-[11px] whitespace-nowrap">
-          <button onclick="sendQuickPrompt('Resuma como estão meus gastos e saúde financeira deste mês.')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">📊 Resumo do Mês</button>
+          <button onclick="sendQuickPrompt('Resuma como estão os meus gastos e a saúde financeira deste mês.')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">📊 Resumo do Mês</button>
           <button onclick="sendQuickPrompt('Em qual categoria gastei mais e onde posso economizar?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">💡 Onde Economizar?</button>
           <button onclick="sendQuickPrompt('Com base nos gastos atuais e pendentes, como vou fechar o mês?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">⚖️ Projeção de Saldo</button>
         </div>
 
         <form onsubmit="handleChatSubmit(event)" class="p-3 bg-white dark:bg-darkCard border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
-          <input type="text" id="chatInput" placeholder="Faça uma pergunta sobre seus gastos..." class="flex-1 px-3.5 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-indigo-500">
+          <input type="text" id="chatInput" placeholder="Faça uma pergunta sobre as suas contas..." class="flex-1 px-3.5 py-2 text-xs rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-indigo-500">
           <button type="submit" id="chatSendBtn" class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-500 transition shadow-md shadow-indigo-500/20 disabled:opacity-50">
             <i class="fa-solid fa-paper-plane text-xs"></i>
           </button>
@@ -596,7 +594,7 @@
     }
 
     function handleAuthClick() {
-      document.getElementById('authStatusMsg').textContent = 'Abrindo Google...';
+      document.getElementById('authStatusMsg').textContent = 'A abrir o Google...';
       if (!tokenClient) return;
       tokenClient.requestAccessToken({ prompt: '' });
     }
@@ -636,7 +634,7 @@
         driveFileId = created.id;
         return driveFileId;
       } catch (e) {
-        console.error('Falha ao localizar/criar arquivo:', e);
+        console.error('Falha ao localizar/criar ficheiro:', e);
         return null;
       }
     }
@@ -658,7 +656,7 @@
           }
         }
       } catch (e) {
-        console.warn('Arquivo novo ou vazio na nuvem.');
+        console.warn('Ficheiro novo ou vazio na nuvem.');
       }
     }
 
@@ -816,7 +814,7 @@
     function populateCategorySelects() {
       const filterSelect = document.getElementById('filterCatSelect');
       const curF = filterSelect.value || 'all';
-      filterSelect.innerHTML = `<option value="all">Todas Categorias</option>` + appData.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+      filterSelect.innerHTML = `<option value="all">Todas as Categorias</option>` + appData.categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
       filterSelect.value = (curF === 'all' || appData.categories.some(c => c.id === curF)) ? curF : 'all';
 
       const txCatInput = document.getElementById('txCatInput');
@@ -875,7 +873,7 @@
           <div class="flex justify-between text-xs"><span class="font-medium flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:${cat.color}"></span>${cat.name}</span><span class="${over ? 'text-rose-500 font-bold' : 'text-slate-500 dark:text-slate-400'}">${formatCurrency(spent)} ${budget > 0 ? `/ ${formatCurrency(budget)}` : ''}</span></div>
           <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-300" style="width:${budget > 0 ? pct : 35}%; background:${over ? '#f43f5e' : cat.color}"></div></div>
         </div>`;
-      }).join('') || `<p class="text-xs text-slate-400 text-center py-4">Sem gastos pagos registrados neste mês.</p>`;
+      }).join('') || `<p class="text-xs text-slate-400 text-center py-4">Sem gastos pagos registados neste mês.</p>`;
     }
 
     function renderDoughnutChart() {
@@ -1153,18 +1151,18 @@
         try {
           const imported = JSON.parse(ev.target.result);
           if (imported.categories && imported.transactions) { appData = imported; saveToStorage(); renderAll(); alert('Backup restaurado!'); }
-        } catch (err) { alert('Arquivo inválido.'); }
+        } catch (err) { alert('Ficheiro inválido.'); }
       };
       reader.readAsText(file);
     }
 
     function clearAllData() {
-      if (!confirm('Eliminar todos os registros?')) return;
+      if (!confirm('Eliminar todos os registos?')) return;
       appData.defaultSalary = 0; appData.monthlySalaries = {}; appData.transactions = [];
       saveToStorage(); renderAll(); document.getElementById('settingsMenu').classList.add('hidden');
     }
 
-    // ====== LÓGICA DO CHATBOT COM GEMINI ======
+    // ====== LÓGICA DO ASSISTENTE FINANCEIRO GEMINI ======
     function toggleChatbot() {
       const win = document.getElementById('chatbotWindow');
       win.classList.toggle('hidden');
@@ -1210,7 +1208,7 @@
 
       const categorySummary = appData.categories.map(c => {
         const spent = paidExpenses.filter(t => t.categoryId === c.id).reduce((a, b) => a + Number(b.amount), 0);
-        return `${c.name}: R$ ${spent.toFixed(2)} (teto: R$ ${c.budget || 0})`;
+        return `${c.name}: R$ ${spent.toFixed(2)} (teto previsto: R$ ${c.budget || 0})`;
       }).join('; ');
 
       const expenseList = expenses.map(t => `- ${t.description}: R$ ${t.amount} (${t.status === 'paid' ? 'pago' : 'pendente'})`).slice(0, 20).join('\n');
@@ -1237,56 +1235,46 @@ ${expenseList || 'Nenhum lançamento no momento.'}`;
 
       const sendBtn = document.getElementById('chatSendBtn');
       sendBtn.disabled = true;
-      appendChatMessage('system', 'Analisando finanças com Gemini...');
+      appendChatMessage('system', 'A analisar finanças em segundos...');
 
       const contextData = buildFinancialContext();
-      const prompt = `Você é um consultor financeiro pessoal do aplicativo FinanControl Pro. 
-Responda de forma direta, prática, empática e com números claros em Reais (R$). Seja conciso e use marcadores quando útil.
+      const prompt = `Você é o consultor financeiro do FinanControl Pro. Responda em no máximo 3 ou 4 frases objetivas com valores em R$. Seja prático e direto ao ponto.
 
 ${contextData}
 
-Pergunta do usuário: "${query}"`;
+Pergunta: "${query}"`;
 
-      // Modelos em ordem de prioridade caso algum esteja temporariamente sobrecarregado (503)
-      const targetModels = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-flash-latest'];
-      let reply = null;
-      let lastErrorMessage = '';
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.3,
+              maxOutputTokens: 350
+            }
+          })
+        });
 
-      for (const model of targetModels) {
-        try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-          });
+        const container = document.getElementById('chatMessagesContainer');
+        container.removeChild(container.lastChild);
 
-          if (res.ok) {
-            const data = await res.json();
-            reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (reply) break;
-          } else {
-            const err = await res.json();
-            lastErrorMessage = err.error?.message || 'Serviço temporariamente indisponível.';
-            // Se for sobrecarga 503, continua no loop tentando o modelo seguinte
-            if (res.status !== 503) break;
-          }
-        } catch (netErr) {
-          lastErrorMessage = 'Falha de rede ao consultar o serviço de IA.';
+        if (res.ok) {
+          const data = await res.json();
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta no momento.';
+          appendChatMessage('ai', reply);
+        } else {
+          const err = await res.json();
+          appendChatMessage('ai', `⚠️ Erro: ${err.error?.message || 'Falha ao consultar a API.'}`);
         }
+      } catch (err) {
+        console.error(err);
+        appendChatMessage('ai', '⚠️ Falha de ligação à internet. Tente novamente.');
+      } finally {
+        sendBtn.disabled = false;
       }
-
-      // Remove mensagem de "Analisando..."
-      const container = document.getElementById('chatMessagesContainer');
-      container.removeChild(container.lastChild);
-
-      if (reply) {
-        appendChatMessage('ai', reply);
-      } else {
-        appendChatMessage('ai', `⚠️ Não foi possível obter resposta no momento: ${lastErrorMessage}`);
-      }
-
-      sendBtn.disabled = false;
     }
 
     window.addEventListener('DOMContentLoaded', initApp);
