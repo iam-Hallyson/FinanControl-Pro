@@ -72,7 +72,7 @@
           </div>
           <div>
             <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-indigo-500 to-purple-400 bg-clip-text text-transparent">FinanControl Pro</h1>
-            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Controlo Financeiro na Nuvem</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Controle Financeiro na Nuvem</p>
           </div>
         </div>
 
@@ -127,10 +127,10 @@
                 <i class="fa-solid fa-arrows-rotate w-4 text-emerald-500"></i> Sincronizar Agora
               </button>
               <button onclick="exportData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5">
-                <i class="fa-solid fa-download text-indigo-500 w-4"></i> Exportar Ficheiro Local
+                <i class="fa-solid fa-download text-indigo-500 w-4"></i> Exportar Arquivo Local
               </button>
               <label class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 cursor-pointer">
-                <i class="fa-solid fa-upload text-emerald-500 w-4"></i> Importar Ficheiro
+                <i class="fa-solid fa-upload text-emerald-500 w-4"></i> Importar Arquivo
                 <input type="file" accept=".json" class="hidden" onchange="importData(event)">
               </label>
               <button onclick="loadSampleData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-amber-500">
@@ -371,7 +371,7 @@
         <i class="fa-solid fa-wand-magic-sparkles group-hover:rotate-12 transition-transform"></i>
       </button>
 
-      <!-- JANELA DO CHAT (SEM ÍCONE DE CHAVE) -->
+      <!-- JANELA DO CHAT -->
       <div id="chatbotWindow" class="hidden absolute bottom-16 right-0 w-[90vw] sm:w-96 max-w-lg h-[500px] bg-white dark:bg-darkCard rounded-3xl border border-slate-200 dark:border-darkBorder shadow-2xl flex flex-col overflow-hidden animate-fade">
         <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between">
           <div class="flex items-center gap-2.5">
@@ -380,7 +380,7 @@
             </div>
             <div>
               <h4 class="font-bold text-sm leading-tight">Consultor Gemini</h4>
-              <p class="text-[10px] text-white/80">Análise de Gastos e Finanças</p>
+              <p class="text-[10px] text-white/80">Análise Financeira em Tempo Real</p>
             </div>
           </div>
           <div class="flex items-center gap-1">
@@ -390,16 +390,16 @@
 
         <div id="chatMessagesContainer" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-3 text-xs">
           <div class="p-3 bg-indigo-50 dark:bg-slate-800/80 rounded-2xl rounded-tl-none border border-indigo-100 dark:border-slate-700 space-y-1">
-            <p class="font-semibold text-indigo-500">Olá! Eu sou o seu consultor financeiro.</p>
-            <p class="text-slate-600 dark:text-slate-300">Posso analisar seus gastos deste mês, sugerir cortes ou calcular quanto você pode poupar. O que quer saber hoje?</p>
+            <p class="font-semibold text-indigo-500">Olá! Eu sou seu consultor financeiro.</p>
+            <p class="text-slate-600 dark:text-slate-300">Posso analisar seus lançamentos deste mês, projetar economia ou avaliar o impacto de novos gastos. O que deseja saber?</p>
           </div>
         </div>
 
         <!-- ATALHOS RÁPIDOS DE PERGUNTAS -->
         <div class="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700/60 flex items-center gap-1.5 overflow-x-auto custom-scroll text-[11px] whitespace-nowrap">
           <button onclick="sendQuickPrompt('Resuma como estão meus gastos e saúde financeira deste mês.')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">📊 Resumo do Mês</button>
-          <button onclick="sendQuickPrompt('Em qual categoria gastei mais e onde posso economizar?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">💡 Dica de Economia</button>
-          <button onclick="sendQuickPrompt('Vou conseguir fechar o mês no positivo com meu salário atual?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">⚖️ Análise de Saldo</button>
+          <button onclick="sendQuickPrompt('Em qual categoria gastei mais e onde posso economizar?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">💡 Onde Economizar?</button>
+          <button onclick="sendQuickPrompt('Com base nos gastos atuais e pendentes, como vou fechar o mês?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">⚖️ Projeção de Saldo</button>
         </div>
 
         <form onsubmit="handleChatSubmit(event)" class="p-3 bg-white dark:bg-darkCard border-t border-slate-100 dark:border-slate-800 flex items-center gap-2">
@@ -412,7 +412,7 @@
     </div>
   </div>
 
-  <!-- MODAIS RESTANTES -->
+  <!-- MODAL SALÁRIO -->
   <div id="salaryModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade">
       <div class="flex justify-between items-center mb-4">
@@ -438,6 +438,7 @@
     </div>
   </div>
 
+  <!-- MODAL LANÇAMENTO -->
   <div id="transactionModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade">
       <div class="flex justify-between items-center mb-4">
@@ -487,6 +488,7 @@
     </div>
   </div>
 
+  <!-- MODAL CATEGORIA -->
   <div id="categoryModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade">
       <div class="flex justify-between items-center mb-4">
@@ -523,7 +525,7 @@
 
   <script>
     const CLIENT_ID = '36156789113-4ckjb57b2ulfoebtgm83kqrm29q8cmc1.apps.googleusercontent.com';
-    const GEMINI_API_KEY = 'AQ.Ab8RN6LLEKS4H_YcPx40jex5bt-RwOfOgwj8Hqc00L7bSzgshQ';
+    const GEMINI_API_KEY = 'AQ.Ab8RN6IXhb0OwFaZ_qehUidg54FvbUrF5iCKsHiRoEsbBPQI_Q';
     const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
     const FILE_NAME = 'financontrol_data.json';
     const STORAGE_KEY = 'financontrol_pro_v6_data';
@@ -634,7 +636,7 @@
         driveFileId = created.id;
         return driveFileId;
       } catch (e) {
-        console.error('Falha ao localizar/criar ficheiro:', e);
+        console.error('Falha ao localizar/criar arquivo:', e);
         return null;
       }
     }
@@ -656,7 +658,7 @@
           }
         }
       } catch (e) {
-        console.warn('Ficheiro novo ou vazio na nuvem.');
+        console.warn('Arquivo novo ou vazio na nuvem.');
       }
     }
 
@@ -1125,14 +1127,14 @@
       const prevKey = `${prevY}-${String(prevM).padStart(2, '0')}`;
       appData.defaultSalary = 6500; appData.monthlySalaries[currentMonthKey] = 6500; appData.monthlySalaries[prevKey] = 6500;
       appData.transactions = [
-        { id: 'ex1', type: 'expense', description: 'Renda de Casa + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, categoryId: 'cat_moradia', status: 'paid' },
-        { id: 'ex2', type: 'expense', description: 'Eletricidade e Internet', amount: 280, date: `${currentMonthKey}-10`, categoryId: 'cat_moradia', status: 'paid' },
-        { id: 'ex3', type: 'expense', description: 'Supermercado', amount: 980, date: `${currentMonthKey}-12`, categoryId: 'cat_mercado', status: 'paid' },
+        { id: 'ex1', type: 'expense', description: 'Aluguel + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, categoryId: 'cat_moradia', status: 'paid' },
+        { id: 'ex2', type: 'expense', description: 'Energia Elétrica e Internet', amount: 280, date: `${currentMonthKey}-10`, categoryId: 'cat_moradia', status: 'paid' },
+        { id: 'ex3', type: 'expense', description: 'Supermercado Mensal', amount: 980, date: `${currentMonthKey}-12`, categoryId: 'cat_mercado', status: 'paid' },
         { id: 'ex4', type: 'expense', description: 'Combustível e Manutenção', amount: 460, date: `${currentMonthKey}-15`, categoryId: 'cat_transporte', status: 'paid' },
-        { id: 'ex5', type: 'expense', description: 'Propinas e Formações', amount: 390, date: `${currentMonthKey}-18`, categoryId: 'cat_estudos', status: 'pending' },
-        { id: 'ex6', type: 'income', description: 'Prestação de Serviços', amount: 850, date: `${currentMonthKey}-22`, categoryId: null, status: 'paid' },
-        { id: 'ex7', type: 'expense', description: 'Renda de Casa', amount: 1450, date: `${prevKey}-05`, categoryId: 'cat_moradia', status: 'paid' },
-        { id: 'ex8', type: 'expense', description: 'Supermercado', amount: 1120, date: `${prevKey}-11`, categoryId: 'cat_mercado', status: 'paid' }
+        { id: 'ex5', type: 'expense', description: 'Cursos e Certificações', amount: 390, date: `${currentMonthKey}-18`, categoryId: 'cat_estudos', status: 'pending' },
+        { id: 'ex6', type: 'income', description: 'Consultoria Externa', amount: 850, date: `${currentMonthKey}-22`, categoryId: null, status: 'paid' },
+        { id: 'ex7', type: 'expense', description: 'Aluguel do Mês Anterior', amount: 1450, date: `${prevKey}-05`, categoryId: 'cat_moradia', status: 'paid' },
+        { id: 'ex8', type: 'expense', description: 'Supermercado Anterior', amount: 1120, date: `${prevKey}-11`, categoryId: 'cat_mercado', status: 'paid' }
       ];
       saveToStorage(); renderAll(); document.getElementById('settingsMenu').classList.add('hidden');
     }
@@ -1151,13 +1153,13 @@
         try {
           const imported = JSON.parse(ev.target.result);
           if (imported.categories && imported.transactions) { appData = imported; saveToStorage(); renderAll(); alert('Backup restaurado!'); }
-        } catch (err) { alert('Ficheiro inválido.'); }
+        } catch (err) { alert('Arquivo inválido.'); }
       };
       reader.readAsText(file);
     }
 
     function clearAllData() {
-      if (!confirm('Eliminar todos os registos?')) return;
+      if (!confirm('Eliminar todos os registros?')) return;
       appData.defaultSalary = 0; appData.monthlySalaries = {}; appData.transactions = [];
       saveToStorage(); renderAll(); document.getElementById('settingsMenu').classList.add('hidden');
     }
@@ -1183,7 +1185,7 @@
         bubble.className = 'p-3 bg-indigo-600 text-white rounded-2xl rounded-tr-none ml-auto max-w-[85%] font-medium animate-fade';
         bubble.textContent = text;
       } else if (sender === 'system') {
-        bubble.className = 'p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-center text-slate-500 text-[11px]';
+        bubble.className = 'p-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl text-center text-slate-500 text-[11px] animate-fade';
         bubble.textContent = text;
       } else {
         bubble.className = 'p-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-2xl rounded-tl-none border border-slate-200 dark:border-slate-700 max-w-[90%] leading-relaxed animate-fade';
@@ -1208,18 +1210,18 @@
 
       const categorySummary = appData.categories.map(c => {
         const spent = paidExpenses.filter(t => t.categoryId === c.id).reduce((a, b) => a + Number(b.amount), 0);
-        return `${c.name}: gasto R$ ${spent.toFixed(2)} (teto previsto: R$ ${c.budget || 0})`;
+        return `${c.name}: R$ ${spent.toFixed(2)} (teto: R$ ${c.budget || 0})`;
       }).join('; ');
 
-      const expenseList = expenses.map(t => `- ${t.description} (R$ ${t.amount}, ${t.status === 'paid' ? 'pago' : 'pendente'})`).slice(0, 20).join('\n');
+      const expenseList = expenses.map(t => `- ${t.description}: R$ ${t.amount} (${t.status === 'paid' ? 'pago' : 'pendente'})`).slice(0, 20).join('\n');
 
       return `Dados financeiros do mês selecionado (${formatMonthLabel(currentMonthKey)}):
 - Salário Base: R$ ${baseSalary.toFixed(2)}
 - Rendas Extras: R$ ${totalExtras.toFixed(2)}
 - Total Gasto Pago: R$ ${totalPaid.toFixed(2)}
-- Total Pendente a pagar: R$ ${totalPending.toFixed(2)}
+- Total Pendente: R$ ${totalPending.toFixed(2)}
 - Saldo Restante Atual: R$ ${saldo.toFixed(2)}
-- Resumo por Categoria: ${categorySummary}
+- Gastos por Categoria: ${categorySummary}
 - Principais lançamentos:
 ${expenseList || 'Nenhum lançamento no momento.'}`;
     }
@@ -1235,47 +1237,56 @@ ${expenseList || 'Nenhum lançamento no momento.'}`;
 
       const sendBtn = document.getElementById('chatSendBtn');
       sendBtn.disabled = true;
-      appendChatMessage('system', 'Consultando Gemini...');
+      appendChatMessage('system', 'Analisando finanças com Gemini...');
 
       const contextData = buildFinancialContext();
-      const prompt = `Você é um consultor financeiro pessoal inteligente e direto integrado ao aplicativo FinanControl Pro. 
-Analise as informações financeiras do usuário e responda de forma objetiva, empática e com dicas práticas e números claros em Reais (R$). Não dê respostas longas e cansativas. Seja conciso e use marcadores quando útil.
+      const prompt = `Você é um consultor financeiro pessoal do aplicativo FinanControl Pro. 
+Responda de forma direta, prática, empática e com números claros em Reais (R$). Seja conciso e use marcadores quando útil.
 
 ${contextData}
 
 Pergunta do usuário: "${query}"`;
 
-      try {
-        const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'x-goog-api-key': GEMINI_API_KEY
-          },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        });
+      // Modelos em ordem de prioridade caso algum esteja temporariamente sobrecarregado (503)
+      const targetModels = ['gemini-flash-latest', 'gemini-2.5-flash-lite', 'gemini-2.5-flash'];
+      let reply = null;
+      let lastErrorMessage = '';
 
-        const container = document.getElementById('chatMessagesContainer');
-        container.removeChild(container.lastChild);
+      for (const model of targetModels) {
+        try {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+          });
 
-        if (!res.ok) {
-          const errData = await res.json();
-          appendChatMessage('ai', `⚠️ Erro na chamada da API: ${errData.error?.message || 'Verifique a chave da API.'}`);
-          return;
+          if (res.ok) {
+            const data = await res.json();
+            reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (reply) break;
+          } else {
+            const err = await res.json();
+            lastErrorMessage = err.error?.message || 'Serviço temporariamente indisponível.';
+            // Se for sobrecarga 503, continua no loop tentando o modelo seguinte
+            if (res.status !== 503) break;
+          }
+        } catch (netErr) {
+          lastErrorMessage = 'Falha de rede ao consultar o serviço de IA.';
         }
-
-        const data = await res.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Não consegui formular uma resposta no momento.';
-        appendChatMessage('ai', reply);
-      } catch (err) {
-        console.error(err);
-        appendChatMessage('ai', '⚠️ Ocorreu uma falha de conexão com a API do Gemini.');
-      } finally {
-        sendBtn.disabled = false;
       }
+
+      // Remove mensagem de "Analisando..."
+      const container = document.getElementById('chatMessagesContainer');
+      container.removeChild(container.lastChild);
+
+      if (reply) {
+        appendChatMessage('ai', reply);
+      } else {
+        appendChatMessage('ai', `⚠️ Não foi possível obter resposta no momento: ${lastErrorMessage}`);
+      }
+
+      sendBtn.disabled = false;
     }
 
     window.addEventListener('DOMContentLoaded', initApp);
