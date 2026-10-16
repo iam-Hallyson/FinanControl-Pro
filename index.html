@@ -121,14 +121,9 @@
             <button id="settingsGearBtn" onclick="toggleSettingsMenu(event)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" title="Opções">
               <i class="fa-solid fa-gear pointer-events-none"></i>
             </button>
-            <div id="settingsMenu" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-2 z-50 text-sm animate-fade">
-              <div class="px-4 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Inteligência Artificial</div>
-              <button onclick="openApiKeyModal()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-indigo-500 font-medium">
-                <i class="fa-solid fa-key w-4"></i> Gerenciar Chave Gemini
-              </button>
-              <hr class="my-1 border-slate-200 dark:border-slate-700">
+            <div id="settingsMenu" class="hidden absolute right-0 mt-2 w-60 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-2 z-50 text-sm animate-fade">
               <div class="px-4 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Google Drive & Dados</div>
-              <button onclick="syncToDriveManual()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5">
+              <button onclick="syncToDriveManual()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-indigo-500 font-medium">
                 <i class="fa-solid fa-arrows-rotate w-4 text-emerald-500"></i> Sincronizar Agora
               </button>
               <button onclick="exportData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5">
@@ -376,7 +371,7 @@
         <i class="fa-solid fa-wand-magic-sparkles group-hover:rotate-12 transition-transform"></i>
       </button>
 
-      <!-- JANELA DO CHAT -->
+      <!-- JANELA DO CHAT (SEM ÍCONE DE CHAVE) -->
       <div id="chatbotWindow" class="hidden absolute bottom-16 right-0 w-[90vw] sm:w-96 max-w-lg h-[500px] bg-white dark:bg-darkCard rounded-3xl border border-slate-200 dark:border-darkBorder shadow-2xl flex flex-col overflow-hidden animate-fade">
         <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between">
           <div class="flex items-center gap-2.5">
@@ -389,7 +384,6 @@
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <button onclick="openApiKeyModal()" title="Configurar API Key" class="p-1.5 hover:bg-white/20 rounded-lg text-xs transition"><i class="fa-solid fa-key"></i></button>
             <button onclick="toggleChatbot()" class="p-1.5 hover:bg-white/20 rounded-lg text-xs transition"><i class="fa-solid fa-xmark"></i></button>
           </div>
         </div>
@@ -414,29 +408,6 @@
             <i class="fa-solid fa-paper-plane text-xs"></i>
           </button>
         </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL CONFIGURAÇÃO GEMINI API KEY -->
-  <div id="apiKeyModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade space-y-4">
-      <div class="flex justify-between items-center">
-        <h3 class="font-bold text-lg flex items-center gap-2">
-          <i class="fa-solid fa-key text-indigo-500"></i> Chave de API do Gemini
-        </h3>
-        <button onclick="closeApiKeyModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-      <p class="text-xs text-slate-400">
-        Chave padrão pré-configurada no código. Pode substituir abaixo caso queira utilizar outra chave pessoal.
-      </p>
-      <div>
-        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Google Gemini API Key</label>
-        <input type="password" id="geminiApiKeyInput" placeholder="Chave da API" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs focus:outline-none focus:border-indigo-500">
-      </div>
-      <div class="flex justify-end gap-2 pt-2">
-        <button type="button" onclick="closeApiKeyModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800">Cancelar</button>
-        <button type="button" onclick="saveGeminiApiKey()" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">Salvar Chave</button>
       </div>
     </div>
   </div>
@@ -552,11 +523,10 @@
 
   <script>
     const CLIENT_ID = '36156789113-4ckjb57b2ulfoebtgm83kqrm29q8cmc1.apps.googleusercontent.com';
-    const DEFAULT_GEMINI_KEY = 'AQ.Ab8RN6LLEKS4H_YcPx40jex5bt-RwOfOgwj8Hqc00L7bSzgshQ';
+    const GEMINI_API_KEY = 'AQ.Ab8RN6LLEKS4H_YcPx40jex5bt-RwOfOgwj8Hqc00L7bSzgshQ';
     const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
     const FILE_NAME = 'financontrol_data.json';
     const STORAGE_KEY = 'financontrol_pro_v6_data';
-    const GEMINI_STORAGE_KEY = 'financontrol_gemini_key';
     const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const MONTH_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const AVAILABLE_ICONS = [
@@ -1201,23 +1171,6 @@
       }
     }
 
-    function openApiKeyModal() {
-      document.getElementById('geminiApiKeyInput').value = localStorage.getItem(GEMINI_STORAGE_KEY) || DEFAULT_GEMINI_KEY;
-      document.getElementById('apiKeyModal').classList.remove('hidden');
-    }
-
-    function closeApiKeyModal() {
-      document.getElementById('apiKeyModal').classList.add('hidden');
-    }
-
-    function saveGeminiApiKey() {
-      const key = document.getElementById('geminiApiKeyInput').value.trim();
-      if (!key) { alert('Digite uma chave válida.'); return; }
-      localStorage.setItem(GEMINI_STORAGE_KEY, key);
-      closeApiKeyModal();
-      appendChatMessage('system', '✅ Chave da API Gemini atualizada com sucesso!');
-    }
-
     function sendQuickPrompt(promptText) {
       document.getElementById('chatInput').value = promptText;
       handleChatSubmit(new Event('submit'));
@@ -1277,8 +1230,6 @@ ${expenseList || 'Nenhum lançamento no momento.'}`;
       const query = input.value.trim();
       if (!query) return;
 
-      const apiKey = localStorage.getItem(GEMINI_STORAGE_KEY) || DEFAULT_GEMINI_KEY;
-
       appendChatMessage('user', query);
       input.value = '';
 
@@ -1300,7 +1251,7 @@ Pergunta do usuário: "${query}"`;
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
-            'x-goog-api-key': apiKey
+            'x-goog-api-key': GEMINI_API_KEY
           },
           body: JSON.stringify({
             contents: [{ parts: [{ text: prompt }] }]
