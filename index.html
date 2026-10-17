@@ -35,7 +35,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
 
-  <!-- TELA DE AUTENTICAÇÃO GOOGLE / ACESSO SALVO -->
+  <!-- TELA DE AUTENTICAÇÃO (SÓ GOOGLE) -->
   <div id="authGateScreen" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white dark:bg-darkCard max-w-md w-full rounded-3xl p-8 border border-slate-200 dark:border-darkBorder shadow-2xl text-center space-y-6 animate-fade">
       <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-indigo-500/30 mx-auto">
@@ -43,7 +43,7 @@
       </div>
       <div>
         <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-purple-400 bg-clip-text text-transparent">FinanControl Pro</h2>
-        <p class="text-xs text-slate-400 mt-2">Controle financeiro pessoal completo com sincronização segura.</p>
+        <p class="text-xs text-slate-400 mt-2">Controle financeiro pessoal completo com sincronização segura via Google Drive.</p>
       </div>
 
       <div class="space-y-3">
@@ -51,14 +51,9 @@
           <i class="fa-brands fa-google text-red-500 text-lg"></i>
           <span>Entrar com Conta Google</span>
         </button>
-
-        <!-- FUNÇÃO CORRIGIDA PARA ABRIR O PAINEL DIRETAMENTE -->
-        <button onclick="unlockApp()" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium text-xs transition flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 cursor-pointer">
-          <i class="fa-solid fa-arrow-right-to-bracket"></i> Acessar Painel Salvo
-        </button>
       </div>
 
-      <p id="authStatusMsg" class="text-xs text-slate-500">Conecte sua conta para desbloquear o painel mantendo seus dados seguros.</p>
+      <p id="authStatusMsg" class="text-xs text-slate-500">Conecte sua conta para acessar e manter seus dados sincronizados e protegidos.</p>
     </div>
   </div>
 
@@ -111,8 +106,8 @@
         <div class="flex items-center gap-2">
           <div id="googleUserSection" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
             <span id="syncIndicator" title="Status" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-            <span id="userEmailLabel" class="text-xs font-medium max-w-[130px] truncate text-slate-600 dark:text-slate-300">Sincronizado</span>
-            <button onclick="handleSignoutClick()" title="Desconectar ou Trocar Conta" class="text-slate-400 hover:text-rose-500 text-xs ml-1 cursor-pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <span id="userEmailLabel" class="text-xs font-medium max-w-[130px] truncate text-slate-600 dark:text-slate-300">Conectado</span>
+            <button onclick="handleSignoutClick()" title="Desconectar ou Sair" class="text-slate-400 hover:text-rose-500 text-xs ml-1 cursor-pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
           </div>
 
           <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Alternar Tema Claro/Escuro">
@@ -276,7 +271,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span id="labelRuleNeeds" class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-shield text-xs"></i> 50% Necessidades
+                  <i class="fa-solid fa-shield text-xs"></i> <span id="valNeedsPct">50</span>% Necessidades
                 </span>
                 <span id="rule50Target" class="text-xs font-bold text-slate-700 dark:text-slate-200">Teto: R$ 0,00</span>
               </div>
@@ -299,7 +294,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span id="labelRuleWants" class="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-mug-hot text-xs"></i> 30% Estilo de Vida
+                  <i class="fa-solid fa-mug-hot text-xs"></i> <span id="valWantsPct">30</span>% Estilo de Vida
                 </span>
                 <span id="rule30Target" class="text-xs font-bold text-slate-700 dark:text-slate-200">Teto: R$ 0,00</span>
               </div>
@@ -322,7 +317,7 @@
             <div>
               <div class="flex items-center justify-between mb-1">
                 <span id="labelRuleSavings" class="text-xs font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <i class="fa-solid fa-piggy-bank text-xs"></i> 20% Metas & Futuro
+                  <i class="fa-solid fa-piggy-bank text-xs"></i> <span id="valSavingsPct">20</span>% Metas & Futuro
                 </span>
                 <span id="rule20Target" class="text-xs font-bold text-slate-700 dark:text-slate-200">Meta: R$ 0,00</span>
               </div>
@@ -372,7 +367,7 @@
             <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Despesas deste Mês (Efetivas)
+                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Despesas deste Mês
                 </h3>
                 <span class="text-[11px] text-slate-400">Clique para filtrar</span>
               </div>
@@ -437,7 +432,7 @@
               </div>
             </div>
 
-            <!-- SEÇÃO 2: LANÇAMENTOS FUTUROS -->
+            <!-- SEÇÃO 2: LANÇAMENTOS FUTUROS (Aparece no mês da compra) -->
             <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col">
               <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-700/60">
                 <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
@@ -756,7 +751,7 @@
             <select id="txCatInput" onchange="toggleInvoicePaymentFields()" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none"></select>
           </div>
 
-          <!-- QUITAÇÃO DE FATURA DE CARTÃO (COM CÁLCULO DE DIFERENÇA E AMORTIZAÇÃO DE EXCEDENTE) -->
+          <!-- QUITAÇÃO DE FATURA DE CARTÃO -->
           <div id="txInvoicePaymentContainer" class="hidden space-y-3 p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
             <div class="text-xs font-semibold text-purple-400 flex items-center gap-1.5">
               <i class="fa-solid fa-receipt"></i> Quitação de Fatura do Cartão
@@ -771,10 +766,10 @@
                 <input type="month" id="txInvoiceMonthInput" onchange="autoFillInvoiceAmount()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               </div>
             </div>
-            <p class="text-[10px] text-purple-300">💡 O valor da fatura é preenchido automaticamente, mas você pode editá-lo. Se pagar a menos, o resquício permanece pendente. Se pagar a mais, o excedente amortiza automaticamente as faturas seguintes.</p>
+            <p class="text-[10px] text-purple-300">💡 O valor da fatura é preenchido automaticamente. Se pagar a mais, o excedente amortizará a fatura seguinte de forma contínua.</p>
           </div>
 
-          <!-- BAIXA DE BOLETO -->
+          <!-- BAIXA DE BOLETO PENDENTE -->
           <div id="txBoletoPaymentContainer" class="hidden space-y-3 p-3 bg-amber-500/10 rounded-2xl border border-amber-500/20">
             <div class="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
               <i class="fa-solid fa-barcode"></i> Baixa de Boleto Pendente
@@ -789,7 +784,7 @@
                 <select id="txBoletoTargetSelect" onchange="onSelectPendingBoleto()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold"></select>
               </div>
             </div>
-            <p class="text-[10px] text-amber-300">💡 Quita estritamente o boleto selecionado sem gerar resquício ou abatimento em outros meses.</p>
+            <p class="text-[10px] text-amber-300">💡 Ao salvar, o boleto será marcado como pago com o valor integral correto, sem zerar.</p>
           </div>
 
           <div class="flex justify-end gap-2 pt-3">
@@ -850,7 +845,11 @@
     const CLIENT_ID = '36156789113-4ckjb57b2ulfoebtgm83kqrm29q8cmc1.apps.googleusercontent.com';
     const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
     const FILE_NAME = 'financontrol_data.json';
-    const STORAGE_KEY = 'financontrol_pro_v12_data'; // Chave persistente e imutável para não perder dados ao atualizar
+    
+    // Chave Mestra Estável (Nunca altera, para não perder dados)
+    const STORAGE_KEY = 'financontrol_pro_data_v_final';
+    const OLD_KEYS = ['financontrol_pro_v12_data', 'financontrol_pro_v11_data', 'financontrol_pro_v10_data', 'financontrol_pro_v9_data', 'financontrol_pro_v8_data', 'financontrol_pro_v7_data', 'financontrol_data'];
+
     const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const MONTH_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const AVAILABLE_ICONS = [
@@ -1041,16 +1040,15 @@
         handleAuthClick();
         return;
       }
-      syncToDrive().then(() => alert('Sincronizado com o seu Google Drive com sucesso!'));
+      syncToDrive().then(() => alert('Sincronizado com o Google Drive com sucesso!'));
     }
 
     function initApp() {
       loadFromStorage();
       initGoogleAuth();
 
-      // Auto-desbloqueio imediato se houver dados salvos no navegador (mantendo persistência intacta)
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
+      // Desbloqueia automaticamente se já houver dados salvos no navegador (Mantém tudo funcionando offline)
+      if (localStorage.getItem(STORAGE_KEY) || OLD_KEYS.some(k => localStorage.getItem(k))) {
         unlockApp();
       }
 
@@ -1070,11 +1068,15 @@
     }
 
     function loadFromStorage() {
-      // Recupera dados salvos preservando histórico de versões anteriores
+      // Carrega os dados blindando perda em atualizações
       let raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
-        raw = localStorage.getItem('financontrol_pro_v11_data') || localStorage.getItem('financontrol_pro_v10_data') || localStorage.getItem('financontrol_pro_v9_data') || localStorage.getItem('financontrol_pro_v7_data') || localStorage.getItem('financontrol_data');
+        for (const key of OLD_KEYS) {
+          raw = localStorage.getItem(key);
+          if (raw) break;
+        }
       }
+
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
@@ -1211,25 +1213,53 @@
       };
     }
 
+    // MOTOR INTELIGENTE DE FATURA DE CARTÃO (Calcula Resquícios e Amortizações Dinamicamente)
+    function getCardInvoiceStatus(cardId, monthKey) {
+      const purchases = appData.transactions.filter(t => t.paymentMethod === 'credit' && t.cardId === cardId && t.billingMonth <= monthKey && t.type === 'expense');
+      const payments = appData.transactions.filter(t => t.categoryId === 'cat_fatura' && t.cardId === cardId && (t.billingMonth || (t.date || '').slice(0,7)) <= monthKey && t.type === 'expense');
+
+      const totalPurchases = purchases.reduce((sum, t) => sum + Number(t.amount), 0);
+      const totalPayments = payments.reduce((sum, t) => sum + Number(t.amount), 0);
+
+      const card = appData.cards.find(c => c.id === cardId);
+      const initial = card ? Number(card.initialUsedLimit || 0) : 0;
+
+      const currentMonthPurchases = purchases.filter(t => t.billingMonth === monthKey).reduce((sum, t) => sum + Number(t.amount), 0);
+      const currentMonthPayments = payments.filter(t => (t.billingMonth || (t.date || '').slice(0,7)) === monthKey).reduce((sum, t) => sum + Number(t.amount), 0);
+
+      const pastPurchases = totalPurchases - currentMonthPurchases + initial;
+      const pastPayments = totalPayments - currentMonthPayments;
+
+      const rolloverDebt = Math.max(0, pastPurchases - pastPayments);
+      const totalInvoiceDue = currentMonthPurchases + rolloverDebt;
+
+      const remainingToPayThisMonth = Math.max(0, totalInvoiceDue - currentMonthPayments);
+
+      return {
+        totalInvoiceDue,
+        remainingToPayThisMonth,
+        isPaid: remainingToPayThisMonth === 0 && totalInvoiceDue > 0
+      };
+    }
+
+    function getCardGlobalStatus(cardId) {
+      const purchases = appData.transactions.filter(t => t.paymentMethod === 'credit' && t.cardId === cardId && t.type === 'expense');
+      const payments = appData.transactions.filter(t => t.categoryId === 'cat_fatura' && t.cardId === cardId && t.type === 'expense');
+      
+      const totalPurchases = purchases.reduce((sum, t) => sum + Number(t.amount), 0);
+      const totalPayments = payments.reduce((sum, t) => sum + Number(t.amount), 0);
+      
+      const card = appData.cards.find(c => c.id === cardId);
+      const initial = card ? Number(card.initialUsedLimit || 0) : 0;
+      
+      const totalUsed = Math.max(0, totalPurchases - totalPayments + initial);
+      const totalLimit = card ? Number(card.totalLimit || 0) : 0;
+      
+      return { totalUsed, totalLimit, available: Math.max(0, totalLimit - totalUsed) };
+    }
+
     function isBoletoSettled(tx) {
       return tx.boletoPaid === true || tx.status === 'boleto_paid';
-    }
-
-    function isCardSettled(tx) {
-      return tx.status === 'card_paid';
-    }
-
-    function isTxSettled(tx) {
-      if (tx.paymentMethod === 'boleto') return isBoletoSettled(tx);
-      if (tx.paymentMethod === 'credit') return isCardSettled(tx);
-      return true;
-    }
-
-    function getTxPendingAmount(tx) {
-      if (isTxSettled(tx)) return 0;
-      const orig = Number(tx.amount || 0);
-      const disc = Number(tx.discountAmount || 0);
-      return Math.max(0, orig - disc);
     }
 
     function isBoletoOverdue(tx) {
@@ -1261,28 +1291,30 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      const cashOutflows = monthTxs.filter(t => {
-        if (t.type !== 'expense') return false;
-        if (!isDeferredMethod(t.paymentMethod)) return true;
-        if (t.paymentMethod === 'boleto' && isBoletoSettled(t)) return true;
-        if (t.paymentMethod === 'credit' && isCardSettled(t)) return true;
-        return false;
-      }).reduce((a, b) => {
-        return a + Number(b.amount);
+      // Saídas em Conta Real: Apenas o que descontou do saldo efetivamente
+      const cashOutflows = monthTxs.filter(t => t.type === 'expense').reduce((sum, t) => {
+        if (t.paymentMethod === 'credit') return sum; // Compras no crédito não afetam a conta, o que afeta é o cat_fatura
+        if (t.paymentMethod === 'boleto' && !isBoletoSettled(t)) return sum; // Boletos não pagos não afetam a conta
+        return sum + Number(t.amount);
       }, 0);
 
-      const totalDeferredPending = monthTxs.filter(t => t.type === 'expense' && isDeferredMethod(t.paymentMethod) && !isTxSettled(t))
-        .reduce((a, b) => a + getTxPendingAmount(b), 0);
+      // Previsão de Boletos não pagos no mês
+      let expectedDeferred = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'boleto' && !isBoletoSettled(t)).reduce((sum, t) => sum + Number(t.amount), 0);
 
-      const totalOutflow = cashOutflows;
-      const salaryRemaining = baseSalary - totalOutflow;
+      // Previsão de Faturas de Cartão do Mês
+      appData.cards.forEach(card => {
+        const status = getCardInvoiceStatus(card.id, currentMonthKey);
+        expectedDeferred += status.remainingToPayThisMonth;
+      });
+
+      const salaryRemaining = baseSalary - cashOutflows;
       const totalRemainingWithExtras = salaryRemaining + extraIncome;
-      const percent = baseSalary > 0 ? Math.min(100, Math.round((totalOutflow / baseSalary) * 100)) : 0;
+      const percent = baseSalary > 0 ? Math.min(100, Math.round((cashOutflows / baseSalary) * 100)) : 0;
 
       document.getElementById('cardBaseSalary').textContent = formatCurrency(baseSalary);
       document.getElementById('cardExtraIncome').textContent = formatCurrency(extraIncome);
-      document.getElementById('cardTotalExpenses').textContent = formatCurrency(totalOutflow);
-      document.getElementById('cardTotalInvoicesExpected').textContent = formatCurrency(totalDeferredPending);
+      document.getElementById('cardTotalExpenses').textContent = formatCurrency(cashOutflows);
+      document.getElementById('cardTotalInvoicesExpected').textContent = formatCurrency(expectedDeferred);
       document.getElementById('cardDirectExpenses').textContent = formatCurrency(cashOutflows);
 
       const remEl = document.getElementById('cardRemaining');
@@ -1303,17 +1335,10 @@
         let globalTotalUsed = 0;
 
         individualListEl.innerHTML = appData.cards.map(c => {
-          const cardExpenses = appData.transactions
-            .filter(t => t.paymentMethod === 'credit' && t.cardId === c.id && !isCardSettled(t))
-            .reduce((a, b) => a + getTxPendingAmount(b), 0);
-
-          const used = Number(c.initialUsedLimit || 0) + cardExpenses;
-          const total = Number(c.totalLimit || 0);
-          const available = Math.max(0, total - used);
-          const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
-
-          globalTotalLimit += total;
-          globalTotalUsed += used;
+          const stats = getCardGlobalStatus(c.id);
+          globalTotalLimit += stats.totalLimit;
+          globalTotalUsed += stats.totalUsed;
+          const pct = stats.totalLimit > 0 ? Math.min(100, Math.round((stats.totalUsed / stats.totalLimit) * 100)) : 0;
 
           return `
             <div class="space-y-0.5">
@@ -1322,7 +1347,7 @@
                   <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${c.brandColor || '#8b5cf6'}"></span>
                   ${c.name}:
                 </span>
-                <strong class="text-emerald-500 font-bold">${formatCurrency(available)}</strong>
+                <strong class="text-emerald-500 font-bold">${formatCurrency(stats.available)}</strong>
               </div>
               <div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                 <div class="h-full rounded-full transition-all duration-300" style="width: ${pct}%; background:${pct > 85 ? '#ef4444' : (c.brandColor || '#8b5cf6')}"></div>
@@ -1341,35 +1366,24 @@
       document.getElementById('rule50BaseSalary').textContent = formatCurrency(baseSalary);
 
       const cfg = appData.ruleConfig || { needs: 50, wants: 30, savings: 20 };
-      const pctN = cfg.needs || 50;
-      const pctW = cfg.wants || 30;
-      const pctS = cfg.savings || 20;
+      document.getElementById('valNeedsPct').textContent = cfg.needs;
+      document.getElementById('valWantsPct').textContent = cfg.wants;
+      document.getElementById('valSavingsPct').textContent = cfg.savings;
 
-      document.getElementById('labelRuleNeeds').innerHTML = `<i class="fa-solid fa-shield text-xs"></i> ${pctN}% Necessidades`;
-      document.getElementById('labelRuleWants').innerHTML = `<i class="fa-solid fa-mug-hot text-xs"></i> ${pctW}% Estilo de Vida`;
-      document.getElementById('labelRuleSavings').innerHTML = `<i class="fa-solid fa-piggy-bank text-xs"></i> ${pctS}% Metas & Futuro`;
-
-      const target50 = baseSalary * (pctN / 100);
-      const target30 = baseSalary * (pctW / 100);
-      const target20 = baseSalary * (pctS / 100);
+      const target50 = baseSalary * (cfg.needs / 100);
+      const target30 = baseSalary * (cfg.wants / 100);
+      const target20 = baseSalary * (cfg.savings / 100);
 
       document.getElementById('rule50Target').textContent = `Teto: ${formatCurrency(target50)}`;
       document.getElementById('rule30Target').textContent = `Teto: ${formatCurrency(target30)}`;
       document.getElementById('rule20Target').textContent = `Meta: ${formatCurrency(target20)}`;
 
-      const monthExpenses = appData.transactions.filter(t => {
-        if (getEffectiveMonthKey(t) !== currentMonthKey || t.type !== 'expense') return false;
-        if (!isDeferredMethod(t.paymentMethod)) return true;
-        if (t.paymentMethod === 'boleto' && isBoletoSettled(t)) return true;
-        if (t.paymentMethod === 'credit' && isCardSettled(t)) return true;
-        return false;
-      });
+      // Pega todos os gastos efetivos consumidos no mês, IGNORANDO pagamentos de fatura ou baixa de boleto, para não contar o mesmo gasto 2x
+      const budgetingExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && t.categoryId !== 'cat_fatura' && t.categoryId !== 'cat_boleto');
 
-      let spent50 = 0;
-      let spent30 = 0;
-      let spent20 = 0;
+      let spent50 = 0, spent30 = 0, spent20 = 0;
 
-      monthExpenses.forEach(t => {
+      budgetingExpenses.forEach(t => {
         const cat = appData.categories.find(c => c.id === t.categoryId);
         const group = (cat && cat.group) ? cat.group : 'needs';
         const val = Number(t.amount || 0);
@@ -1453,8 +1467,8 @@
       const invoiceCardSelect = document.getElementById('txInvoiceCardSelect');
 
       if (!appData.cards || appData.cards.length === 0) {
-        if(cardSelect) cardSelect.innerHTML = `<option value="">Nenhum cartão cadastrado</option>`;
-        if(avistaCardSelect) avistaCardSelect.innerHTML = `<option value="">Nenhum cartão cadastrado</option>`;
+        if(cardSelect) cardSelect.innerHTML = `<option value="">Nenhum cartão</option>`;
+        if(avistaCardSelect) avistaCardSelect.innerHTML = `<option value="">Nenhum cartão</option>`;
         if(invoiceCardSelect) invoiceCardSelect.innerHTML = `<option value="">Nenhum cartão</option>`;
         return;
       }
@@ -1475,7 +1489,7 @@
       );
 
       if (pendingBoletos.length === 0) {
-        selectEl.innerHTML = `<option value="">Nenhum boleto pendente para este mês</option>`;
+        selectEl.innerHTML = `<option value="">Nenhum boleto pendente no mês</option>`;
         return;
       }
 
@@ -1492,12 +1506,8 @@
       if (selectedOpt && selectedOpt.value) {
         const amt = selectedOpt.getAttribute('data-amt');
         const desc = selectedOpt.getAttribute('data-desc');
-        if (!document.getElementById('txAmountInput').value) {
-          document.getElementById('txAmountInput').value = amt;
-        }
-        if (!document.getElementById('txDescInput').value) {
-          document.getElementById('txDescInput').value = `Pgto Boleto: ${desc}`;
-        }
+        if (!document.getElementById('txAmountInput').value) document.getElementById('txAmountInput').value = amt;
+        if (!document.getElementById('txDescInput').value) document.getElementById('txDescInput').value = `Pgto Boleto: ${desc}`;
       }
     }
 
@@ -1506,16 +1516,11 @@
       const monthKey = document.getElementById('txInvoiceMonthInput').value;
       if (!cardId || !monthKey) return;
 
-      const matchingTxs = appData.transactions.filter(t =>
-        t.paymentMethod === 'credit' &&
-        t.cardId === cardId &&
-        (t.billingMonth || (t.date || '').slice(0, 7)) === monthKey &&
-        !isCardSettled(t)
-      );
-
-      const totalInvoice = matchingTxs.reduce((acc, curr) => acc + getTxPendingAmount(curr), 0);
-      if (totalInvoice > 0) {
-        document.getElementById('txAmountInput').value = totalInvoice.toFixed(2);
+      const status = getCardInvoiceStatus(cardId, monthKey);
+      if (status.remainingToPayThisMonth > 0) {
+        document.getElementById('txAmountInput').value = status.remainingToPayThisMonth.toFixed(2);
+      } else {
+        document.getElementById('txAmountInput').value = "0.00";
       }
     }
 
@@ -1568,7 +1573,8 @@
           paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-arrow-up"></i> Recebido</span>`;
         } else if (t.paymentMethod === 'credit') {
           const card = appData.cards.find(c => c.id === t.cardId);
-          const isPaid = isCardSettled(t);
+          const status = getCardInvoiceStatus(t.cardId, currentMonthKey);
+          const isPaid = status.isPaid;
           const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
 
           if (isPaid) {
@@ -1589,13 +1595,18 @@
           const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
 
           if (isPaid) {
-            paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-circle-check"></i> Boleto${installmentTag} (Pago)</span>`;
+            paymentBadge = `
+              <div class="flex items-center gap-2">
+                <input type="checkbox" onchange="toggleBoletoPayment('${t.id}', this.checked)" title="Desmarcar Pagamento" class="w-4 h-4 rounded text-emerald-600 cursor-pointer" checked>
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-circle-check"></i> Boleto${installmentTag} (Pago)</span>
+              </div>
+            `;
           } else {
             const badgeBg = isOverdue ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30 animate-pulse';
             const textAlert = isOverdue ? '❌ Boleto Vencido / Atrasado' : '⚠️ Boleto em aberto (Atenção)';
             paymentBadge = `
               <div class="flex items-center gap-2">
-                <input type="checkbox" onchange="toggleBoletoPayment('${t.id}', this.checked)" title="Marcar como Pago" class="w-4 h-4 rounded text-emerald-600 cursor-pointer" ${isPaid ? 'checked' : ''}>
+                <input type="checkbox" onchange="toggleBoletoPayment('${t.id}', this.checked)" title="Marcar como Pago" class="w-4 h-4 rounded text-emerald-600 cursor-pointer">
                 <div class="inline-flex flex-col">
                   <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold inline-flex items-center gap-1 border ${badgeBg}">
                     <i class="fa-solid fa-barcode"></i> Boleto${installmentTag}
@@ -1633,6 +1644,7 @@
           `;
         }
 
+        // O VALOR NÃO ZERA MAIS: Sempre exibe o total registrado do item
         const displayVal = t.amount;
 
         return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
@@ -1646,13 +1658,14 @@
       }).join('');
     }
 
-    // TABELA 2: LANÇAMENTOS FUTUROS
+    // TABELA 2: LANÇAMENTOS FUTUROS (Aparece no mês da compra e não nos meses futuros)
     function renderFutureTransactionsTable() {
       const tbody = document.getElementById('futureTransactionsTableBody');
       
       const futureList = appData.transactions.filter(t => {
         const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
         const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
+        // Só aparece na aba futura do mês em que foi comprado e que o vencimento não é nesse próprio mês!
         return isPurchasedHere && !isEffectiveHere && (isDeferredMethod(t.paymentMethod) || (t.installmentsTotal && t.installmentsTotal > 1));
       });
 
@@ -1720,9 +1733,10 @@
 
     function renderCategoryLimits() {
       const container = document.getElementById('categoryLimitsList');
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
+      const budgetingExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && t.categoryId !== 'cat_fatura' && t.categoryId !== 'cat_boleto');
+      
       container.innerHTML = appData.categories.map(cat => {
-        const spent = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        const spent = budgetingExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
         const budget = Number(cat.budget || 0);
         const pct = budget > 0 ? Math.min(100, Math.round((spent / budget) * 100)) : (spent > 0 ? 100 : 0);
         const over = budget > 0 && spent > budget;
@@ -1735,10 +1749,11 @@
 
     function renderDoughnutChart() {
       const ctx = document.getElementById('categoryDoughnutChart').getContext('2d');
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
+      const budgetingExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && t.categoryId !== 'cat_fatura' && t.categoryId !== 'cat_boleto');
+      
       const labels = [], data = [], colors = [], categoryIds = [];
       appData.categories.forEach(cat => {
-        const sum = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        const sum = budgetingExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
         if (sum > 0) { labels.push(cat.name); data.push(sum); colors.push(cat.color); categoryIds.push(cat.id); }
       });
       document.getElementById('emptyChartMsg').classList.toggle('hidden', data.length > 0);
@@ -1781,18 +1796,10 @@
       }
 
       container.innerHTML = appData.cards.map(card => {
-        const cardExpenses = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && !isCardSettled(t))
-          .reduce((a, b) => a + getTxPendingAmount(b), 0);
-
-        const currentMonthInvoice = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.billingMonth === currentMonthKey && !isCardSettled(t))
-          .reduce((a, b) => a + getTxPendingAmount(b), 0);
-
-        const totalUsed = Number(card.initialUsedLimit || 0) + cardExpenses;
-        const totalLimit = Number(card.totalLimit || 0);
-        const available = Math.max(0, totalLimit - totalUsed);
-        const pctUsed = totalLimit > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
+        const stats = getCardGlobalStatus(card.id);
+        const invoiceStats = getCardInvoiceStatus(card.id, currentMonthKey);
+        const currentMonthInvoice = invoiceStats.remainingToPayThisMonth;
+        const pctUsed = stats.totalLimit > 0 ? Math.min(100, Math.round((stats.totalUsed / stats.totalLimit) * 100)) : 0;
 
         return `
           <div class="bg-white dark:bg-darkCard rounded-3xl p-6 border border-slate-200 dark:border-darkBorder shadow-xl relative overflow-hidden flex flex-col justify-between" style="border-top: 5px solid ${card.brandColor || '#8b5cf6'}">
@@ -1816,14 +1823,14 @@
               <div class="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/60">
                 <div class="flex justify-between items-center text-xs">
                   <span class="text-slate-400">Limite Disponível</span>
-                  <strong class="text-emerald-500 font-bold text-sm">${formatCurrency(available)}</strong>
+                  <strong class="text-emerald-500 font-bold text-sm">${formatCurrency(stats.available)}</strong>
                 </div>
                 <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                   <div class="h-full rounded-full transition-all duration-300" style="width: ${pctUsed}%; background: ${pctUsed > 85 ? '#ef4444' : card.brandColor || '#8b5cf6'}"></div>
                 </div>
                 <div class="flex justify-between items-center text-[11px] text-slate-400">
-                  <span>Comprometido Total: <strong class="text-slate-700 dark:text-slate-200">${formatCurrency(totalUsed)}</strong></span>
-                  <span>Limite: <strong>${formatCurrency(totalLimit)}</strong></span>
+                  <span>Comprometido: <strong class="text-slate-700 dark:text-slate-200">${formatCurrency(stats.totalUsed)}</strong></span>
+                  <span>Limite: <strong>${formatCurrency(stats.totalLimit)}</strong></span>
                 </div>
               </div>
 
@@ -2028,7 +2035,7 @@
 
     function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
 
-    // SALVAR LANÇAMENTO (COM CÁLCULO PRECISO DE RESQUÍCIO E ABATIMENTO DE FATURA)
+    // SALVAR LANÇAMENTO E PRESERVAR HISTÓRICO
     function saveTransaction(e) {
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
@@ -2064,7 +2071,7 @@
         }
       }
 
-      // QUITAÇÃO DE FATURA DE CARTÃO (COM RESQUÍCIO SE PAGAR PARCIAL E AMORTIZAÇÃO SE PAGAR A MAIS)
+      // QUITAÇÃO DE FATURA: Cria um item de despesa simples, motor matemático cuida do resquício
       if (currentTxType === 'expense' && categoryId === 'cat_fatura' && paymentMode === 'avista') {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
@@ -2075,47 +2082,22 @@
           return;
         }
 
-        const cardExpenses = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === invoiceCardId && !isCardSettled(t));
-        
-        let pool = totalAmount;
-        const currentMonthTxs = cardExpenses.filter(t => (t.billingMonth || (t.date || '').slice(0, 7)) === invoiceMonth);
-        
-        for (const tx of currentMonthTxs) {
-          if (pool <= 0) break;
-          const pending = getTxPendingAmount(tx);
-          if (pool >= pending) {
-            tx.status = 'card_paid';
-            pool -= pending;
-          } else {
-            tx.discountAmount = Number(((tx.discountAmount || 0) + pool).toFixed(2));
-            pool = 0;
-            break;
-          }
-        }
+        appData.transactions.push({
+          id: id || 'tx_' + Date.now(),
+          type: 'expense',
+          paymentMethod: avistaSubMethod,
+          cardId: invoiceCardId,
+          billingMonth: invoiceMonth,
+          description: desc || `Pagamento Fatura ${targetCard.name}`,
+          amount: totalAmount,
+          date: txDate,
+          categoryId: 'cat_fatura'
+        });
 
-        if (pool > 0) {
-          const futureMonthTxs = cardExpenses
-            .filter(t => (t.billingMonth || (t.date || '').slice(0, 7)) > invoiceMonth)
-            .sort((a, b) => (a.billingMonth || a.date).localeCompare(b.billingMonth || b.date));
-
-          for (const tx of futureMonthTxs) {
-            if (pool <= 0) break;
-            const pending = getTxPendingAmount(tx);
-            if (pool >= pending) {
-              tx.status = 'card_paid';
-              pool -= pending;
-            } else {
-              tx.discountAmount = Number(((tx.discountAmount || 0) + pool).toFixed(2));
-              pool = 0;
-              break;
-            }
-          }
-        }
-
-        if (pool > 0 && Number(targetCard.initialUsedLimit || 0) > 0) {
-          targetCard.initialUsedLimit = Math.max(0, Number(targetCard.initialUsedLimit) - pool);
-        }
+        saveToStorage();
+        closeTransactionModal();
+        renderAll();
+        return;
       }
 
       if (currentTxType === 'expense' && categoryId === 'cat_boleto' && paymentMode === 'avista') {
@@ -2126,6 +2108,10 @@
             targetBoleto.boletoPaid = true;
           }
         }
+        saveToStorage();
+        closeTransactionModal();
+        renderAll();
+        return;
       }
 
       if (paymentMode === 'parcelado' && installments > 1) {
@@ -2152,7 +2138,6 @@
             description: `${desc} (${i + 1}/${installments})`,
             amount: installmentAmount,
             originalTotalAmount: totalAmount,
-            discountAmount: 0,
             date: txDate,
             categoryId: categoryId,
             installmentsTotal: installments,
@@ -2178,7 +2163,6 @@
           description: desc,
           amount: totalAmount,
           originalTotalAmount: totalAmount,
-          discountAmount: 0,
           date: txDate,
           categoryId: categoryId,
           installmentsTotal: 1,
@@ -2474,7 +2458,7 @@
       ];
       appData.transactions = [
         { id: 'ex1', type: 'expense', paymentMethod: 'pix', description: 'Aluguel + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, billingMonth: currentMonthKey, categoryId: 'cat_moradia' },
-        { id: 'ex2', type: 'expense', paymentMethod: 'credit', cardId: 'card_nubank', billingMonth: currentMonthKey, description: 'Supermercado Mensal', amount: 820, originalTotalAmount: 820, discountAmount: 0, date: `${currentMonthKey}-10`, categoryId: 'cat_mercado', status: 'pending' },
+        { id: 'ex2', type: 'expense', paymentMethod: 'credit', cardId: 'card_nubank', billingMonth: currentMonthKey, description: 'Supermercado Mensal', amount: 820, originalTotalAmount: 820, date: `${currentMonthKey}-10`, categoryId: 'cat_mercado', status: 'pending' },
         { id: 'ex3', type: 'expense', paymentMethod: 'debit', description: 'Combustível Posto Ipiranga', amount: 280, date: `${currentMonthKey}-12`, billingMonth: currentMonthKey, categoryId: 'cat_transporte' },
         { id: 'ex4', type: 'income', paymentMethod: 'income', description: 'Freelance & Consultoria', amount: 1200, date: `${currentMonthKey}-18`, billingMonth: currentMonthKey, categoryId: null }
       ];
