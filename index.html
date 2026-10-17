@@ -1119,7 +1119,7 @@
       const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Soma de todas as compras no crédito que vencem neste mês
+      // Total de faturas em aberto deste mês
       const totalCreditInvoices = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
@@ -1318,126 +1318,274 @@
       }
     }
 
-    // SALVAR LANÇAMENTO COM VALIDAÇÃO E ISOLAMENTO ESTRITO POR CARTÃO
-    function saveTransaction(e) {
-      e.preventDefault();
-      const id = document.getElementById('txIdInput').value;
-      const txDate = document.getElementById('txDateInput').value;
-      const desc = document.getElementById('txDescInput').value.trim();
-      const totalAmount = Number(document.getElementById('txAmountInput').value);
-      const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
-      const cardId = currentPaymentMethod === 'credit' ? document.getElementById('txCardIdInput').value : null;
-      const installments = (currentTxType === 'expense' && currentPaymentMethod === 'credit') ? Number(document.getElementById('txInstallmentsInput').value || 1) : 1;
+    // TABELA PRINCIPAL: CONSOLIDA COMPRAS PARCELADAS NO MÊS DA COMPRA EM UMA LINHA SÓ
+    function renderTransactionsTable() {
+      const tbody = document.getElementById('transactionsTableBody');
+      const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
+      const catFilter = document.getElementById('filterCatSelect').value;
 
-      // VALIDAÇÃO: PAGAMENTO DE FATURA DE CARTÃO
-      if (currentTxType === 'expense' && categoryId === 'cat_fatura') {
-        const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
-        const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
-        const targetCard = appData.cards.find(c => c.id === invoiceCardId);
+      // 1. Coleta todas as transações de interesse
+      let rawList = appData.transactions.filter(t => {
+        const belongsToEffective = getEffectiveMonthKey(t) === currentMonthKey;
+        const belongsToPurchase = isTxPurchasedInMonth(t, currentMonthKey);
+        return belongsToEffective || belongsToPurchase;
+      })
+      .filter(t => t.description.toLowerCase().includes(search))
+      .filter(t => catFilter === 'all' || (t.type === 'expense' && t.categoryId === catFilter));
 
-        if (!targetCard) {
-          alert('Por favor, selecione um cartão válido para realizar o pagamento da fatura.');
-          return;
-        }
+      // 2. Agrupamento para não exibir 10 linhas repetidas no mês em que a compra ocorreu
+      const renderedList = [];
+      const seenGroups = new Set();
 
-        // Calcula exatamente quanto esse cartão possui a pagar no mês e em faturas futuras
-        const cardExpenses = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === invoiceCardId && t.status !== 'card_paid');
-        
-        const totalPendingDebt = cardExpenses.reduce((a, b) => a + Number(b.amount), 0) + Number(targetCard.initialUsedLimit || 0);
+      rawList.forEach(t => {
+        const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
+        const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
 
-        if (totalPendingDebt <= 0) {
-          alert(`O cartão "${targetCard.name}" não possui fatura em aberto nem limite comprometido para pagar.`);
-          return;
-        }
+        // Se for compra parcelada no crédito e estivermos visualizando o mês em que a compra foi realizada:
+        if (t.paymentMethod === 'credit' && t.installmentsTotal > 1 && isPurchasedHere && !isEffectiveHere) {
+          if (t.groupId) {
+            if (seenGroups.has(t.groupId)) return;
+            seenGroups.add(t.groupId);
 
-        // Realiza o abatimento estritamente dentro deste cartão selecionado
-        let pool = totalAmount;
+            // Soma o total de todas as parcelas deste grupo
+            const groupTxs = appData.transactions.filter(x => x.groupId === t.groupId);
+            const totalGroupAmount = groupTxs.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            const cleanDesc = t.description.replace(/\s\(\d+\/\d+\)$/, '');
 
-        // 1. Prioriza faturas do mês selecionado deste cartão
-        const currentMonthTxs = cardExpenses.filter(t => (t.billingMonth || t.date.slice(0, 7)) === invoiceMonth);
-        // 2. Faturas seguintes deste mesmo cartão
-        const futureMonthTxs = cardExpenses
-          .filter(t => (t.billingMonth || t.date.slice(0, 7)) > invoiceMonth)
-          .sort((a, b) => (a.billingMonth || a.date).localeCompare(b.billingMonth || b.date));
-
-        const orderedQueue = [...currentMonthTxs, ...futureMonthTxs];
-
-        for (const tx of orderedQueue) {
-          if (pool <= 0) break;
-          const txAmt = Number(tx.amount);
-
-          if (pool >= txAmt) {
-            tx.status = 'card_paid';
-            pool -= txAmt;
-          } else {
-            tx.amount = Number((txAmt - pool).toFixed(2));
-            pool = 0;
-            break;
+            renderedList.push({
+              ...t,
+              isConsolidatedSummary: true,
+              description: cleanDesc,
+              amount: totalGroupAmount,
+              installmentVal: Number(t.amount)
+            });
+            return;
           }
         }
 
-        // 3. Se ainda houver sobra, abate exclusivamente do limite inicial comprometido DESTE cartão
-        if (pool > 0 && Number(targetCard.initialUsedLimit || 0) > 0) {
-          targetCard.initialUsedLimit = Math.max(0, Number(targetCard.initialUsedLimit) - pool);
-        }
+        renderedList.push(t);
+      });
+
+      renderedList.sort((a, b) => b.date.localeCompare(a.date));
+
+      if (renderedList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 block opacity-40"></i>Nenhum lançamento com registro em <strong>${formatMonthLabel(currentMonthKey)}</strong>.</td></tr>`;
+        return;
       }
 
-      // LANÇAMENTO DE COMPRA PARCELADA NO CRÉDITO
-      if (currentPaymentMethod === 'credit' && cardId && installments > 1 && !id) {
-        const installmentAmount = Number((totalAmount / installments).toFixed(2));
-        const groupId = 'group_' + Date.now();
+      tbody.innerHTML = renderedList.map(t => {
+        const isExpense = t.type === 'expense';
+        const [y, m, d] = t.date.split('-');
+        const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
+        const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
+        
+        let paymentBadge = '';
+        if (!isExpense) {
+          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-arrow-up"></i> Recebido</span>`;
+        } else if (t.paymentMethod === 'credit') {
+          const card = appData.cards.find(c => c.id === t.cardId);
+          const isPaid = t.status === 'card_paid';
 
-        for (let i = 0; i < installments; i++) {
-          const billing = calculateCardBilling(cardId, txDate, i).billingMonth;
-          appData.transactions.push({
-            id: 'tx_' + Date.now() + '_' + i,
-            groupId: groupId,
-            type: 'expense',
-            paymentMethod: 'credit',
-            cardId: cardId,
-            billingMonth: billing,
-            description: `${desc} (${i + 1}/${installments})`,
-            amount: installmentAmount,
-            date: txDate,
-            categoryId: categoryId,
-            installmentsTotal: installments,
-            installmentNumber: i + 1,
-            status: 'paid'
-          });
-        }
-      } else {
-        let billingMonth = txDate.slice(0, 7);
-        if (currentPaymentMethod === 'credit' && cardId) {
-          billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
-        }
-
-        const txObj = {
-          id: id || 'tx_' + Date.now(),
-          type: currentTxType,
-          paymentMethod: currentTxType === 'expense' ? currentPaymentMethod : 'income',
-          cardId: cardId,
-          billingMonth: billingMonth,
-          description: desc,
-          amount: totalAmount,
-          date: txDate,
-          categoryId: categoryId,
-          installmentsTotal: 1,
-          installmentNumber: 1,
-          status: 'paid'
-        };
-
-        if (id) {
-          const idx = appData.transactions.findIndex(t => t.id === id);
-          if (idx > -1) appData.transactions[idx] = txObj;
+          // EXIBIÇÃO CONSOLIDADA EM 1 LINHA NO MÊS DA COMPRA
+          if (t.isConsolidatedSummary) {
+            paymentBadge = `
+              <div class="inline-flex flex-col">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  <i class="fa-solid fa-credit-card"></i> ${card ? card.name : 'Crédito'} (Compra Parcelada)
+                </span>
+                <span class="text-[10px] text-amber-400 font-semibold mt-0.5">
+                  Parcelado em ${t.installmentsTotal}x de ${formatCurrency(t.installmentVal)}
+                </span>
+              </div>
+            `;
+          } else if (isPurchasedHere && !isEffectiveHere) {
+            const [by, bm] = (t.billingMonth || '').split('-').map(Number);
+            paymentBadge = `
+              <div class="inline-flex flex-col">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <i class="fa-solid fa-clock"></i> Informativo (Compra no Crédito)
+                </span>
+                <span class="text-[10px] text-purple-400 font-semibold mt-0.5">Vence na fatura de: ${MONTH_SHORT[bm - 1]}/${by}</span>
+              </div>
+            `;
+          } else {
+            const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
+            paymentBadge = `
+              <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 ${isPaid ? 'bg-emerald-500/15 text-emerald-400' : 'bg-purple-500/15 text-purple-400'}" title="${isPaid ? 'Fatura Liquidada' : 'Fatura em Aberto'}">
+                <i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-credit-card'}"></i> ${card ? card.name : 'Crédito'}${installmentTag}
+              </span>
+            `;
+          }
+        } else if (t.paymentMethod === 'debit') {
+          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-blue-500/15 text-blue-400"><i class="fa-solid fa-money-check"></i> Débito</span>`;
+        } else if (t.paymentMethod === 'cash') {
+          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-amber-500/15 text-amber-500"><i class="fa-solid fa-money-bill-1"></i> Dinheiro</span>`;
         } else {
-          appData.transactions.push(txObj);
+          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-teal-500/15 text-teal-400"><i class="fa-brands fa-pix"></i> PIX</span>`;
         }
+
+        let catBadge = isExpense ? (() => { 
+          const cat = appData.categories.find(c => c.id === t.categoryId) || { name: 'Geral', color: '#64748b', icon: 'fa-tag' }; 
+          return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium" style="background:${cat.color}18; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i> ${cat.name}</span>`; 
+        })() : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-chart-line"></i> Extra</span>`;
+
+        return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+          <td class="py-3 px-2">${paymentBadge}</td>
+          <td class="py-3 px-2 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${d}/${m}/${y}</td>
+          <td class="py-3 px-2 font-medium text-slate-800 dark:text-slate-100">${t.description}</td>
+          <td class="py-3 px-2">${catBadge}</td>
+          <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${isExpense ? 'text-rose-500' : 'text-emerald-500'}">${isExpense ? '-' : '+'} ${formatCurrency(t.amount)}</td>
+          <td class="py-3 px-2 text-center whitespace-nowrap">
+            <button onclick="editTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderCategoryLimits() {
+      const container = document.getElementById('categoryLimitsList');
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
+      container.innerHTML = appData.categories.map(cat => {
+        const spent = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        const budget = Number(cat.budget || 0);
+        if (spent === 0 && budget === 0) return '';
+        const pct = budget > 0 ? Math.min(100, Math.round((spent / budget) * 100)) : 100;
+        const over = budget > 0 && spent > budget;
+        return `<div class="space-y-1">
+          <div class="flex justify-between text-xs"><span class="font-medium flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:${cat.color}"></span>${cat.name}</span><span class="${over ? 'text-rose-500 font-bold' : 'text-slate-500 dark:text-slate-400'}">${formatCurrency(spent)} ${budget > 0 ? `/ ${formatCurrency(budget)}` : ''}</span></div>
+          <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-300" style="width:${budget > 0 ? pct : 35}%; background:${over ? '#f43f5e' : cat.color}"></div></div>
+        </div>`;
+      }).join('') || `<p class="text-xs text-slate-400 text-center py-4">Sem gastos registrados neste mês.</p>`;
+    }
+
+    function renderDoughnutChart() {
+      const ctx = document.getElementById('categoryDoughnutChart').getContext('2d');
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
+      const labels = [], data = [], colors = [], categoryIds = [];
+      appData.categories.forEach(cat => {
+        const sum = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        if (sum > 0) { labels.push(cat.name); data.push(sum); colors.push(cat.color); categoryIds.push(cat.id); }
+      });
+      document.getElementById('emptyChartMsg').classList.toggle('hidden', data.length > 0);
+      if (doughnutChart) doughnutChart.destroy();
+      doughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }] },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '68%',
+          onClick: (evt, elements) => {
+            if (elements && elements.length > 0) {
+              const clickedCatId = categoryIds[elements[0].index];
+              const filterSelect = document.getElementById('filterCatSelect');
+              if (filterSelect.value === clickedCatId && chartFilteredExpenseOnly) { clearCategoryFilter(); }
+              else { filterSelect.value = clickedCatId; chartFilteredExpenseOnly = true; updateFilterBadgeUI(); renderTransactionsTable(); }
+            }
+          },
+          plugins: {
+            legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } },
+            tooltip: { callbacks: { label: (c) => { const total = c.dataset.data.reduce((a, b) => a + Number(b), 0); const pct = total > 0 ? ((Number(c.raw) / total) * 100).toFixed(1).replace('.', ',') : '0,0'; return ` ${c.label}: ${pct}%`; } } }
+          }
+        }
+      });
+    }
+
+    function renderCardsTab() {
+      const container = document.getElementById('cardsListContainer');
+      if (!appData.cards || appData.cards.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-darkBorder p-8">
+            <i class="fa-solid fa-credit-card text-4xl mb-3 text-purple-400 opacity-60"></i>
+            <h4 class="font-bold text-base text-slate-700 dark:text-slate-200">Você ainda não tem cartões cadastrados</h4>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-5">Cadastre o seu cartão para ter o controle do limite e acompanhar suas faturas.</p>
+            <button onclick="openCardModal()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-md">
+              <i class="fa-solid fa-plus mr-1"></i> Cadastrar Meu Primeiro Cartão
+            </button>
+          </div>
+        `;
+        return;
       }
 
-      saveToStorage();
-      closeTransactionModal();
-      renderAll();
+      container.innerHTML = appData.cards.map(card => {
+        const cardExpenses = appData.transactions
+          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.status !== 'card_paid')
+          .reduce((a, b) => a + Number(b.amount), 0);
+
+        const currentMonthInvoice = appData.transactions
+          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.billingMonth === currentMonthKey && t.status !== 'card_paid')
+          .reduce((a, b) => a + Number(b.amount), 0);
+
+        const totalUsed = Number(card.initialUsedLimit || 0) + cardExpenses;
+        const totalLimit = Number(card.totalLimit || 0);
+        const available = Math.max(0, totalLimit - totalUsed);
+        const pctUsed = totalLimit > 0 ? Math.min(100, Math.round((totalUsed / totalLimit) * 100)) : 0;
+
+        return `
+          <div class="bg-white dark:bg-darkCard rounded-3xl p-6 border border-slate-200 dark:border-darkBorder shadow-xl relative overflow-hidden flex flex-col justify-between" style="border-top: 5px solid ${card.brandColor || '#8b5cf6'}">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shadow-md" style="background:${card.brandColor || '#8b5cf6'}">
+                    <i class="fa-solid fa-credit-card"></i>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-base text-slate-800 dark:text-slate-100">${card.name}</h4>
+                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Crédito</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button type="button" onclick="editCard('${card.id}')" class="p-2 text-slate-400 hover:text-purple-400 transition" title="Editar Cartão"><i class="fa-solid fa-pen pointer-events-none"></i></button>
+                  <button type="button" onclick="deleteCard('${card.id}')" class="p-2 text-slate-400 hover:text-rose-400 transition" title="Excluir"><i class="fa-solid fa-trash pointer-events-none"></i></button>
+                </div>
+              </div>
+
+              <div class="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/60">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="text-slate-400">Limite Disponível</span>
+                  <strong class="text-emerald-500 font-bold text-sm">${formatCurrency(available)}</strong>
+                </div>
+                <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-300" style="width: ${pctUsed}%; background: ${pctUsed > 85 ? '#ef4444' : card.brandColor || '#8b5cf6'}"></div>
+                </div>
+                <div class="flex justify-between items-center text-[11px] text-slate-400">
+                  <span>Comprometido Total: <strong class="text-slate-700 dark:text-slate-200">${formatCurrency(totalUsed)}</strong></span>
+                  <span>Limite: <strong>${formatCurrency(totalLimit)}</strong></span>
+                </div>
+              </div>
+
+              <div class="mt-4 p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between text-xs">
+                <span class="text-purple-600 dark:text-purple-300 font-medium flex items-center gap-1.5">
+                  <i class="fa-solid fa-receipt"></i> Fatura em Aberto (${formatMonthLabel(currentMonthKey)}):
+                </span>
+                <strong class="text-purple-600 dark:text-purple-300 font-bold text-sm">${formatCurrency(currentMonthInvoice)}</strong>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 mt-3 text-xs">
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+                  <span class="text-[10px] uppercase text-slate-400 block font-semibold">Fechamento</span>
+                  <span class="font-bold text-slate-700 dark:text-slate-200">Todo dia ${card.closingDay}</span>
+                </div>
+                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
+                  <span class="text-[10px] uppercase text-slate-400 block font-semibold">Pagamento</span>
+                  <span class="font-bold text-indigo-400">Todo dia ${card.dueDay}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openCardModal() {
+      document.getElementById('cardModalTitle').innerHTML = '<i class="fa-solid fa-credit-card text-purple-500"></i> Cadastrar Cartão';
+      document.getElementById('cardIdInput').value = '';
+      document.getElementById('cardNameInput').value = '';
+      document.getElementById('cardTotalLimitInput').value = '';
+      document.getElementById('cardUsedLimitInput').value = '0';
+      document.getElementById('cardClosingDayInput').value = '25';
+      document.getElementById('cardDueDayInput').value = '5';
+      document.getElementById('cardColorInput').value = '#8b5cf6';
+      document.getElementById('cardModal').classList.remove('hidden');
     }
 
     function editCard(cardId) {
@@ -1451,18 +1599,6 @@
       document.getElementById('cardClosingDayInput').value = card.closingDay;
       document.getElementById('cardDueDayInput').value = card.dueDay;
       document.getElementById('cardColorInput').value = card.brandColor || '#8b5cf6';
-      document.getElementById('cardModal').classList.remove('hidden');
-    }
-
-    function openCardModal() {
-      document.getElementById('cardModalTitle').innerHTML = '<i class="fa-solid fa-credit-card text-purple-500"></i> Cadastrar Cartão';
-      document.getElementById('cardIdInput').value = '';
-      document.getElementById('cardNameInput').value = '';
-      document.getElementById('cardTotalLimitInput').value = '';
-      document.getElementById('cardUsedLimitInput').value = '0';
-      document.getElementById('cardClosingDayInput').value = '25';
-      document.getElementById('cardDueDayInput').value = '5';
-      document.getElementById('cardColorInput').value = '#8b5cf6';
       document.getElementById('cardModal').classList.remove('hidden');
     }
 
@@ -1575,6 +1711,123 @@
       document.getElementById('transactionModal').classList.add('hidden');
     }
 
+    // SALVAR LANÇAMENTO COM VALIDAÇÃO E ISOLAMENTO ESTRITO POR CARTÃO
+    function saveTransaction(e) {
+      e.preventDefault();
+      const id = document.getElementById('txIdInput').value;
+      const txDate = document.getElementById('txDateInput').value;
+      const desc = document.getElementById('txDescInput').value.trim();
+      const totalAmount = Number(document.getElementById('txAmountInput').value);
+      const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
+      const cardId = currentPaymentMethod === 'credit' ? document.getElementById('txCardIdInput').value : null;
+      const installments = (currentTxType === 'expense' && currentPaymentMethod === 'credit') ? Number(document.getElementById('txInstallmentsInput').value || 1) : 1;
+
+      // VALIDAÇÃO: PAGAMENTO DE FATURA DE CARTÃO
+      if (currentTxType === 'expense' && categoryId === 'cat_fatura') {
+        const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
+        const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
+        const targetCard = appData.cards.find(c => c.id === invoiceCardId);
+
+        if (!targetCard) {
+          alert('Por favor, selecione um cartão válido para realizar o pagamento da fatura.');
+          return;
+        }
+
+        const cardExpenses = appData.transactions
+          .filter(t => t.paymentMethod === 'credit' && t.cardId === invoiceCardId && t.status !== 'card_paid');
+        
+        const totalPendingDebt = cardExpenses.reduce((a, b) => a + Number(b.amount), 0) + Number(targetCard.initialUsedLimit || 0);
+
+        if (totalPendingDebt <= 0) {
+          alert(`O cartão "${targetCard.name}" não possui fatura em aberto nem limite comprometido para pagar.`);
+          return;
+        }
+
+        let pool = totalAmount;
+
+        const currentMonthTxs = cardExpenses.filter(t => (t.billingMonth || t.date.slice(0, 7)) === invoiceMonth);
+        const futureMonthTxs = cardExpenses
+          .filter(t => (t.billingMonth || t.date.slice(0, 7)) > invoiceMonth)
+          .sort((a, b) => (a.billingMonth || a.date).localeCompare(b.billingMonth || b.date));
+
+        const orderedQueue = [...currentMonthTxs, ...futureMonthTxs];
+
+        for (const tx of orderedQueue) {
+          if (pool <= 0) break;
+          const txAmt = Number(tx.amount);
+
+          if (pool >= txAmt) {
+            tx.status = 'card_paid';
+            pool -= txAmt;
+          } else {
+            tx.amount = Number((txAmt - pool).toFixed(2));
+            pool = 0;
+            break;
+          }
+        }
+
+        if (pool > 0 && Number(targetCard.initialUsedLimit || 0) > 0) {
+          targetCard.initialUsedLimit = Math.max(0, Number(targetCard.initialUsedLimit) - pool);
+        }
+      }
+
+      // LANÇAMENTO DE COMPRA PARCELADA NO CRÉDITO
+      if (currentPaymentMethod === 'credit' && cardId && installments > 1 && !id) {
+        const installmentAmount = Number((totalAmount / installments).toFixed(2));
+        const groupId = 'group_' + Date.now();
+
+        for (let i = 0; i < installments; i++) {
+          const billing = calculateCardBilling(cardId, txDate, i).billingMonth;
+          appData.transactions.push({
+            id: 'tx_' + Date.now() + '_' + i,
+            groupId: groupId,
+            type: 'expense',
+            paymentMethod: 'credit',
+            cardId: cardId,
+            billingMonth: billing,
+            description: `${desc} (${i + 1}/${installments})`,
+            amount: installmentAmount,
+            date: txDate,
+            categoryId: categoryId,
+            installmentsTotal: installments,
+            installmentNumber: i + 1,
+            status: 'paid'
+          });
+        }
+      } else {
+        let billingMonth = txDate.slice(0, 7);
+        if (currentPaymentMethod === 'credit' && cardId) {
+          billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
+        }
+
+        const txObj = {
+          id: id || 'tx_' + Date.now(),
+          type: currentTxType,
+          paymentMethod: currentTxType === 'expense' ? currentPaymentMethod : 'income',
+          cardId: cardId,
+          billingMonth: billingMonth,
+          description: desc,
+          amount: totalAmount,
+          date: txDate,
+          categoryId: categoryId,
+          installmentsTotal: 1,
+          installmentNumber: 1,
+          status: 'paid'
+        };
+
+        if (id) {
+          const idx = appData.transactions.findIndex(t => t.id === id);
+          if (idx > -1) appData.transactions[idx] = txObj;
+        } else {
+          appData.transactions.push(txObj);
+        }
+      }
+
+      saveToStorage();
+      closeTransactionModal();
+      renderAll();
+    }
+
     function editTransaction(id) {
       const tx = appData.transactions.find(t => t.id === id);
       if (!tx) return;
@@ -1654,4 +1907,23 @@
       const [y, m] = currentMonthKey.split('-').map(Number);
       let prevY = y, prevM = m - 1; if (prevM < 1) { prevM = 12; prevY--; }
       document.getElementById('compareMonthA').value = `${prevY}-${String(prevM).padStart(2, '0')}`;
-      document.getElementById('compareMonthB
+      document.getElementById('compareMonthB').value = currentMonthKey;
+    }
+
+    function renderComparisonDashboard() {
+      const [curY, curM] = currentMonthKey.split('-').map(Number);
+      const last6Keys = [];
+      for (let i = 5; i >= 0; i--) { let m = curM - i, y = curY; while (m < 1) { m += 12; y--; } last6Keys.push(`${y}-${String(m).padStart(2, '0')}`); }
+      const labels6 = last6Keys.map(k => { const [y, m] = k.split('-').map(Number); return `${MONTH_SHORT[m - 1]}/${String(y).slice(2)}`; });
+      const incomes6 = [], expenses6 = [], leftovers6 = [];
+      last6Keys.forEach(k => {
+        const sal = getSalaryForMonth(k), txs = appData.transactions.filter(t => getEffectiveMonthKey(t) === k);
+        const inc = sal + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
+        const exp = txs.filter(t => t.type === 'expense').reduce((a, b) => a + Number(b.amount), 0);
+        incomes6.push(inc); expenses6.push(exp); leftovers6.push((sal - exp) + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0));
+      });
+      const ctxBar = document.getElementById('sixMonthsBarChart').getContext('2d');
+      if (barChart) barChart.destroy();
+      barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: { labels
