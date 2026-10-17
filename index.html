@@ -187,7 +187,7 @@
             </div>
           </div>
           <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <span class="text-purple-400 font-medium"><i class="fa-regular fa-credit-card mr-1"></i>Faturas no Cartão: <strong id="cardCreditExpenses">R$ 0,00</strong></span>
+            <span class="text-purple-400 font-medium"><i class="fa-regular fa-credit-card mr-1"></i>Faturas Deste Mês: <strong id="cardCreditExpenses">R$ 0,00</strong></span>
             <span class="text-amber-500"><i class="fa-solid fa-clock mr-1"></i>Pendente: <strong id="cardPendingExpenses">R$ 0,00</strong></span>
           </div>
         </div>
@@ -196,7 +196,7 @@
           <div>
             <div class="flex justify-between items-start">
               <div>
-                <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Saldo em Conta (Real)</span>
+                <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Saldo Disponível em Conta</span>
                 <h2 id="cardRemaining" class="text-2xl sm:text-3xl font-bold text-indigo-500 mt-1">R$ 0,00</h2>
               </div>
               <div class="w-11 h-11 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-lg">
@@ -205,14 +205,14 @@
             </div>
             <div class="mt-4 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between text-xs">
               <span class="text-indigo-600 dark:text-indigo-300 font-medium flex items-center gap-1.5">
-                <i class="fa-solid fa-plus-minus"></i> Saldo Disponível c/ Extras:
+                <i class="fa-solid fa-plus-minus"></i> Saldo c/ Extras & Faturas:
               </span>
               <strong id="cardRemainingWithExtras" class="text-indigo-600 dark:text-indigo-300 font-bold">R$ 0,00</strong>
             </div>
           </div>
           <div class="mt-4">
             <div class="flex justify-between text-xs mb-1">
-              <span class="text-slate-400">Salário Comprometido</span>
+              <span class="text-slate-400">Comprometimento Mensal</span>
               <span id="cardPercentUsed" class="font-semibold text-slate-600 dark:text-slate-300">0%</span>
             </div>
             <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -226,7 +226,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-darkBorder pb-3">
         <div class="flex flex-wrap gap-2">
           <button onclick="switchTab('overview')" id="tabBtn-overview" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center gap-2">
-            <i class="fa-solid fa-receipt"></i> Lançamentos e Visão do Mês
+            <i class="fa-solid fa-receipt"></i> Lançamentos do Mês
           </button>
           <button onclick="switchTab('cards')" id="tabBtn-cards" class="tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-darkCard text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-darkBorder transition flex items-center gap-2">
             <i class="fa-solid fa-credit-card"></i> Cartões de Crédito
@@ -251,7 +251,7 @@
             <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Para onde foi seu dinheiro
+                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Despesas deste Mês (c/ Faturas)
                 </h3>
                 <span class="text-[11px] text-slate-400">Clique para filtrar</span>
               </div>
@@ -259,7 +259,7 @@
                 <canvas id="categoryDoughnutChart" class="cursor-pointer"></canvas>
                 <div id="emptyChartMsg" class="hidden absolute inset-0 flex flex-col items-center justify-center text-slate-400 text-xs text-center p-4">
                   <i class="fa-solid fa-chart-pie text-3xl mb-2 opacity-30"></i>
-                  Nenhum gasto registrado neste mês.
+                  Nenhum gasto registrado para este mês.
                 </div>
               </div>
             </div>
@@ -279,7 +279,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div class="flex items-center gap-2 flex-wrap">
                 <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                  <i class="fa-solid fa-list-check text-indigo-500"></i> Seus Gastos e Entradas
+                  <i class="fa-solid fa-list-check text-indigo-500"></i> Contas e Parcelas de <span id="tableCurrentMonthTitle" class="capitalize"></span>
                 </h3>
                 <button id="activeChartFilterBadge" onclick="clearCategoryFilter()" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-500/15 text-indigo-400 hover:bg-rose-500/15 hover:text-rose-400 transition">
                   <span id="activeChartFilterText">Filtrado</span>
@@ -302,7 +302,7 @@
                 <thead>
                   <tr class="border-b border-slate-200 dark:border-slate-700/70 text-[11px] uppercase tracking-wider text-slate-400">
                     <th class="py-3 px-2">Pagamento</th>
-                    <th class="py-3 px-2">Data</th>
+                    <th class="py-3 px-2">Data da Compra</th>
                     <th class="py-3 px-2">Descrição</th>
                     <th class="py-3 px-2">Categoria</th>
                     <th class="py-3 px-2 text-right">Valor</th>
@@ -414,7 +414,7 @@
         <div id="chatMessagesContainer" class="flex-1 p-4 overflow-y-auto custom-scroll space-y-3 text-xs">
           <div class="p-3 bg-indigo-50 dark:bg-slate-800/80 rounded-2xl rounded-tl-none border border-indigo-100 dark:border-slate-700 space-y-1">
             <p class="font-semibold text-indigo-500">Olá! Sou o seu consultor financeiro.</p>
-            <p class="text-slate-600 dark:text-slate-300">Posso analisar seus gastos, o uso do limite dos seus cartões e projetar faturas futuras. O que você gostaria de saber?</p>
+            <p class="text-slate-600 dark:text-slate-300">Posso analisar seus gastos, faturas futuras e parcelamentos. Como posso te ajudar?</p>
           </div>
         </div>
 
@@ -480,22 +480,22 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Limite Total (R$)</label>
-            <input type="number" step="0.01" min="1" id="cardTotalLimitInput" required placeholder="Ex: 5000.00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
+            <input type="number" step="0.01" min="1" id="cardTotalLimitInput" required placeholder="Ex: 5000.00" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Limite Já Comprometido (R$)</label>
-            <input type="number" step="0.01" min="0" id="cardUsedLimitInput" value="0.00" placeholder="Ex: 1200.00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
+            <input type="number" step="0.01" min="0" id="cardUsedLimitInput" value="0.00" placeholder="Ex: 1200.00" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Dia do Fechamento</label>
-            <input type="number" min="1" max="31" id="cardClosingDayInput" required placeholder="Ex: 25" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
+            <input type="number" min="1" max="31" id="cardClosingDayInput" required placeholder="Ex: 25" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Dia do Pagamento (Vencimento)</label>
-            <input type="number" min="1" max="31" id="cardDueDayInput" required placeholder="Ex: 05" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
+            <input type="number" min="1" max="31" id="cardDueDayInput" required placeholder="Ex: 05" class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
           </div>
         </div>
 
@@ -541,21 +541,47 @@
           </div>
         </div>
 
-        <!-- SELECIONAR QUAL CARTÃO DE CRÉDITO -->
-        <div id="txCreditCardSelectContainer" class="hidden">
-          <label class="block text-xs font-semibold uppercase text-purple-400 mb-1">Qual cartão você usou?</label>
-          <select id="txCardIdInput" class="w-full px-3.5 py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-semibold text-sm focus:outline-none"></select>
-          <p id="txBillingNotice" class="text-[10px] text-slate-400 mt-1 italic"></p>
+        <!-- SELECIONAR CARTÃO E PARCELAS (CRÉDITO) -->
+        <div id="txCreditCardSelectContainer" class="hidden space-y-3">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-purple-400 mb-1">Qual cartão você usou?</label>
+            <select id="txCardIdInput" onchange="updateBillingNotice()" class="w-full px-3.5 py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-semibold text-sm focus:outline-none"></select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold uppercase text-purple-400 mb-1">Parcelamento</label>
+              <select id="txInstallmentsInput" onchange="updateBillingNotice()" class="w-full px-3 py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-semibold text-xs focus:outline-none">
+                <option value="1">1x (À vista na fatura)</option>
+                <option value="2">2x</option>
+                <option value="3">3x</option>
+                <option value="4">4x</option>
+                <option value="5">5x</option>
+                <option value="6">6x</option>
+                <option value="7">7x</option>
+                <option value="8">8x</option>
+                <option value="9">9x</option>
+                <option value="10">10x</option>
+                <option value="12">12x</option>
+                <option value="18">18x</option>
+                <option value="24">24x</option>
+              </select>
+            </div>
+            <div class="flex flex-col justify-end">
+              <span id="installmentPreviewAmount" class="text-xs font-bold text-purple-400 mb-2">1x de R$ 0,00</span>
+            </div>
+          </div>
+          <p id="txBillingNotice" class="text-[10px] text-slate-400 italic bg-purple-500/5 p-2 rounded-lg border border-purple-500/10"></p>
         </div>
 
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Descrição</label>
-          <input type="text" id="txDescInput" required placeholder="Ex: Supermercado, Gasolina..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-indigo-500">
+          <input type="text" id="txDescInput" required placeholder="Ex: Supermercado, Celular..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-indigo-500">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Valor (R$)</label>
-            <input type="number" step="0.01" min="0.01" id="txAmountInput" required placeholder="0,00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
+            <label id="txAmountLabel" class="block text-xs font-semibold uppercase text-slate-400 mb-1">Valor Total (R$)</label>
+            <input type="number" step="0.01" min="0.01" id="txAmountInput" required oninput="updateBillingNotice()" placeholder="0,00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
           </div>
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Data da Compra</label>
@@ -846,7 +872,7 @@
       grid.innerHTML = MONTH_SHORT.map((mName, idx) => {
         const mNum = idx + 1;
         const mKey = `${pickerYear}-${String(mNum).padStart(2, '0')}`;
-        const hasData = appData.transactions.some(t => t.date.startsWith(mKey)) || appData.monthlySalaries[mKey] !== undefined;
+        const hasData = appData.transactions.some(t => getEffectiveMonthKey(t) === mKey) || appData.monthlySalaries[mKey] !== undefined;
         const isSelected = (pickerYear === activeY && mNum === activeM);
         return `<button onclick="selectMonthFromPicker(${pickerYear}, ${mNum})" class="py-2.5 px-2 rounded-xl transition relative flex flex-col items-center justify-center border ${isSelected ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-500/30' : 'bg-slate-50 dark:bg-slate-700/50 hover:bg-indigo-500/10 text-slate-700 dark:text-slate-200 border-transparent'}"><span>${mName}</span>${hasData ? `<span class="w-1.5 h-1.5 rounded-full mt-1 ${isSelected ? 'bg-white' : 'bg-emerald-400'}"></span>` : '<span class="w-1.5 h-1.5 mt-1"></span>'}</button>`;
       }).join('');
@@ -877,8 +903,49 @@
       } else { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
     }
 
+    // RETORNA EM QUAL MÊS O LANÇAMENTO IMPACTA A CONTA / FATURA
+    function getEffectiveMonthKey(tx) {
+      if (tx.type === 'expense' && tx.paymentMethod === 'credit' && tx.billingMonth) {
+        return tx.billingMonth;
+      }
+      return tx.date.slice(0, 7);
+    }
+
+    // CÁLCULO PRECISO DO CICLO DE FATURA DO CARTÃO (FECHAMENTO E VENCIMENTO)
+    function calculateCardBilling(cardId, txDateStr, monthOffset = 0) {
+      const card = appData.cards.find(c => c.id === cardId);
+      if (!card) return { billingMonth: txDateStr.slice(0, 7) };
+
+      const [y, m, d] = txDateStr.split('-').map(Number);
+      const closingDay = Number(card.closingDay);
+
+      let targetYear = y;
+      let targetMonth = m;
+
+      // Se a compra foi feita antes do fechamento (ex: dia 17 e fecha dia 25): a fatura fecha no mês atual e vence no próximo mês
+      // Se a compra foi feita após o fechamento: a fatura só fecha no mês seguinte e vence a 2 meses
+      if (d < closingDay) {
+        targetMonth += 1;
+      } else {
+        targetMonth += 2;
+      }
+
+      // Adiciona o mês de parcelamento
+      targetMonth += monthOffset;
+
+      while (targetMonth > 12) {
+        targetMonth -= 12;
+        targetYear += 1;
+      }
+
+      return {
+        billingMonth: `${targetYear}-${String(targetMonth).padStart(2, '0')}`
+      };
+    }
+
     function renderAll() {
       document.getElementById('currentMonthLabel').textContent = formatMonthLabel(currentMonthKey);
+      document.getElementById('tableCurrentMonthTitle').textContent = formatMonthLabel(currentMonthKey);
       populateCategorySelects();
       populateCardSelect();
       updateFilterBadgeUI();
@@ -891,42 +958,18 @@
       renderComparisonDashboard();
     }
 
-    // CÁLCULO DE DATA DE COBRANÇA DO CARTÃO (FECHAMENTO E VENCIMENTO)
-    function calculateCardBilling(cardId, txDateStr) {
-      const card = appData.cards.find(c => c.id === cardId);
-      if (!card) return { billingMonth: txDateStr.slice(0, 7), isNextMonth: false };
-
-      const [y, m, d] = txDateStr.split('-').map(Number);
-      const closingDay = Number(card.closingDay);
-
-      let targetYear = y;
-      let targetMonth = m;
-
-      // Se a compra foi feita após ou no dia de fechamento, a fatura vai para o próximo mês
-      if (d >= closingDay) {
-        targetMonth += 1;
-        if (targetMonth > 12) {
-          targetMonth = 1;
-          targetYear += 1;
-        }
-      }
-
-      return {
-        billingMonth: `${targetYear}-${String(targetMonth).padStart(2, '0')}`,
-        isNextMonth: (targetMonth !== m)
-      };
-    }
-
     function renderSummaryCards() {
       const baseSalary = getSalaryForMonth(currentMonthKey);
-      const monthTxs = appData.transactions.filter(t => t.date.startsWith(currentMonthKey));
+
+      // Transações que vencem ou impactam financeiramente este mês
+      const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
       // Gastos que saíram diretamente do dinheiro em conta (débito, pix, dinheiro)
       const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Gastos feitos no cartão de crédito neste mês
+      // Faturas de Cartão de Crédito com vencimento neste mês
       const creditExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
@@ -934,10 +977,11 @@
       const pendingExpenses = monthTxs.filter(t => t.type === 'expense' && t.status === 'pending')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // O saldo em dinheiro leva em conta o que realmente saiu da conta
-      const salaryRemaining = baseSalary - cashDebitExpenses;
+      // O saldo em dinheiro desconta as saídas diretas e as faturas que vencem neste mês
+      const totalOutflow = cashDebitExpenses + creditExpenses;
+      const salaryRemaining = baseSalary - totalOutflow;
       const totalRemainingWithExtras = salaryRemaining + extraIncome;
-      const percent = baseSalary > 0 ? Math.min(100, Math.round(((cashDebitExpenses + creditExpenses) / baseSalary) * 100)) : 0;
+      const percent = baseSalary > 0 ? Math.min(100, Math.round((totalOutflow / baseSalary) * 100)) : 0;
 
       document.getElementById('cardBaseSalary').textContent = formatCurrency(baseSalary);
       document.getElementById('cardExtraIncome').textContent = formatCurrency(extraIncome);
@@ -974,7 +1018,7 @@
         cardSelect.innerHTML = `<option value="">Nenhum cartão cadastrado</option>`;
         return;
       }
-      cardSelect.innerHTML = appData.cards.map(c => `<option value="${c.id}">${c.name} (Fecha dia ${c.closingDay})</option>`).join('');
+      cardSelect.innerHTML = appData.cards.map(c => `<option value="${c.id}">${c.name} (Fecha dia ${c.closingDay} / Vence dia ${c.dueDay})</option>`).join('');
     }
 
     function renderTransactionsTable() {
@@ -982,13 +1026,14 @@
       const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
       const catFilter = document.getElementById('filterCatSelect').value;
 
-      let list = appData.transactions.filter(t => t.date.startsWith(currentMonthKey))
+      // Lista as transações que pertencem financeiramente a este mês selecionado
+      let list = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey)
         .filter(t => t.description.toLowerCase().includes(search))
         .filter(t => catFilter === 'all' || (t.type === 'expense' && t.categoryId === catFilter))
         .sort((a, b) => b.date.localeCompare(a.date));
 
       if (list.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 block opacity-40"></i>Nenhum lançamento encontrado para <strong>${formatMonthLabel(currentMonthKey)}</strong>.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 block opacity-40"></i>Nenhum lançamento com impacto para <strong>${formatMonthLabel(currentMonthKey)}</strong>.</td></tr>`;
         return;
       }
 
@@ -1001,7 +1046,8 @@
           paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-arrow-up"></i> Recebido</span>`;
         } else if (t.paymentMethod === 'credit') {
           const card = appData.cards.find(c => c.id === t.cardId);
-          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-purple-500/15 text-purple-400" title="Fatura prevista: ${t.billingMonth || ''}"><i class="fa-solid fa-credit-card"></i> ${card ? card.name : 'Crédito'}</span>`;
+          const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
+          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-purple-500/15 text-purple-400" title="Vencimento na Fatura deste Mês"><i class="fa-solid fa-credit-card"></i> ${card ? card.name : 'Crédito'}${installmentTag}</span>`;
         } else if (t.paymentMethod === 'debit') {
           paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-blue-500/15 text-blue-400"><i class="fa-solid fa-money-check"></i> Débito</span>`;
         } else if (t.paymentMethod === 'cash') {
@@ -1031,7 +1077,7 @@
 
     function renderCategoryLimits() {
       const container = document.getElementById('categoryLimitsList');
-      const monthExpenses = appData.transactions.filter(t => t.date.startsWith(currentMonthKey) && t.type === 'expense');
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
       container.innerHTML = appData.categories.map(cat => {
         const spent = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
         const budget = Number(cat.budget || 0);
@@ -1047,7 +1093,7 @@
 
     function renderDoughnutChart() {
       const ctx = document.getElementById('categoryDoughnutChart').getContext('2d');
-      const monthExpenses = appData.transactions.filter(t => t.date.startsWith(currentMonthKey) && t.type === 'expense');
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
       const labels = [], data = [], colors = [], categoryIds = [];
       appData.categories.forEach(cat => {
         const sum = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
@@ -1094,9 +1140,14 @@
       }
 
       container.innerHTML = appData.cards.map(card => {
-        // Soma as despesas em aberto registradas no app para este cartão
+        // Todas as parcelas em aberto registradas no app que ainda não foram liquidadas
         const cardExpenses = appData.transactions
           .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.status !== 'card_paid')
+          .reduce((a, b) => a + Number(b.amount), 0);
+
+        // Fatura do mês selecionado
+        const currentMonthInvoice = appData.transactions
+          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.billingMonth === currentMonthKey)
           .reduce((a, b) => a + Number(b.amount), 0);
 
         const totalUsed = Number(card.initialUsedLimit || 0) + cardExpenses;
@@ -1133,27 +1184,35 @@
                   <div class="h-full rounded-full transition-all duration-300" style="width: ${pctUsed}%; background: ${pctUsed > 85 ? '#ef4444' : card.brandColor || '#8b5cf6'}"></div>
                 </div>
                 <div class="flex justify-between items-center text-[11px] text-slate-400">
-                  <span>Comprometido: <strong class="text-slate-700 dark:text-slate-200">${formatCurrency(totalUsed)}</strong></span>
-                  <span>Total: <strong>${formatCurrency(totalLimit)}</strong></span>
+                  <span>Comprometido Total: <strong class="text-slate-700 dark:text-slate-200">${formatCurrency(totalUsed)}</strong></span>
+                  <span>Limite: <strong>${formatCurrency(totalLimit)}</strong></span>
                 </div>
               </div>
 
+              <!-- FATURA DO MÊS ATUAL SELECIONADO -->
+              <div class="mt-4 p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between text-xs">
+                <span class="text-purple-600 dark:text-purple-300 font-medium flex items-center gap-1.5">
+                  <i class="fa-solid fa-receipt"></i> Fatura em ${formatMonthLabel(currentMonthKey)}:
+                </span>
+                <strong class="text-purple-600 dark:text-purple-300 font-bold text-sm">${formatCurrency(currentMonthInvoice)}</strong>
+              </div>
+
               <!-- DATAS DE CORTE E VENCIMENTO -->
-              <div class="grid grid-cols-2 gap-3 mt-4 text-xs">
+              <div class="grid grid-cols-2 gap-3 mt-3 text-xs">
                 <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                   <span class="text-[10px] uppercase text-slate-400 block font-semibold">Fechamento</span>
-                  <span class="font-bold text-slate-700 dark:text-slate-200">Dia ${card.closingDay}</span>
+                  <span class="font-bold text-slate-700 dark:text-slate-200">Todo dia ${card.closingDay}</span>
                 </div>
                 <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                   <span class="text-[10px] uppercase text-slate-400 block font-semibold">Pagamento</span>
-                  <span class="font-bold text-indigo-400">Dia ${card.dueDay}</span>
+                  <span class="font-bold text-indigo-400">Todo dia ${card.dueDay}</span>
                 </div>
               </div>
             </div>
 
             <div class="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
               <button onclick="payCardInvoice('${card.id}')" class="w-full py-2.5 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 text-purple-500 dark:text-purple-300 font-semibold text-xs transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-receipt"></i> Liquidar / Pagar Fatura
+                <i class="fa-solid fa-check"></i> Liquidar Fatura de ${formatMonthLabel(currentMonthKey)}
               </button>
             </div>
           </div>
@@ -1228,17 +1287,15 @@
     function payCardInvoice(cardId) {
       const card = appData.cards.find(c => c.id === cardId);
       if (!card) return;
-      if (confirm(`Deseja liquidar as faturas pendentes do cartão "${card.name}" e liberar o limite?`)) {
-        // Marca as transações em crédito como pagas
+      if (confirm(`Deseja liquidar a fatura de ${formatMonthLabel(currentMonthKey)} do cartão "${card.name}" e liberar o respectivo limite?`)) {
         appData.transactions.forEach(t => {
-          if (t.paymentMethod === 'credit' && t.cardId === cardId) {
+          if (t.paymentMethod === 'credit' && t.cardId === cardId && t.billingMonth === currentMonthKey) {
             t.status = 'card_paid';
           }
         });
-        card.initialUsedLimit = 0;
         saveToStorage();
         renderAll();
-        alert('Fatura liquidada e limite liberado com sucesso!');
+        alert(`Fatura de ${formatMonthLabel(currentMonthKey)} liquidada com sucesso!`);
       }
     }
 
@@ -1255,11 +1312,15 @@
       });
 
       const cardContainer = document.getElementById('txCreditCardSelectContainer');
+      const amountLabel = document.getElementById('txAmountLabel');
+
       if (method === 'credit') {
         cardContainer.classList.remove('hidden');
+        amountLabel.textContent = 'Valor Total da Compra (R$)';
         updateBillingNotice();
       } else {
         cardContainer.classList.add('hidden');
+        amountLabel.textContent = 'Valor (R$)';
       }
     }
 
@@ -1267,16 +1328,29 @@
       if (currentPaymentMethod !== 'credit') return;
       const cardId = document.getElementById('txCardIdInput').value;
       const dateVal = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
+      const installments = Number(document.getElementById('txInstallmentsInput').value || 1);
+      const totalAmount = Number(document.getElementById('txAmountInput').value || 0);
       const notice = document.getElementById('txBillingNotice');
+      const previewAmount = document.getElementById('installmentPreviewAmount');
+
+      const installmentValue = installments > 0 ? (totalAmount / installments) : totalAmount;
+      previewAmount.textContent = `${installments}x de ${formatCurrency(installmentValue)}`;
 
       if (!cardId) {
         notice.textContent = 'Cadastre um cartão na aba Cartões para vincular compras a prazo.';
         return;
       }
 
-      const res = calculateCardBilling(cardId, dateVal);
+      const res = calculateCardBilling(cardId, dateVal, 0);
       const [by, bm] = res.billingMonth.split('-').map(Number);
-      notice.innerHTML = `📅 Esta compra cairá na <strong>Fatura de ${MONTH_NAMES[bm - 1]} de ${by}</strong> (não desconta do saldo imediato em conta).`;
+
+      if (installments === 1) {
+        notice.innerHTML = `📅 Esta compra cairá na <strong>Fatura de ${MONTH_NAMES[bm - 1]} de ${by}</strong> (não desconta do saldo imediato em conta).`;
+      } else {
+        const lastRes = calculateCardBilling(cardId, dateVal, installments - 1);
+        const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
+        notice.innerHTML = `📅 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até a última em <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. O limite de ${formatCurrency(totalAmount)} é comprometido agora.`;
+      }
     }
 
     function openTransactionModal() {
@@ -1285,6 +1359,7 @@
       document.getElementById('txDescInput').value = '';
       document.getElementById('txAmountInput').value = '';
       document.getElementById('txDateInput').value = `${currentMonthKey}-10`;
+      document.getElementById('txInstallmentsInput').value = '1';
       setTxType('expense');
       setPaymentMethod('pix');
       populateCardSelect();
@@ -1299,34 +1374,64 @@
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
       const txDate = document.getElementById('txDateInput').value;
+      const desc = document.getElementById('txDescInput').value.trim();
+      const totalAmount = Number(document.getElementById('txAmountInput').value);
+      const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
       const cardId = currentPaymentMethod === 'credit' ? document.getElementById('txCardIdInput').value : null;
+      const installments = (currentTxType === 'expense' && currentPaymentMethod === 'credit') ? Number(document.getElementById('txInstallmentsInput').value || 1) : 1;
 
-      let billingMonth = txDate.slice(0, 7);
-      if (currentPaymentMethod === 'credit' && cardId) {
-        billingMonth = calculateCardBilling(cardId, txDate).billingMonth;
-      }
+      // Se for compra parcelada no crédito e um novo lançamento: gera cada parcela como registro
+      if (currentPaymentMethod === 'credit' && cardId && installments > 1 && !id) {
+        const installmentAmount = Number((totalAmount / installments).toFixed(2));
+        const groupId = 'group_' + Date.now();
 
-      const txObj = {
-        id: id || 'tx_' + Date.now(),
-        type: currentTxType,
-        paymentMethod: currentTxType === 'expense' ? currentPaymentMethod : 'income',
-        cardId: cardId,
-        billingMonth: billingMonth,
-        description: document.getElementById('txDescInput').value.trim(),
-        amount: Number(document.getElementById('txAmountInput').value),
-        date: txDate,
-        categoryId: currentTxType === 'expense' ? document.getElementById('txCatInput').value : null,
-        status: 'paid'
-      };
-
-      if (id) {
-        const idx = appData.transactions.findIndex(t => t.id === id);
-        if (idx > -1) appData.transactions[idx] = txObj;
+        for (let i = 0; i < installments; i++) {
+          const billing = calculateCardBilling(cardId, txDate, i).billingMonth;
+          appData.transactions.push({
+            id: 'tx_' + Date.now() + '_' + i,
+            groupId: groupId,
+            type: 'expense',
+            paymentMethod: 'credit',
+            cardId: cardId,
+            billingMonth: billing,
+            description: `${desc} (${i + 1}/${installments})`,
+            amount: installmentAmount,
+            date: txDate,
+            categoryId: categoryId,
+            installmentsTotal: installments,
+            installmentNumber: i + 1,
+            status: 'paid'
+          });
+        }
       } else {
-        appData.transactions.push(txObj);
+        let billingMonth = txDate.slice(0, 7);
+        if (currentPaymentMethod === 'credit' && cardId) {
+          billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
+        }
+
+        const txObj = {
+          id: id || 'tx_' + Date.now(),
+          type: currentTxType,
+          paymentMethod: currentTxType === 'expense' ? currentPaymentMethod : 'income',
+          cardId: cardId,
+          billingMonth: billingMonth,
+          description: desc,
+          amount: totalAmount,
+          date: txDate,
+          categoryId: categoryId,
+          installmentsTotal: 1,
+          installmentNumber: 1,
+          status: 'paid'
+        };
+
+        if (id) {
+          const idx = appData.transactions.findIndex(t => t.id === id);
+          if (idx > -1) appData.transactions[idx] = txObj;
+        } else {
+          appData.transactions.push(txObj);
+        }
       }
 
-      currentMonthKey = txObj.date.slice(0, 7);
       saveToStorage();
       closeTransactionModal();
       renderAll();
@@ -1346,12 +1451,25 @@
         setPaymentMethod(tx.paymentMethod || 'pix');
         if (tx.paymentMethod === 'credit' && tx.cardId) {
           document.getElementById('txCardIdInput').value = tx.cardId;
+          document.getElementById('txInstallmentsInput').value = tx.installmentsTotal || 1;
         }
       }
       document.getElementById('transactionModal').classList.remove('hidden');
     }
 
     function deleteTransaction(id) {
+      const tx = appData.transactions.find(t => t.id === id);
+      if (!tx) return;
+
+      if (tx.groupId) {
+        if (confirm('Este lançamento faz parte de uma compra parcelada. Deseja excluir todas as parcelas restantes desta compra?')) {
+          appData.transactions = appData.transactions.filter(t => t.groupId !== tx.groupId);
+          saveToStorage();
+          renderAll();
+          return;
+        }
+      }
+
       if (!confirm('Eliminar este lançamento?')) return;
       appData.transactions = appData.transactions.filter(t => t.id !== id);
       saveToStorage();
@@ -1407,7 +1525,7 @@
       const labels6 = last6Keys.map(k => { const [y, m] = k.split('-').map(Number); return `${MONTH_SHORT[m - 1]}/${String(y).slice(2)}`; });
       const incomes6 = [], expenses6 = [], leftovers6 = [];
       last6Keys.forEach(k => {
-        const sal = getSalaryForMonth(k), txs = appData.transactions.filter(t => t.date.startsWith(k));
+        const sal = getSalaryForMonth(k), txs = appData.transactions.filter(t => getEffectiveMonthKey(t) === k);
         const inc = sal + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
         const exp = txs.filter(t => t.type === 'expense').reduce((a, b) => a + Number(b.amount), 0);
         incomes6.push(inc); expenses6.push(exp); leftovers6.push((sal - exp) + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0));
@@ -1416,7 +1534,7 @@
       if (barChart) barChart.destroy();
       barChart = new Chart(ctxBar, {
         type: 'bar',
-        data: { labels: labels6, datasets: [{ label: 'Salário + Entradas', data: incomes6, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Total de Despesas', data: expenses6, backgroundColor: '#f43f5e', borderRadius: 6 }, { label: 'Saldo', data: leftovers6, backgroundColor: '#6366f1', borderRadius: 6 }] },
+        data: { labels: labels6, datasets: [{ label: 'Salário + Entradas', data: incomes6, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Total de Despesas (c/ Fatura)', data: expenses6, backgroundColor: '#f43f5e', borderRadius: 6 }, { label: 'Saldo', data: leftovers6, backgroundColor: '#6366f1', borderRadius: 6 }] },
         options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8' }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#33415533' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
       });
 
@@ -1425,13 +1543,13 @@
       document.getElementById('thMonthA').textContent = formatMonthLabel(monthA);
       document.getElementById('thMonthB').textContent = formatMonthLabel(monthB);
 
-      const expA = appData.transactions.filter(t => t.date.startsWith(monthA) && t.type === 'expense');
-      const expB = appData.transactions.filter(t => t.date.startsWith(monthB) && t.type === 'expense');
+      const expA = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthA && t.type === 'expense');
+      const expB = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthB && t.type === 'expense');
       const totalA = expA.reduce((a, b) => a + Number(b.amount), 0), totalB = expB.reduce((a, b) => a + Number(b.amount), 0), diffTotal = totalB - totalA;
 
       document.getElementById('comparisonSummaryCards').innerHTML = `
-        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total Gasto em ${formatMonthLabel(monthA)}</span><p class="text-xl font-bold text-indigo-400 mt-1">${formatCurrency(totalA)}</p></div>
-        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total Gasto em ${formatMonthLabel(monthB)}</span><p class="text-xl font-bold text-purple-400 mt-1">${formatCurrency(totalB)}</p></div>
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total em ${formatMonthLabel(monthA)}</span><p class="text-xl font-bold text-indigo-400 mt-1">${formatCurrency(totalA)}</p></div>
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total em ${formatMonthLabel(monthB)}</span><p class="text-xl font-bold text-purple-400 mt-1">${formatCurrency(totalB)}</p></div>
         <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Resultado</span><p class="text-xl font-bold mt-1 ${diffTotal <= 0 ? 'text-emerald-500' : 'text-rose-500'}">${diffTotal <= 0 ? `Poupou ${formatCurrency(Math.abs(diffTotal))}` : `Gastou +${formatCurrency(diffTotal)}`}</p></div>
       `;
 
@@ -1540,10 +1658,10 @@
         { id: 'card_c6', name: 'C6 Carbon', totalLimit: 8000, initialUsedLimit: 0, closingDay: 15, dueDay: 22, brandColor: '#242424' }
       ];
       appData.transactions = [
-        { id: 'ex1', type: 'expense', paymentMethod: 'pix', description: 'Aluguel + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, categoryId: 'cat_moradia', status: 'paid' },
+        { id: 'ex1', type: 'expense', paymentMethod: 'pix', description: 'Aluguel + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, billingMonth: currentMonthKey, categoryId: 'cat_moradia', status: 'paid' },
         { id: 'ex2', type: 'expense', paymentMethod: 'credit', cardId: 'card_nubank', billingMonth: currentMonthKey, description: 'Supermercado Mensal', amount: 820, date: `${currentMonthKey}-10`, categoryId: 'cat_mercado', status: 'paid' },
-        { id: 'ex3', type: 'expense', paymentMethod: 'debit', description: 'Combustível Posto Ipiranga', amount: 280, date: `${currentMonthKey}-12`, categoryId: 'cat_transporte', status: 'paid' },
-        { id: 'ex4', type: 'income', paymentMethod: 'income', description: 'Freelance & Consultoria', amount: 1200, date: `${currentMonthKey}-18`, categoryId: null, status: 'paid' }
+        { id: 'ex3', type: 'expense', paymentMethod: 'debit', description: 'Combustível Posto Ipiranga', amount: 280, date: `${currentMonthKey}-12`, billingMonth: currentMonthKey, categoryId: 'cat_transporte', status: 'paid' },
+        { id: 'ex4', type: 'income', paymentMethod: 'income', description: 'Freelance & Consultoria', amount: 1200, date: `${currentMonthKey}-18`, billingMonth: currentMonthKey, categoryId: null, status: 'paid' }
       ];
       saveToStorage(); renderAll(); document.getElementById('settingsMenu').classList.add('hidden');
     }
@@ -1573,7 +1691,7 @@
       saveToStorage(); renderAll(); document.getElementById('settingsMenu').classList.add('hidden');
     }
 
-    // ====== LÓGICA DO ASSISTENTE FINANCEIRO GEMINI COM CONTEXTO DE CARTÕES ======
+    // ====== LÓGICA DO ASSISTENTE FINANCEIRO GEMINI ======
     function toggleChatbot() {
       const win = document.getElementById('chatbotWindow');
       win.classList.toggle('hidden');
@@ -1606,12 +1724,12 @@
 
     function buildFinancialContext() {
       const baseSalary = getSalaryForMonth(currentMonthKey);
-      const monthTxs = appData.transactions.filter(t => t.date.startsWith(currentMonthKey));
+      const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extras = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
       const cashDebit = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit').reduce((a, b) => a + Number(b.amount), 0);
       const creditTotal = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit').reduce((a, b) => a + Number(b.amount), 0);
-      const saldo = (baseSalary - cashDebit) + extras;
+      const saldo = (baseSalary - (cashDebit + creditTotal)) + extras;
 
       const cardsSummary = (appData.cards || []).map(c => {
         const spent = appData.transactions.filter(t => t.paymentMethod === 'credit' && t.cardId === c.id && t.status !== 'card_paid').reduce((a, b) => a + Number(b.amount), 0);
@@ -1623,8 +1741,8 @@
 - Salário Base: R$ ${baseSalary.toFixed(2)}
 - Rendas Extras: R$ ${extras.toFixed(2)}
 - Gastos em Débito/PIX/Dinheiro: R$ ${cashDebit.toFixed(2)}
-- Gastos no Cartão de Crédito (Faturas): R$ ${creditTotal.toFixed(2)}
-- Saldo Restante Atual em Conta: R$ ${saldo.toFixed(2)}
+- Faturas de Cartão com vencimento neste mês: R$ ${creditTotal.toFixed(2)}
+- Saldo Restante em Conta: R$ ${saldo.toFixed(2)}
 - Situação dos Cartões: ${cardsSummary || 'Nenhum cartão cadastrado.'}`;
     }
 
@@ -1639,10 +1757,10 @@
 
       const sendBtn = document.getElementById('chatSendBtn');
       sendBtn.disabled = true;
-      appendChatMessage('system', 'Analisando finanças e limites em segundos...');
+      appendChatMessage('system', 'Analisando finanças em segundos...');
 
       const contextData = buildFinancialContext();
-      const prompt = `Você é o consultor financeiro do FinanControl Pro. Responda em no máximo 3 ou 4 frases bem práticas com valores em R$. Dê atenção tanto ao saldo em conta quanto ao limite e faturas dos cartões.
+      const prompt = `Você é o consultor financeiro do FinanControl Pro. Responda em no máximo 3 ou 4 frases bem práticas com valores em R$. Dê atenção tanto ao saldo em conta quanto ao limite e faturas futuras dos cartões.
 
 ${contextData}
 
