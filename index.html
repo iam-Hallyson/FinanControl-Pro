@@ -403,7 +403,7 @@
           </div>
 
           <div class="lg:col-span-2 space-y-6">
-            <!-- SEÇÃO 1: GASTOS DO MÊS (EFETIVOS + BOLETOS CONFIRMADOS) -->
+            <!-- SEÇÃO 1: GASTOS DO MÊS -->
             <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col">
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
                 <div class="flex items-center gap-2 flex-wrap">
@@ -443,7 +443,7 @@
               </div>
             </div>
 
-            <!-- SEÇÃO 2: LANÇAMENTOS FUTUROS (ANOTAÇÕES DE COMPRAS FEITAS NO MÊS QUE VENCEM DEPOIS) -->
+            <!-- SEÇÃO 2: LANÇAMENTOS FUTUROS -->
             <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col">
               <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-700/60">
                 <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
@@ -661,7 +661,7 @@
       </div>
     </div>
 
-    <!-- MODAL LANÇAMENTO DE GASTO / ENTRADA SIMPLIFICADO -->
+    <!-- MODAL LANÇAMENTO DE GASTO / ENTRADA UNIFICADO -->
     <div id="transactionModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade max-h-[92vh] overflow-y-auto custom-scroll">
         <div class="flex justify-between items-center mb-4">
@@ -679,26 +679,34 @@
             </button>
           </div>
 
-          <!-- FORMA DE PAGAMENTO SIMPLIFICADA (À VISTA vs PARCELAMENTO) -->
+          <!-- FORMA DE PAGAMENTO (À VISTA vs PARCELAMENTO) -->
           <div id="txPaymentMethodContainer">
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Como você pagou / contratou?</label>
             <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-bold">
-              <button type="button" onclick="setPaymentMode('avista')" id="btnModeAvista" class="py-2 rounded-lg text-center transition cursor-pointer bg-indigo-600 text-white shadow-sm">À Vista</button>
+              <button type="button" onclick="setPaymentMode('avista')" id="btnModeAvista" class="py-2 rounded-lg text-center transition cursor-pointer bg-indigo-600 text-white shadow-sm">À Vista (1x)</button>
               <button type="button" onclick="setPaymentMode('parcelado')" id="btnModeParcelado" class="py-2 rounded-lg text-center transition text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer">Parcelamento / A Prazo</button>
             </div>
           </div>
 
-          <!-- SUB-OPÇÕES DE À VISTA (Dinheiro, PIX, Débito) -->
+          <!-- SUB-OPÇÕES À VISTA (Dinheiro, PIX, Débito, Crédito 1x, Boleto 1x) -->
           <div id="txAvistaSubContainer" class="space-y-2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-700">
             <label class="block text-[11px] font-semibold uppercase text-slate-400 mb-1">Método À Vista</label>
-            <div class="grid grid-cols-3 gap-1.5 text-xs font-medium">
+            <div class="grid grid-cols-5 gap-1 text-[11px] font-medium">
               <button type="button" onclick="setAvistaSubMethod('cash')" id="btnAvistaCash" class="py-1.5 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700">Dinheiro</button>
-              <button type="button" onclick="setAvistaSubMethod('pix')" id="btnAvistaPix" class="py-1.5 rounded-lg text-center transition cursor-pointer bg-indigo-600 text-white">PIX</button>
+              <button type="button" onclick="setAvistaSubMethod('pix')" id="btnAvistaPix" class="py-1.5 rounded-lg text-center transition cursor-pointer bg-indigo-600 text-white font-bold">PIX</button>
               <button type="button" onclick="setAvistaSubMethod('debit')" id="btnAvistaDebit" class="py-1.5 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700">Débito</button>
+              <button type="button" onclick="setAvistaSubMethod('credit')" id="btnAvistaCredit" class="py-1.5 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700">Crédito 1x</button>
+              <button type="button" onclick="setAvistaSubMethod('boleto')" id="btnAvistaBoleto" class="py-1.5 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700">Boleto 1x</button>
+            </div>
+
+            <!-- Seletor de Cartão para Crédito 1x -->
+            <div id="txAvistaCardWrapper" class="hidden mt-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+              <label class="block text-[10px] uppercase font-bold text-purple-400 mb-1">Qual cartão?</label>
+              <select id="txAvistaCardIdInput" class="w-full px-2.5 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-300 text-xs font-semibold focus:outline-none"></select>
             </div>
           </div>
 
-          <!-- SUB-OPÇÕES DE PARCELAMENTO (Boleto vs Cartão) -->
+          <!-- SUB-OPÇÕES PARCELAMENTO (Boleto vs Cartão) -->
           <div id="txParceladoSubContainer" class="hidden space-y-3 p-3 rounded-xl bg-purple-500/10 border border-purple-500/20">
             <label class="block text-[11px] font-semibold uppercase text-purple-400 mb-1">Tipo de Parcelamento</label>
             <div class="grid grid-cols-2 gap-2 text-xs font-bold mb-2">
@@ -706,7 +714,7 @@
               <button type="button" onclick="setParceladoSubType('credit')" id="btnParceladoCredit" class="py-2 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700 text-slate-400">Cartão de Crédito</button>
             </div>
 
-            <!-- Seletor de Cartão (Visível apenas se escolher Cartão) -->
+            <!-- Seletor de Cartão para Parcelado Cartão -->
             <div id="txCardSelectWrapper" class="hidden">
               <label class="block text-xs font-semibold uppercase text-purple-300 mb-1">Qual cartão você usou?</label>
               <select id="txCardIdInput" onchange="updateBillingNotice()" class="w-full px-3 py-2 rounded-xl bg-purple-500/15 border border-purple-500/30 text-purple-300 font-semibold text-xs focus:outline-none"></select>
@@ -743,7 +751,7 @@
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label id="txAmountLabel" class="block text-xs font-semibold uppercase text-slate-400 mb-1">Valor Total (R$)</label>
+              <label id="txAmountLabel" class="block text-xs font-semibold uppercase text-slate-400 mb-1">Valor (R$)</label>
               <input type="number" step="0.01" min="0.01" id="txAmountInput" required oninput="updateBillingNotice()" placeholder="0,00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
             </div>
             <div>
@@ -756,7 +764,7 @@
             <select id="txCatInput" onchange="toggleInvoicePaymentFields()" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none"></select>
           </div>
 
-          <!-- CAMPOS EXCLUSIVOS PARA PAGAMENTO DE FATURA DE CARTÃO -->
+          <!-- CAMPOS EXCLUSIVOS PARA PAGAMENTO DE FATURA DE CARTÃO (COM PREENCHIMENTO AUTOMÁTICO E EDIÇÃO LIVRE) -->
           <div id="txInvoicePaymentContainer" class="hidden space-y-3 p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
             <div class="text-xs font-semibold text-purple-400 flex items-center gap-1.5">
               <i class="fa-solid fa-receipt"></i> Quitação de Fatura do Cartão
@@ -764,14 +772,14 @@
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Cartão Pago</label>
-                <select id="txInvoiceCardSelect" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold"></select>
+                <select id="txInvoiceCardSelect" onchange="autoFillInvoiceAmount()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold"></select>
               </div>
               <div>
                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Mês da Fatura</label>
-                <input type="month" id="txInvoiceMonthInput" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+                <input type="month" id="txInvoiceMonthInput" onchange="autoFillInvoiceAmount()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               </div>
             </div>
-            <p class="text-[10px] text-purple-300">💡 O pagamento quitará as contas deste cartão. Qualquer excedente amortizará a fatura seguinte sem alterar o valor original da compra.</p>
+            <p class="text-[10px] text-purple-300">💡 O valor da fatura é preenchido automaticamente, mas você pode editá-lo. Pagar a mais amortizará a fatura seguinte.</p>
           </div>
 
           <!-- CAMPOS EXCLUSIVOS PARA PAGAMENTO DE BOLETO PENDENTE -->
@@ -850,7 +858,7 @@
     const CLIENT_ID = '36156789113-4ckjb57b2ulfoebtgm83kqrm29q8cmc1.apps.googleusercontent.com';
     const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
     const FILE_NAME = 'financontrol_data.json';
-    const STORAGE_KEY = 'financontrol_pro_v7_data';
+    const STORAGE_KEY = 'financontrol_pro_v8_data';
     const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const MONTH_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const AVAILABLE_ICONS = [
@@ -885,9 +893,8 @@
     let pickerYear = now.getFullYear();
     let currentTxType = 'expense';
     
-    // Novas variáveis para o fluxo simplificado
     let paymentMode = 'avista'; // 'avista' ou 'parcelado'
-    let avistaSubMethod = 'pix'; // 'cash', 'pix', 'debit'
+    let avistaSubMethod = 'pix'; // 'cash', 'pix', 'debit', 'credit', 'boleto'
     let parceladoSubType = 'boleto'; // 'boleto', 'credit'
 
     let selectedIcon = 'fa-house';
@@ -1265,7 +1272,6 @@
       return Math.max(0, orig - disc);
     }
 
-    // Verifica se um boleto pendente está vencido (data atual > data de vencimento da parcela)
     function isBoletoOverdue(tx) {
       if (isBoletoSettled(tx)) return false;
       const todayStr = now.toISOString().slice(0, 10);
@@ -1282,6 +1288,7 @@
       renderSummaryCards();
       renderRule503020();
       renderTransactionsTable();
+      renderFutureTransactionsTable();
       renderCategoryLimits();
       renderDoughnutChart();
       renderCardsTab();
@@ -1294,7 +1301,7 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      // Saídas efetivas: À vista + Boletos marcados como pagos no mês + Faturas de cartão quitadas
+      // Saídas efetivas reais
       const cashOutflows = monthTxs.filter(t => {
         if (t.type !== 'expense') return false;
         if (!isDeferredMethod(t.paymentMethod)) return true;
@@ -1302,11 +1309,12 @@
         if (t.paymentMethod === 'credit' && isCardSettled(t)) return true;
         return false;
       }).reduce((a, b) => {
-        if (b.paymentMethod === 'boleto' || b.paymentMethod === 'credit') return a + getTxPendingAmount(b) === 0 ? Number(b.amount) : 0; // Se pago, soma o valor efetivo
+        if (b.paymentMethod === 'boleto' || b.paymentMethod === 'credit') {
+          return a + (isTxSettled(b) ? Number(b.amount) : 0);
+        }
         return a + Number(b.amount);
       }, 0);
 
-      // Previsão de faturas/boletos pendentes que vencem neste mês
       const totalDeferredPending = monthTxs.filter(t => t.type === 'expense' && isDeferredMethod(t.paymentMethod) && !isTxSettled(t))
         .reduce((a, b) => a + getTxPendingAmount(b), 0);
 
@@ -1485,15 +1493,19 @@
 
     function populateCardSelect() {
       const cardSelect = document.getElementById('txCardIdInput');
+      const avistaCardSelect = document.getElementById('txAvistaCardIdInput');
       const invoiceCardSelect = document.getElementById('txInvoiceCardSelect');
+
       if (!appData.cards || appData.cards.length === 0) {
-        cardSelect.innerHTML = `<option value="">Nenhum cartão cadastrado</option>`;
-        invoiceCardSelect.innerHTML = `<option value="">Nenhum cartão</option>`;
+        if(cardSelect) cardSelect.innerHTML = `<option value="">Nenhum cartão cadastrado</option>`;
+        if(avistaCardSelect) avistaCardSelect.innerHTML = `<option value="">Nenhum cartão cadastrado</option>`;
+        if(invoiceCardSelect) invoiceCardSelect.innerHTML = `<option value="">Nenhum cartão</option>`;
         return;
       }
       const opts = appData.cards.map(c => `<option value="${c.id}">${c.name} (Fecha ${c.closingDay} / Vence ${c.dueDay})</option>`).join('');
-      cardSelect.innerHTML = opts;
-      invoiceCardSelect.innerHTML = opts;
+      if(cardSelect) cardSelect.innerHTML = opts;
+      if(avistaCardSelect) avistaCardSelect.innerHTML = opts;
+      if(invoiceCardSelect) invoiceCardSelect.innerHTML = opts;
     }
 
     function populatePendingBoletosSelect() {
@@ -1533,6 +1545,25 @@
       }
     }
 
+    // AUTO-PREENCHIMENTO DO VALOR DA FATURA DE CARTÃO AO SELECIONAR CARTÃO E MÊS
+    function autoFillInvoiceAmount() {
+      const cardId = document.getElementById('txInvoiceCardSelect').value;
+      const monthKey = document.getElementById('txInvoiceMonthInput').value;
+      if (!cardId || !monthKey) return;
+
+      const matchingTxs = appData.transactions.filter(t =>
+        t.paymentMethod === 'credit' &&
+        t.cardId === cardId &&
+        (t.billingMonth || (t.date || '').slice(0, 7)) === monthKey &&
+        !isCardSettled(t)
+      );
+
+      const totalInvoice = matchingTxs.reduce((acc, curr) => acc + getTxPendingAmount(curr), 0);
+      if (totalInvoice > 0) {
+        document.getElementById('txAmountInput').value = totalInvoice.toFixed(2);
+      }
+    }
+
     function toggleInvoicePaymentFields() {
       const catVal = document.getElementById('txCatInput').value;
       const invContainer = document.getElementById('txInvoicePaymentContainer');
@@ -1542,6 +1573,7 @@
         invContainer.classList.remove('hidden');
         bolContainer.classList.add('hidden');
         document.getElementById('txInvoiceMonthInput').value = currentMonthKey;
+        autoFillInvoiceAmount();
       } else if (catVal === 'cat_boleto' && paymentMode === 'avista') {
         bolContainer.classList.remove('hidden');
         invContainer.classList.add('hidden');
@@ -1553,16 +1585,14 @@
       }
     }
 
-    // TABELA 1: GASTOS DO MÊS (EFETIVOS + BOLETOS DO MÊS)
+    // TABELA 1: GASTOS DO MÊS
     function renderTransactionsTable() {
       const tbody = document.getElementById('transactionsTableBody');
       const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
       const catFilter = document.getElementById('filterCatSelect').value;
 
-      // Filtra transações cujo mês efetivo (vencimento/cobrança) seja o mês atual
       let rawList = appData.transactions.filter(t => {
-        const belongsToEffective = getEffectiveMonthKey(t) === currentMonthKey;
-        return belongsToEffective;
+        return getEffectiveMonthKey(t) === currentMonthKey;
       })
       .filter(t => (t.description || '').toLowerCase().includes(search))
       .filter(t => catFilter === 'all' || (t.type === 'expense' && t.categoryId === catFilter));
@@ -1606,7 +1636,6 @@
           if (isPaid) {
             paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-circle-check"></i> Boleto${installmentTag} (Pago)</span>`;
           } else {
-            // Flag de confirmação de pagamento direto na linha + Alerta de atenção (amarelo) ou Vencido (vermelho)
             const badgeBg = isOverdue ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30 animate-pulse';
             const textAlert = isOverdue ? '❌ Boleto Vencido / Atrasado' : '⚠️ Boleto em aberto (Atenção)';
             paymentBadge = `
@@ -1634,7 +1663,7 @@
           return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium" style="background:${cat.color}18; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i> ${cat.name}</span>`; 
         })() : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-chart-line"></i> Extra</span>`;
 
-        // TRAVA RIGOROSA (Cadeado): Se for lançamento de cartão/boleto em mês posterior ao da compra original, bloqueia edição/exclusão
+        // TRAVA RIGOROSA (Cadeado): Bloqueia edição/exclusão se for parcela filha fora do mês original
         const isFutureOrInstallmentChild = (t.installmentsTotal > 1 || t.paymentMethod === 'credit') && !(t.date || '').startsWith(currentMonthKey);
         let actionsHtml = '';
         if (isFutureOrInstallmentChild) {
@@ -1663,25 +1692,34 @@
       }).join('');
     }
 
-    // TABELA 2: LANÇAMENTOS FUTUROS (ANOTAÇÕES DE COMPRAS FEITAS NO MÊS QUE VENCEM DEPOIS)
+    // TABELA 2: LANÇAMENTOS FUTUROS (CORRIGIDO PARA EXIBIR COMPRAS FEITAS NO MÊS QUE VENCEM APÓS)
     function renderFutureTransactionsTable() {
       const tbody = document.getElementById('futureTransactionsTableBody');
       
-      // Filtra compras parceladas ou no crédito realizadas NO MÊS ATUAL, mas cujo vencimento é em meses futuros
       const futureList = appData.transactions.filter(t => {
         const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
         const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
-        return isPurchasedHere && !isEffectiveHere && isDeferredMethod(t.paymentMethod);
+        // Exibe se foi comprado neste mês mas o vencimento efetivo é posterior
+        return isPurchasedHere && !isEffectiveHere && (isDeferredMethod(t.paymentMethod) || (t.installmentsTotal && t.installmentsTotal > 1));
       });
 
-      futureList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      // Remove duplicados de grupo para exibir apenas a linha consolidada/mãe da anotação
+      const uniqueMap = new Map();
+      futureList.forEach(t => {
+        const key = t.groupId || t.id;
+        if (!uniqueMap.has(key)) {
+          uniqueMap.set(key, t);
+        }
+      });
+      const uniqueFutureList = Array.from(uniqueMap.values());
+      uniqueFutureList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
-      if (futureList.length === 0) {
+      if (uniqueFutureList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 text-xs italic">Nenhuma compra parcelada ou a prazo registrada neste mês para meses futuros.</td></tr>`;
         return;
       }
 
-      tbody.innerHTML = futureList.map(t => {
+      tbody.innerHTML = uniqueFutureList.map(t => {
         const [y, m, d] = (t.date || '2026-01-01').split('-');
         const [by, bm] = (t.billingMonth || '').split('-').map(Number);
         const card = t.cardId ? appData.cards.find(c => c.id === t.cardId) : null;
@@ -1694,16 +1732,17 @@
         let catBadge = `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium" style="background:${cat.color}18; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i> ${cat.name}</span>`;
 
         const totalOrig = t.originalTotalAmount ? Number(t.originalTotalAmount) : Number(t.amount) * Number(t.installmentsTotal || 1);
+        const cleanDesc = t.description.replace(/\s\(\d+\/\d+\)$/, '');
 
         return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
           <td class="py-3 px-2">
             <div class="inline-flex flex-col">
               ${typeBadge}
-              <span class="text-[9px] text-slate-400 mt-0.5">1ª parc. em: ${MONTH_SHORT[bm - 1]}/${by} (${t.installmentsTotal || 1}x)</span>
+              <span class="text-[9px] text-slate-400 mt-0.5">1ª parc. em: ${MONTH_SHORT[bm - 1] || 'Próx'}/${by || y} (${t.installmentsTotal || 1}x)</span>
             </div>
           </td>
           <td class="py-3 px-2 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${d}/${m}/${y}</td>
-          <td class="py-3 px-2 font-medium text-slate-800 dark:text-slate-100">${t.description}</td>
+          <td class="py-3 px-2 font-medium text-slate-800 dark:text-slate-100">${cleanDesc}</td>
           <td class="py-3 px-2">${catBadge}</td>
           <td class="py-3 px-2 text-right font-bold text-indigo-400 whitespace-nowrap">${formatCurrency(totalOrig)}</td>
           <td class="py-3 px-2 text-center whitespace-nowrap">
@@ -1801,7 +1840,7 @@
         const totalUsed = Number(card.initialUsedLimit || 0) + cardExpenses;
         const totalLimit = Number(card.totalLimit || 0);
         const available = Math.max(0, totalLimit - totalUsed);
-        const pctUsed = totalLimit > 0 ? Math.min(100, Math.round((totalUsed / totalLimit) * 100)) : 0;
+        const pctUsed = totalLimit > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
 
         return `
           <div class="bg-white dark:bg-darkCard rounded-3xl p-6 border border-slate-200 dark:border-darkBorder shadow-xl relative overflow-hidden flex flex-col justify-between" style="border-top: 5px solid ${card.brandColor || '#8b5cf6'}">
@@ -1920,7 +1959,7 @@
       renderAll();
     }
 
-    // CONTROLE DO MODAL SIMPLIFICADO: À VISTA vs PARCELAMENTO
+    // CONTROLE DO MODAL: À VISTA (com crédito 1x e boleto 1x) vs PARCELAMENTO
     function setPaymentMode(mode) {
       paymentMode = mode;
       const btnAvista = document.getElementById('btnModeAvista');
@@ -1945,7 +1984,7 @@
 
     function setAvistaSubMethod(method) {
       avistaSubMethod = method;
-      ['cash', 'pix', 'debit'].forEach(m => {
+      ['cash', 'pix', 'debit', 'credit', 'boleto'].forEach(m => {
         const btn = document.getElementById(`btnAvista${m.charAt(0).toUpperCase() + m.slice(1)}`);
         if (!btn) return;
         if (m === method) {
@@ -1954,6 +1993,14 @@
           btn.className = 'py-1.5 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300';
         }
       });
+
+      const cardWrapper = document.getElementById('txAvistaCardWrapper');
+      if (method === 'credit') {
+        cardWrapper.classList.remove('hidden');
+      } else {
+        cardWrapper.classList.add('hidden');
+      }
+
       toggleInvoicePaymentFields();
     }
 
@@ -2030,7 +2077,7 @@
 
     function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
 
-    // SALVAR LANÇAMENTO (COM CORREÇÃO NA EDIÇÃO DE PARCELADOS E FLUXO SIMPLIFICADO)
+    // SALVAR LANÇAMENTO UNIFICADO (COM SUPORTE A CRÉDITO 1X, BOLETO 1X E CORREÇÃO DE EDIÇÃO/DUPLICIDADE)
     function saveTransaction(e) {
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
@@ -2043,7 +2090,11 @@
       let cardId = null;
       let installments = 1;
 
-      if (paymentMode === 'parcelado') {
+      if (paymentMode === 'avista') {
+        if (avistaSubMethod === 'credit') {
+          cardId = document.getElementById('txAvistaCardIdInput').value;
+        }
+      } else {
         installments = Number(document.getElementById('txInstallmentsInput').value || 2);
         if (parceladoSubType === 'credit') {
           paymentMethod = 'credit';
@@ -2053,10 +2104,9 @@
         }
       }
 
-      // SE ESTIVER EDITANDO UM LANÇAMENTO EXISTENTE
+      // LIMPEZA SEGURA AO EDITAR (REMOVE O REGISTRO ANTERIOR OU O GRUPO ANTERIOR INTEIRO)
       if (id) {
-        // Se for parcelado e tiver groupId, remove o grupo antigo inteiro para recriar limpo sem bagunça
-        const existingTx = appData.transactions.find(t => t.id === id);
+        const existingTx = appData.transactions.find(t => t.id === id || t.groupId === id);
         if (existingTx && existingTx.groupId) {
           appData.transactions = appData.transactions.filter(t => t.groupId !== existingTx.groupId);
         } else {
@@ -2064,7 +2114,7 @@
         }
       }
 
-      // VALIDAÇÃO E LIQUIDAÇÃO DE FATURA DE CARTÃO
+      // 1. VALIDAÇÃO E LIQUIDAÇÃO DE FATURA DE CARTÃO (COM PREENCHIMENTO AUTOMÁTICO E EXCEDENTE)
       if (currentTxType === 'expense' && categoryId === 'cat_fatura' && paymentMode === 'avista') {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
@@ -2082,11 +2132,6 @@
 
         if (totalPendingDebt <= 0) {
           alert(`O cartão "${targetCard.name}" não possui fatura em aberto nem limite comprometido para pagar.`);
-          return;
-        }
-
-        if (totalAmount > totalPendingDebt) {
-          alert(`O valor de ${formatCurrency(totalAmount)} excede a dívida total deste cartão (${formatCurrency(totalPendingDebt)}).`);
           return;
         }
 
@@ -2150,7 +2195,7 @@
         }
       }
 
-      // BAIXA DE BOLETO PENDENTE
+      // 2. BAIXA DE BOLETO PENDENTE
       if (currentTxType === 'expense' && categoryId === 'cat_boleto' && paymentMode === 'avista') {
         const targetBoletoId = document.getElementById('txBoletoTargetSelect').value;
         if (targetBoletoId) {
@@ -2161,7 +2206,7 @@
         }
       }
 
-      // CRIAÇÃO DE PARCELAMENTO (CARTÃO OU BOLETO)
+      // 3. CRIAÇÃO DE PARCELAMENTO OU 1X (CRÉDITO / BOLETO / OUTROS)
       if (paymentMode === 'parcelado' && installments > 1) {
         if (paymentMethod === 'credit' && !cardId) {
           alert('Selecione um cartão de crédito válido.');
@@ -2230,7 +2275,7 @@
     }
 
     function editTransaction(id) {
-      const tx = appData.transactions.find(t => t.id === id);
+      const tx = appData.transactions.find(t => t.id === id || t.groupId === id);
       if (!tx) return;
       document.getElementById('txModalTitle').textContent = 'Editar Lançamento';
       document.getElementById('txIdInput').value = tx.groupId || tx.id;
@@ -2240,7 +2285,7 @@
       setTxType(tx.type);
       if (tx.type === 'expense') {
         document.getElementById('txCatInput').value = tx.categoryId;
-        if (isDeferredMethod(tx.paymentMethod)) {
+        if (isDeferredMethod(tx.paymentMethod) && (tx.installmentsTotal || 1) > 1) {
           setPaymentMode('parcelado');
           if (tx.paymentMethod === 'credit') {
             setParceladoSubType('credit');
@@ -2252,6 +2297,9 @@
         } else {
           setPaymentMode('avista');
           setAvistaSubMethod(tx.paymentMethod);
+          if (tx.paymentMethod === 'credit' && tx.cardId) {
+            document.getElementById('txAvistaCardIdInput').value = tx.cardId;
+          }
         }
         toggleInvoicePaymentFields();
       }
