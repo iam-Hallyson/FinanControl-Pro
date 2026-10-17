@@ -175,7 +175,7 @@
             </div>
           </div>
           <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-right">
-            <button onclick="openSalaryModal()" class="text-[11px] text-indigo-500 hover:text-indigo-400 font-semibold">Configurar Salário</button>
+            <button onclick="openSalaryModal()" class="text-[11px] text-indigo-500 hover:text-indigo-400 font-semibold cursor-pointer">Configurar Salário</button>
           </div>
         </div>
 
@@ -264,7 +264,7 @@
               <p class="text-[11px] text-slate-400">Diretriz sobre o Salário Líquido deste mês (<span id="rule50BaseSalary" class="font-semibold text-slate-300">R$ 0,00</span>)</p>
             </div>
           </div>
-          <button onclick="openRuleModal()" class="text-xs font-semibold text-indigo-500 hover:text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 self-start sm:self-auto">
+          <button onclick="openRuleModal()" class="text-xs font-semibold text-indigo-500 hover:text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer">
             <i class="fa-solid fa-sliders"></i> Ajustar Regra de Divisão
           </button>
         </div>
@@ -360,7 +360,7 @@
           </button>
         </div>
 
-        <button onclick="openTransactionModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/30 transition flex items-center justify-center gap-2">
+        <button onclick="openTransactionModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold text-sm shadow-lg shadow-indigo-500/30 transition flex items-center justify-center gap-2 cursor-pointer">
           <i class="fa-solid fa-plus"></i> Novo Lançamento
         </button>
       </div>
@@ -390,7 +390,7 @@
                 <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
                   <i class="fa-solid fa-bullseye text-rose-500"></i> Gastos vs. Limite da Categoria
                 </h3>
-                <button onclick="switchTab('categories')" class="text-xs text-indigo-500 hover:underline">Editar limites</button>
+                <button onclick="switchTab('categories')" class="text-xs text-indigo-500 hover:underline cursor-pointer">Editar limites</button>
               </div>
               <div id="categoryLimitsList" class="space-y-3.5 max-h-80 overflow-y-auto custom-scroll pr-1"></div>
             </div>
@@ -446,7 +446,7 @@
             </h3>
             <p class="text-xs text-slate-400 mt-0.5">Cadastre seus cartões, controle seus limites e acompanhe o fechamento das faturas.</p>
           </div>
-          <button onclick="openCardModal()" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg shadow-purple-500/20 transition flex items-center gap-2">
+          <button onclick="openCardModal()" class="px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-lg shadow-purple-500/20 transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-plus"></i> Cadastrar Novo Cartão
           </button>
         </div>
@@ -503,7 +503,7 @@
             </h3>
             <p class="text-xs text-slate-400 mt-0.5">Defina as cores, ícones, limites e o grupo da regra de divisão.</p>
           </div>
-          <button onclick="openCategoryModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-500/20 transition flex items-center gap-2">
+          <button onclick="openCategoryModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-500/20 transition flex items-center gap-2 cursor-pointer">
             <i class="fa-solid fa-plus"></i> Criar Nova Categoria
           </button>
         </div>
@@ -518,7 +518,7 @@
           <h3 class="font-bold text-lg flex items-center gap-2">
             <i class="fa-solid fa-money-bill-wave text-emerald-500"></i> Configurar Salário Base
           </h3>
-          <button onclick="closeSalaryModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+          <button onclick="closeSalaryModal()" class="text-slate-400 hover:text-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
         <form onsubmit="saveSalary(event)" class="space-y-4">
           <div>
@@ -530,8 +530,8 @@
             <span>Usar automaticamente este valor para todos os meses seguintes.</span>
           </label>
           <div class="flex justify-end gap-2 pt-2">
-            <button type="button" onclick="closeSalaryModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800">Cancelar</button>
-            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white">Salvar Salário</button>
+            <button type="button" onclick="closeSalaryModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer">Salvar Salário</button>
           </div>
         </form>
       </div>
@@ -544,7 +544,7 @@
           <h3 class="font-bold text-lg flex items-center gap-2">
             <i class="fa-solid fa-sliders text-indigo-500"></i> Personalizar Regra de Distribuição
           </h3>
-          <button onclick="closeRuleModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+          <button onclick="closeRuleModal()" class="text-slate-400 hover:text-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
         <form onsubmit="saveCustomRule(event)" class="space-y-4">
           <p class="text-xs text-slate-400">Personalize a proporção do seu salário. A soma das porcentagens deve totalizar exatamente 100%.</p>
@@ -565,10 +565,10 @@
           </div>
 
           <div class="flex justify-between items-center pt-2">
-            <button type="button" onclick="resetDefaultRule()" class="text-xs text-indigo-400 hover:underline">Restaurar Padrão 50/30/20</button>
+            <button type="button" onclick="resetDefaultRule()" class="text-xs text-indigo-400 hover:underline cursor-pointer">Restaurar Padrão 50/30/20</button>
             <div class="flex gap-2">
-              <button type="button" onclick="closeRuleModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800">Cancelar</button>
-              <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">Salvar Regra</button>
+              <button type="button" onclick="closeRuleModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
+              <button type="submit" class="px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">Salvar Regra</button>
             </div>
           </div>
         </form>
@@ -582,7 +582,7 @@
           <h3 id="cardModalTitle" class="font-bold text-lg flex items-center gap-2">
             <i class="fa-solid fa-credit-card text-purple-500"></i> Cadastrar Cartão de Crédito
           </h3>
-          <button onclick="closeCardModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+          <button onclick="closeCardModal()" class="text-slate-400 hover:text-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
         <form onsubmit="saveCard(event)" class="space-y-4">
           <input type="hidden" id="cardIdInput">
@@ -619,8 +619,8 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2">
-            <button type="button" onclick="closeCardModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800">Cancelar</button>
-            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white">Salvar Cartão</button>
+            <button type="button" onclick="closeCardModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white cursor-pointer">Salvar Cartão</button>
           </div>
         </form>
       </div>
@@ -631,15 +631,15 @@
       <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade">
         <div class="flex justify-between items-center mb-4">
           <h3 id="txModalTitle" class="font-bold text-lg">Novo Lançamento</h3>
-          <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+          <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
         <form onsubmit="saveTransaction(event)" class="space-y-4">
           <input type="hidden" id="txIdInput">
           <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl">
-            <button type="button" id="btnTypeExpense" onclick="setTxType('expense')" class="py-2 rounded-lg text-xs font-bold bg-rose-500 text-white transition">
+            <button type="button" id="btnTypeExpense" onclick="setTxType('expense')" class="py-2 rounded-lg text-xs font-bold bg-rose-500 text-white transition cursor-pointer">
               <i class="fa-solid fa-arrow-down mr-1"></i> Despesa / Gasto
             </button>
-            <button type="button" id="btnTypeIncome" onclick="setTxType('income')" class="py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition">
+            <button type="button" id="btnTypeIncome" onclick="setTxType('income')" class="py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition cursor-pointer">
               <i class="fa-solid fa-arrow-up mr-1"></i> Renda Extra
             </button>
           </div>
@@ -648,10 +648,10 @@
           <div id="txPaymentMethodContainer">
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Como você pagou?</label>
             <div class="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-[11px] font-semibold">
-              <button type="button" onclick="setPaymentMethod('cash')" id="btnMethodCash" class="py-1.5 rounded-lg text-center transition">Dinheiro</button>
-              <button type="button" onclick="setPaymentMethod('pix')" id="btnMethodPix" class="py-1.5 rounded-lg text-center transition">PIX</button>
-              <button type="button" onclick="setPaymentMethod('debit')" id="btnMethodDebit" class="py-1.5 rounded-lg text-center transition">Débito</button>
-              <button type="button" onclick="setPaymentMethod('credit')" id="btnMethodCredit" class="py-1.5 rounded-lg text-center transition">Crédito</button>
+              <button type="button" onclick="setPaymentMethod('cash')" id="btnMethodCash" class="py-1.5 rounded-lg text-center transition cursor-pointer">Dinheiro</button>
+              <button type="button" onclick="setPaymentMethod('pix')" id="btnMethodPix" class="py-1.5 rounded-lg text-center transition cursor-pointer">PIX</button>
+              <button type="button" onclick="setPaymentMethod('debit')" id="btnMethodDebit" class="py-1.5 rounded-lg text-center transition cursor-pointer">Débito</button>
+              <button type="button" onclick="setPaymentMethod('credit')" id="btnMethodCredit" class="py-1.5 rounded-lg text-center transition cursor-pointer">Crédito</button>
             </div>
           </div>
 
@@ -726,8 +726,8 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-3">
-            <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800">Cancelar</button>
-            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">Salvar Lançamento</button>
+            <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">Salvar Lançamento</button>
           </div>
         </form>
       </div>
@@ -738,7 +738,7 @@
       <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade">
         <div class="flex justify-between items-center mb-4">
           <h3 id="catModalTitle" class="font-bold text-lg">Nova Categoria</h3>
-          <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+          <button onclick="closeCategoryModal()" class="text-slate-400 hover:text-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
         <form onsubmit="saveCategory(event)" class="space-y-4">
           <input type="hidden" id="catIdInput">
@@ -771,8 +771,8 @@
             <div id="iconPickerGrid" class="grid grid-cols-6 gap-2 max-h-36 overflow-y-auto p-1"></div>
           </div>
           <div class="flex justify-end gap-2 pt-2">
-            <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800">Cancelar</button>
-            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">Salvar Categoria</button>
+            <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">Salvar Categoria</button>
           </div>
         </form>
       </div>
@@ -948,15 +948,17 @@
         });
         if (res.ok) {
           const cloudData = await res.json();
-          if (cloudData && typeof cloudData === 'object' && cloudData.categories) {
+          if (cloudData && typeof cloudData === 'object') {
             appData = {
               defaultSalary: cloudData.defaultSalary || 0,
               monthlySalaries: cloudData.monthlySalaries || {},
-              categories: cloudData.categories || [...DEFAULT_CATEGORIES],
+              categories: (cloudData.categories && cloudData.categories.length) ? cloudData.categories : [...DEFAULT_CATEGORIES],
               transactions: cloudData.transactions || [],
               cards: cloudData.cards || [],
               ruleConfig: cloudData.ruleConfig || { needs: 50, wants: 30, savings: 20 }
             };
+            // Assegura grupo em todas as categorias
+            appData.categories.forEach(c => { if (!c.group) c.group = 'needs'; });
             if (!appData.categories.some(c => c.id === 'cat_fatura')) {
               appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' });
             }
@@ -1023,6 +1025,7 @@
             cards: parsed.cards || [],
             ruleConfig: parsed.ruleConfig || { needs: 50, wants: 30, savings: 20 }
           };
+          appData.categories.forEach(c => { if (!c.group) c.group = 'needs'; });
           if (!appData.categories.some(c => c.id === 'cat_fatura')) {
             appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' });
           }
@@ -1148,11 +1151,9 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      // Gastos que realmente saíram da conta no mês
       const cashOutflows = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Soma das faturas de cartão previstas para o mês
       const totalCreditInvoices = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit' && t.status !== 'card_paid')
         .reduce((a, b) => a + Number(b.amount), 0);
 
@@ -1350,7 +1351,6 @@
       }
     }
 
-    // TABELA PRINCIPAL
     function renderTransactionsTable() {
       const tbody = document.getElementById('transactionsTableBody');
       const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
@@ -1463,8 +1463,8 @@
           <td class="py-3 px-2">${catBadge}</td>
           <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${isExpense ? 'text-rose-500' : 'text-emerald-500'}">${isExpense ? '-' : '+'} ${formatCurrency(t.amount)}</td>
           <td class="py-3 px-2 text-center whitespace-nowrap">
-            <button onclick="editTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>
+            <button onclick="editTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-indigo-500 transition cursor-pointer"><i class="fa-solid fa-pen"></i></button>
+            <button onclick="deleteTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 transition cursor-pointer"><i class="fa-solid fa-trash"></i></button>
           </td>
         </tr>`;
       }).join('');
@@ -1476,14 +1476,13 @@
       container.innerHTML = appData.categories.map(cat => {
         const spent = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
         const budget = Number(cat.budget || 0);
-        if (spent === 0 && budget === 0) return '';
-        const pct = budget > 0 ? Math.min(100, Math.round((spent / budget) * 100)) : 100;
+        const pct = budget > 0 ? Math.min(100, Math.round((spent / budget) * 100)) : (spent > 0 ? 100 : 0);
         const over = budget > 0 && spent > budget;
         return `<div class="space-y-1">
           <div class="flex justify-between text-xs"><span class="font-medium flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:${cat.color}"></span>${cat.name}</span><span class="${over ? 'text-rose-500 font-bold' : 'text-slate-500 dark:text-slate-400'}">${formatCurrency(spent)} ${budget > 0 ? `/ ${formatCurrency(budget)}` : ''}</span></div>
-          <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-300" style="width:${budget > 0 ? pct : 35}%; background:${over ? '#f43f5e' : cat.color}"></div></div>
+          <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-300" style="width:${budget > 0 ? pct : (spent > 0 ? 100 : 0)}%; background:${over ? '#f43f5e' : cat.color}"></div></div>
         </div>`;
-      }).join('') || `<p class="text-xs text-slate-400 text-center py-4">Sem gastos registrados neste mês.</p>`;
+      }).join('') || `<p class="text-xs text-slate-400 text-center py-4">Sem categorias cadastradas.</p>`;
     }
 
     function renderDoughnutChart() {
@@ -1525,7 +1524,7 @@
             <i class="fa-solid fa-credit-card text-4xl mb-3 text-purple-400 opacity-60"></i>
             <h4 class="font-bold text-base text-slate-700 dark:text-slate-200">Você ainda não tem cartões cadastrados</h4>
             <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-5">Cadastre o seu cartão para ter o controle do limite e acompanhar suas faturas.</p>
-            <button onclick="openCardModal()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-md">
+            <button onclick="openCardModal()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-md cursor-pointer">
               <i class="fa-solid fa-plus mr-1"></i> Cadastrar Meu Primeiro Cartão
             </button>
           </div>
@@ -1561,8 +1560,8 @@
                   </div>
                 </div>
                 <div class="flex items-center gap-1">
-                  <button type="button" onclick="editCard('${card.id}')" class="p-2 text-slate-400 hover:text-purple-400 transition" title="Editar Cartão"><i class="fa-solid fa-pen pointer-events-none"></i></button>
-                  <button type="button" onclick="deleteCard('${card.id}')" class="p-2 text-slate-400 hover:text-rose-400 transition" title="Excluir"><i class="fa-solid fa-trash pointer-events-none"></i></button>
+                  <button type="button" onclick="editCard('${card.id}')" class="p-2 text-slate-400 hover:text-purple-400 transition cursor-pointer" title="Editar Cartão"><i class="fa-solid fa-pen pointer-events-none"></i></button>
+                  <button type="button" onclick="deleteCard('${card.id}')" class="p-2 text-slate-400 hover:text-rose-400 transition cursor-pointer" title="Excluir"><i class="fa-solid fa-trash pointer-events-none"></i></button>
                 </div>
               </div>
 
@@ -1672,9 +1671,9 @@
       ['cash', 'pix', 'debit', 'credit'].forEach(m => {
         const btn = document.getElementById(`btnMethod${m.charAt(0).toUpperCase() + m.slice(1)}`);
         if (m === method) {
-          btn.className = 'py-1.5 rounded-lg text-center transition bg-purple-600 text-white font-bold shadow-sm';
+          btn.className = 'py-1.5 rounded-lg text-center transition bg-purple-600 text-white font-bold shadow-sm cursor-pointer';
         } else {
-          btn.className = 'py-1.5 rounded-lg text-center transition text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700';
+          btn.className = 'py-1.5 rounded-lg text-center transition text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer';
         }
       });
 
@@ -1940,14 +1939,14 @@
       const btnExp = document.getElementById('btnTypeExpense'), btnInc = document.getElementById('btnTypeIncome');
       const catContainer = document.getElementById('txCategoryContainer'), payContainer = document.getElementById('txPaymentMethodContainer');
       if (type === 'expense') {
-        btnExp.className = 'py-2 rounded-lg text-xs font-bold bg-rose-500 text-white transition';
-        btnInc.className = 'py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition';
+        btnExp.className = 'py-2 rounded-lg text-xs font-bold bg-rose-500 text-white transition cursor-pointer';
+        btnInc.className = 'py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition cursor-pointer';
         catContainer.style.display = 'block';
         payContainer.style.display = 'block';
         document.getElementById('txCatInput').setAttribute('required', 'true');
       } else {
-        btnInc.className = 'py-2 rounded-lg text-xs font-bold bg-emerald-500 text-white transition';
-        btnExp.className = 'py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition';
+        btnInc.className = 'py-2 rounded-lg text-xs font-bold bg-emerald-500 text-white transition cursor-pointer';
+        btnExp.className = 'py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition cursor-pointer';
         catContainer.style.display = 'none';
         payContainer.style.display = 'none';
         document.getElementById('txCreditCardSelectContainer').classList.add('hidden');
@@ -1961,9 +1960,9 @@
         document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
         const btn = document.getElementById(`tabBtn-${t}`);
         if (t === tabName) {
-          btn.className = 'tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center gap-2';
+          btn.className = 'tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center gap-2 cursor-pointer';
         } else {
-          btn.className = 'tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-darkCard text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-darkBorder transition flex items-center gap-2';
+          btn.className = 'tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-darkCard text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-darkBorder transition flex items-center gap-2 cursor-pointer';
         }
       });
       if (tabName === 'comparison') renderComparisonDashboard();
@@ -2041,8 +2040,8 @@
               </div>
             </div>
             <div class="flex items-center gap-1">
-              <button onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
-              ${cat.id !== 'cat_fatura' ? `<button onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+              <button type="button" onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition cursor-pointer"><i class="fa-solid fa-pen pointer-events-none"></i></button>
+              ${cat.id !== 'cat_fatura' ? `<button type="button" onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition cursor-pointer"><i class="fa-solid fa-trash pointer-events-none"></i></button>` : ''}
             </div>
           </div>
         `;
@@ -2051,20 +2050,31 @@
 
     function renderIconPicker() {
       document.getElementById('iconPickerGrid').innerHTML = AVAILABLE_ICONS.map(icon => `
-        <button type="button" onclick="selectCatIcon('${icon}')" class="p-2.5 rounded-xl border flex items-center justify-center transition ${selectedIcon === icon ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-500'}"><i class="fa-solid ${icon}"></i></button>
+        <button type="button" onclick="selectCatIcon('${icon}')" class="p-2.5 rounded-xl border flex items-center justify-center transition cursor-pointer ${selectedIcon === icon ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-500'}"><i class="fa-solid ${icon}"></i></button>
       `).join('');
     }
 
     function selectCatIcon(icon) { selectedIcon = icon; renderIconPicker(); }
 
-    function openSalaryModal() { document.getElementById('salaryInput').value = getSalaryForMonth(currentMonthKey) || ''; document.getElementById('salaryModal').classList.remove('hidden'); }
-    function closeSalaryModal() { document.getElementById('salaryModal').classList.add('hidden'); }
+    function openSalaryModal() {
+      document.getElementById('salaryInput').value = getSalaryForMonth(currentMonthKey) || '';
+      document.getElementById('salaryModal').classList.remove('hidden');
+    }
+
+    function closeSalaryModal() {
+      document.getElementById('salaryModal').classList.add('hidden');
+    }
+
     function saveSalary(e) {
       e.preventDefault();
       const val = Number(document.getElementById('salaryInput').value || 0);
       appData.monthlySalaries[currentMonthKey] = val;
-      if (document.getElementById('salaryDefaultCheckbox').checked) appData.defaultSalary = val;
-      saveToStorage(); closeSalaryModal(); renderAll();
+      if (document.getElementById('salaryDefaultCheckbox').checked) {
+        appData.defaultSalary = val;
+      }
+      saveToStorage();
+      closeSalaryModal();
+      renderAll();
     }
 
     function openCategoryModal(catId = null) {
@@ -2091,7 +2101,9 @@
       document.getElementById('categoryModal').classList.remove('hidden');
     }
 
-    function closeCategoryModal() { document.getElementById('categoryModal').classList.add('hidden'); }
+    function closeCategoryModal() {
+      document.getElementById('categoryModal').classList.add('hidden');
+    }
 
     function saveCategory(e) {
       e.preventDefault();
