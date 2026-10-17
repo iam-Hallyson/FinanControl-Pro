@@ -53,7 +53,7 @@
         <p>Seus dados financeiros ficam gravados exclusivamente na pasta privada da sua conta Google Drive pessoal.</p>
       </div>
 
-      <button onclick="handleAuthClick()" class="w-full py-3.5 px-4 rounded-xl bg-white text-slate-800 font-semibold text-sm shadow-md hover:bg-slate-100 transition flex items-center justify-center gap-3 border border-slate-300">
+      <button id="googleLoginBtn" onclick="handleAuthClick()" class="w-full py-3.5 px-4 rounded-xl bg-white text-slate-800 font-semibold text-sm shadow-md hover:bg-slate-100 transition flex items-center justify-center gap-3 border border-slate-300 active:scale-[0.98]">
         <i class="fa-brands fa-google text-red-500 text-lg"></i>
         <span>Entrar com Conta Google</span>
       </button>
@@ -825,25 +825,62 @@
     let accessToken = localStorage.getItem('gdrive_access_token') || null;
     let driveFileId = null;
 
+    // INICIALIZAÇÃO ROBUSTA DO GOOGLE AUTH
     function initGoogleAuth() {
-      if (typeof google === 'undefined') { setTimeout(initGoogleAuth, 300); return; }
-      tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        callback: async (resp) => {
-          if (resp.error !== undefined) { 
-            document.getElementById('authStatusMsg').textContent = 'Erro de permissão: ' + resp.error;
-            return; 
+      if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+        setTimeout(initGoogleAuth, 150);
+        return;
+      }
+
+      try {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: async (resp) => {
+            if (resp.error !== undefined) { 
+              const statusEl = document.getElementById('authStatusMsg');
+              if (statusEl) statusEl.textContent = 'Erro de permissão: ' + resp.error;
+              return; 
+            }
+            accessToken = resp.access_token;
+            localStorage.setItem('gdrive_access_token', accessToken);
+            unlockApp();
+            await loadFromDrive();
           }
-          accessToken = resp.access_token;
-          localStorage.setItem('gdrive_access_token', accessToken);
-          unlockApp();
-          await loadFromDrive();
+        });
+
+        const statusEl = document.getElementById('authStatusMsg');
+        if (statusEl) {
+          statusEl.textContent = 'Pronto para autenticar.';
         }
-      });
+      } catch (err) {
+        console.error('Falha ao inicializar o Google Auth:', err);
+      }
+
       if (accessToken) {
         unlockApp();
         loadFromDrive();
+      }
+    }
+
+    function handleAuthClick() {
+      const statusEl = document.getElementById('authStatusMsg');
+      if (statusEl) statusEl.textContent = 'Conectando ao Google...';
+
+      if (!tokenClient) {
+        if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+          if (statusEl) statusEl.textContent = 'Carregando serviços Google, aguarde...';
+          setTimeout(handleAuthClick, 300);
+          return;
+        }
+        initGoogleAuth();
+      }
+
+      try {
+        tokenClient.requestAccessToken({ prompt: '' });
+      } catch (err) {
+        console.error(err);
+        if (statusEl) statusEl.textContent = 'Erro ao abrir janela de login. Verifique o pop-up.';
       }
     }
 
@@ -860,14 +897,10 @@
       document.getElementById('appContainer').classList.add('hidden');
     }
 
-    function handleAuthClick() {
-      document.getElementById('authStatusMsg').textContent = 'Abrindo Google...';
-      if (!tokenClient) return;
-      tokenClient.requestAccessToken({ prompt: '' });
-    }
-
     function handleSignoutClick() {
-      if (accessToken) google.accounts.oauth2.revoke(accessToken, () => {});
+      if (accessToken && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+        google.accounts.oauth2.revoke(accessToken, () => {});
+      }
       accessToken = null;
       driveFileId = null;
       localStorage.removeItem('gdrive_access_token');
@@ -1119,7 +1152,6 @@
       const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Total de faturas em aberto deste mês
       const totalCreditInvoices = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
@@ -1143,7 +1175,6 @@
       bar.style.width = `${percent}%`;
       bar.className = `h-full transition-all duration-300 ${percent > 90 ? 'bg-rose-500' : percent > 70 ? 'bg-amber-500' : 'bg-indigo-500'}`;
 
-      // Card 4: Detalhamento Individual
       const individualListEl = document.getElementById('cardIndividualLimitsList');
       if (!appData.cards || appData.cards.length === 0) {
         individualListEl.innerHTML = `<p class="text-[11px] text-slate-400 py-1">Nenhum cartão cadastrado.</p>`;
@@ -1318,13 +1349,11 @@
       }
     }
 
-    // TABELA PRINCIPAL: CONSOLIDA COMPRAS PARCELADAS NO MÊS DA COMPRA EM UMA LINHA SÓ
     function renderTransactionsTable() {
       const tbody = document.getElementById('transactionsTableBody');
       const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
       const catFilter = document.getElementById('filterCatSelect').value;
 
-      // 1. Coleta todas as transações de interesse
       let rawList = appData.transactions.filter(t => {
         const belongsToEffective = getEffectiveMonthKey(t) === currentMonthKey;
         const belongsToPurchase = isTxPurchasedInMonth(t, currentMonthKey);
@@ -1333,7 +1362,6 @@
       .filter(t => t.description.toLowerCase().includes(search))
       .filter(t => catFilter === 'all' || (t.type === 'expense' && t.categoryId === catFilter));
 
-      // 2. Agrupamento para não exibir 10 linhas repetidas no mês em que a compra ocorreu
       const renderedList = [];
       const seenGroups = new Set();
 
@@ -1341,13 +1369,11 @@
         const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
         const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
 
-        // Se for compra parcelada no crédito e estivermos visualizando o mês em que a compra foi realizada:
         if (t.paymentMethod === 'credit' && t.installmentsTotal > 1 && isPurchasedHere && !isEffectiveHere) {
           if (t.groupId) {
             if (seenGroups.has(t.groupId)) return;
             seenGroups.add(t.groupId);
 
-            // Soma o total de todas as parcelas deste grupo
             const groupTxs = appData.transactions.filter(x => x.groupId === t.groupId);
             const totalGroupAmount = groupTxs.reduce((acc, curr) => acc + Number(curr.amount), 0);
             const cleanDesc = t.description.replace(/\s\(\d+\/\d+\)$/, '');
@@ -1386,7 +1412,6 @@
           const card = appData.cards.find(c => c.id === t.cardId);
           const isPaid = t.status === 'card_paid';
 
-          // EXIBIÇÃO CONSOLIDADA EM 1 LINHA NO MÊS DA COMPRA
           if (t.isConsolidatedSummary) {
             paymentBadge = `
               <div class="inline-flex flex-col">
@@ -1711,7 +1736,6 @@
       document.getElementById('transactionModal').classList.add('hidden');
     }
 
-    // SALVAR LANÇAMENTO COM VALIDAÇÃO E ISOLAMENTO ESTRITO POR CARTÃO
     function saveTransaction(e) {
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
@@ -1926,4 +1950,234 @@
       if (barChart) barChart.destroy();
       barChart = new Chart(ctxBar, {
         type: 'bar',
-        data: { labels
+        data: { labels: labels6, datasets: [{ label: 'Salário + Entradas', data: incomes6, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Total de Despesas (c/ Fatura)', data: expenses6, backgroundColor: '#f43f5e', borderRadius: 6 }, { label: 'Saldo', data: leftovers6, backgroundColor: '#6366f1', borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8' }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#33415533' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
+      });
+
+      const monthA = document.getElementById('compareMonthA').value || currentMonthKey;
+      const monthB = document.getElementById('compareMonthB').value || currentMonthKey;
+      document.getElementById('thMonthA').textContent = formatMonthLabel(monthA);
+      document.getElementById('thMonthB').textContent = formatMonthLabel(monthB);
+
+      const expA = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthA && t.type === 'expense');
+      const expB = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthB && t.type === 'expense');
+      const totalA = expA.reduce((a, b) => a + Number(b.amount), 0), totalB = expB.reduce((a, b) => a + Number(b.amount), 0), diffTotal = totalB - totalA;
+
+      document.getElementById('comparisonSummaryCards').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total em ${formatMonthLabel(monthA)}</span><p class="text-xl font-bold text-indigo-400 mt-1">${formatCurrency(totalA)}</p></div>
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total em ${formatMonthLabel(monthB)}</span><p class="text-xl font-bold text-purple-400 mt-1">${formatCurrency(totalB)}</p></div>
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Resultado</span><p class="text-xl font-bold mt-1 ${diffTotal <= 0 ? 'text-emerald-500' : 'text-rose-500'}">${diffTotal <= 0 ? `Poupou ${formatCurrency(Math.abs(diffTotal))}` : `Gastou +${formatCurrency(diffTotal)}`}</p></div>
+      `;
+
+      document.getElementById('comparisonTableBody').innerHTML = appData.categories.map(cat => {
+        const valA = expA.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        const valB = expB.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        if (valA === 0 && valB === 0) return '';
+        const diff = valB - valA;
+        return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+          <td class="py-3 px-3 font-medium flex items-center gap-2"><span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs" style="background:${cat.color}20; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i></span>${cat.name}</td>
+          <td class="py-3 px-3 text-right font-medium">${formatCurrency(valA)}</td>
+          <td class="py-3 px-3 text-right font-medium">${formatCurrency(valB)}</td>
+          <td class="py-3 px-3 text-right font-bold ${diff <= 0 ? 'text-emerald-500' : 'text-rose-500'}">${diff > 0 ? '+' : ''}${formatCurrency(diff)}</td>
+          <td class="py-3 px-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${diff < 0 ? 'bg-emerald-500/10 text-emerald-500' : diff > 0 ? 'bg-rose-500/10 text-rose-500' : 'bg-slate-500/10 text-slate-400'}">${diff < 0 ? 'Gastou menos' : diff > 0 ? 'Gastou mais' : 'Igual'}</span></td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">Sem dados para comparar nestes meses.</td></tr>`;
+    }
+
+    function renderCategoriesTab() {
+      document.getElementById('categoriesGrid').innerHTML = appData.categories.map(cat => {
+        const groupLabel = cat.group === 'wants' ? 'Estilo de Vida' : cat.group === 'savings' ? 'Metas & Futuro' : 'Necessidades Básicas';
+        return `
+          <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center text-lg" style="background:${cat.color}20; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i></div>
+              <div>
+                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${cat.name}</h4>
+                <span class="text-[10px] font-semibold text-slate-400 block">${groupLabel}</span>
+                <p class="text-xs text-slate-400 mt-0.5">Teto mensal: <strong class="text-slate-600 dark:text-slate-300">${cat.budget > 0 ? formatCurrency(cat.budget) : 'Sem limite'}</strong></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
+              ${cat.id !== 'cat_fatura' ? `<button onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderIconPicker() {
+      document.getElementById('iconPickerGrid').innerHTML = AVAILABLE_ICONS.map(icon => `
+        <button type="button" onclick="selectCatIcon('${icon}')" class="p-2.5 rounded-xl border flex items-center justify-center transition ${selectedIcon === icon ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-500'}"><i class="fa-solid ${icon}"></i></button>
+      `).join('');
+    }
+
+    function selectCatIcon(icon) { selectedIcon = icon; renderIconPicker(); }
+
+    function openSalaryModal() { document.getElementById('salaryInput').value = getSalaryForMonth(currentMonthKey) || ''; document.getElementById('salaryModal').classList.remove('hidden'); }
+    function closeSalaryModal() { document.getElementById('salaryModal').classList.add('hidden'); }
+    function saveSalary(e) {
+      e.preventDefault();
+      const val = Number(document.getElementById('salaryInput').value || 0);
+      appData.monthlySalaries[currentMonthKey] = val;
+      if (document.getElementById('salaryDefaultCheckbox').checked) appData.defaultSalary = val;
+      saveToStorage(); closeSalaryModal(); renderAll();
+    }
+
+    function openCategoryModal(catId = null) {
+      if (catId) {
+        const cat = appData.categories.find(c => c.id === catId);
+        if (!cat) return;
+        document.getElementById('catModalTitle').textContent = 'Editar Categoria';
+        document.getElementById('catIdInput').value = cat.id;
+        document.getElementById('catNameInput').value = cat.name;
+        document.getElementById('catColorInput').value = cat.color;
+        document.getElementById('catBudgetInput').value = cat.budget || 0;
+        document.getElementById('catGroupInput').value = cat.group || 'needs';
+        selectedIcon = cat.icon;
+      } else {
+        document.getElementById('catModalTitle').textContent = 'Nova Categoria';
+        document.getElementById('catIdInput').value = '';
+        document.getElementById('catNameInput').value = '';
+        document.getElementById('catColorInput').value = '#6366f1';
+        document.getElementById('catBudgetInput').value = '';
+        document.getElementById('catGroupInput').value = 'needs';
+        selectedIcon = 'fa-tag';
+      }
+      renderIconPicker();
+      document.getElementById('categoryModal').classList.remove('hidden');
+    }
+
+    function closeCategoryModal() { document.getElementById('categoryModal').classList.add('hidden'); }
+
+    function saveCategory(e) {
+      e.preventDefault();
+      const id = document.getElementById('catIdInput').value;
+      const catObj = {
+        id: id || 'cat_' + Date.now(),
+        name: document.getElementById('catNameInput').value.trim(),
+        color: document.getElementById('catColorInput').value,
+        budget: Number(document.getElementById('catBudgetInput').value || 0),
+        group: document.getElementById('catGroupInput').value,
+        icon: selectedIcon
+      };
+      if (id) {
+        const idx = appData.categories.findIndex(c => c.id === id);
+        if (idx > -1) appData.categories[idx] = catObj;
+      } else {
+        appData.categories.push(catObj);
+      }
+      saveToStorage();
+      closeCategoryModal();
+      renderAll();
+    }
+
+    function deleteCategory(id) {
+      if (appData.categories.length <= 1) { alert('Precisa de manter pelo menos uma categoria.'); return; }
+      if (!confirm('Eliminar esta categoria?')) return;
+      appData.categories = appData.categories.filter(c => c.id !== id);
+      saveToStorage();
+      renderAll();
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement; html.classList.toggle('dark');
+      document.getElementById('themeIcon').className = html.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    }
+
+    function toggleSettingsMenu(e) { e.stopPropagation(); document.getElementById('settingsMenu').classList.toggle('hidden'); }
+
+    function loadSampleData() {
+      if (!confirm('Carregar dados de exemplo?')) { document.getElementById('settingsMenu').classList.add('hidden'); return; }
+      const [y, m] = currentMonthKey.split('-').map(Number);
+      let prevY = y, prevM = m - 1; if (prevM < 1) { prevM = 12; prevY--; }
+      const prevKey = `${prevY}-${String(prevM).padStart(2, '0')}`;
+      appData.defaultSalary = 6500;
+      appData.monthlySalaries[currentMonthKey] = 6500;
+      appData.monthlySalaries[prevKey] = 6500;
+      appData.cards = [
+        { id: 'card_nubank', name: 'Nubank', totalLimit: 5000, initialUsedLimit: 850, closingDay: 25, dueDay: 5, brandColor: '#8a05be' },
+        { id: 'card_inter', name: 'Inter', totalLimit: 3000, initialUsedLimit: 200, closingDay: 15, dueDay: 22, brandColor: '#f97316' }
+      ];
+      appData.transactions = [
+        { id: 'ex1', type: 'expense', paymentMethod: 'pix', description: 'Aluguel + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, billingMonth: currentMonthKey, categoryId: 'cat_moradia', status: 'paid' },
+        { id: 'ex2', type: 'expense', paymentMethod: 'credit', cardId: 'card_nubank', billingMonth: currentMonthKey, description: 'Supermercado Mensal', amount: 820, date: `${currentMonthKey}-10`, categoryId: 'cat_mercado', status: 'paid' },
+        { id: 'ex3', type: 'expense', paymentMethod: 'debit', description: 'Combustível Posto Ipiranga', amount: 280, date: `${currentMonthKey}-12`, billingMonth: currentMonthKey, categoryId: 'cat_transporte', status: 'paid' },
+        { id: 'ex4', type: 'income', paymentMethod: 'income', description: 'Freelance & Consultoria', amount: 1200, date: `${currentMonthKey}-18`, billingMonth: currentMonthKey, categoryId: null, status: 'paid' }
+      ];
+      saveToStorage();
+      renderAll();
+      document.getElementById('settingsMenu').classList.add('hidden');
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = `financontrol_${currentMonthKey}.json`; a.click(); URL.revokeObjectURL(url);
+    }
+
+    function importData(e) {
+      const file = e.target.files[0]; if (!file) return;
+      if (!confirm('Restaurar este backup?')) { e.target.value = ''; return; }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          if (imported.categories && imported.transactions) { appData = imported; saveToStorage(); renderAll(); alert('Backup restaurado!'); }
+        } catch (err) { alert('Arquivo inválido.'); }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearCurrentMonthData() {
+      const monthLabel = formatMonthLabel(currentMonthKey);
+      if (!confirm(`Deseja apagar os lançamentos avulsos de ${monthLabel}?\n\n🛡️ PROTEÇÃO TOTAL ATIVA:\nNenhuma compra no crédito ou parcela de cartão será apagada.`)) {
+        document.getElementById('settingsMenu').classList.add('hidden');
+        return;
+      }
+
+      appData.transactions = appData.transactions.filter(t => {
+        const isFromThisMonth = getEffectiveMonthKey(t) === currentMonthKey || isTxPurchasedInMonth(t, currentMonthKey);
+        const isCreditPurchase = t.paymentMethod === 'credit';
+        const isInstallment = (t.installmentsTotal && t.installmentsTotal > 1) || !!t.groupId;
+
+        if (isCreditPurchase || isInstallment) {
+          return true;
+        }
+
+        if (isFromThisMonth) {
+          return false;
+        }
+
+        return true;
+      });
+
+      if (appData.monthlySalaries && appData.monthlySalaries[currentMonthKey] !== undefined) {
+        delete appData.monthlySalaries[currentMonthKey];
+      }
+
+      saveToStorage();
+      renderAll();
+      document.getElementById('settingsMenu').classList.add('hidden');
+      alert(`Lançamentos avulsos de ${monthLabel} foram limpos. Suas contas de cartão e parcelamentos foram 100% preservados!`);
+    }
+
+    function clearAllData() {
+      if (!confirm('ATENÇÃO: Deseja apagar o histórico de TODOS os meses, cartões e registros do app? Esta ação é irreversível.')) {
+        document.getElementById('settingsMenu').classList.add('hidden');
+        return;
+      }
+      appData.defaultSalary = 0;
+      appData.monthlySalaries = {};
+      appData.transactions = [];
+      appData.cards = [];
+      saveToStorage();
+      renderAll();
+      document.getElementById('settingsMenu').classList.add('hidden');
+      alert('Todos os dados foram resetados com sucesso.');
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
