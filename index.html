@@ -147,7 +147,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <!-- 4 CARDS NO DASHBOARD: SALÁRIO, SAÍDAS REAIS, LIMITES DOS CARTÕES E SALDO DISPONÍVEL -->
+      <!-- 4 CARDS NO DASHBOARD: SALÁRIO, SAÍDAS GERAIS, SALDO DISPONÍVEL E LIMITE INDIVIDUAL DOS CARTÕES -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- CARD 1: SALÁRIO -->
@@ -185,7 +185,7 @@
               </div>
             </div>
             <div class="mt-3 p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-between text-[11px]">
-              <span class="text-rose-600 dark:text-rose-400 font-medium">Faturas do Mês:</span>
+              <span class="text-rose-600 dark:text-rose-400 font-medium">Faturas em Aberto:</span>
               <strong id="cardCreditExpenses" class="text-rose-600 dark:text-rose-400 font-bold">R$ 0,00</strong>
             </div>
           </div>
@@ -195,34 +195,7 @@
           </div>
         </div>
 
-        <!-- CARD 3: LIMITE DOS CARTÕES DE CRÉDITO -->
-        <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
-          <div>
-            <div class="flex justify-between items-start">
-              <div>
-                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Limite Livre Cartões</span>
-                <h2 id="cardAvailableLimit" class="text-xl sm:text-2xl font-bold text-purple-400 mt-0.5">R$ 0,00</h2>
-              </div>
-              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-base">
-                <i class="fa-solid fa-credit-card"></i>
-              </div>
-            </div>
-            <div class="mt-3">
-              <div class="flex justify-between text-[10px] text-slate-400 mb-1">
-                <span>Comprometido Total</span>
-                <span id="cardTotalLimitLabel">R$ 0,00</span>
-              </div>
-              <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div id="cardCreditProgressBar" class="h-full bg-purple-500 transition-all duration-300" style="width: 0%"></div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-right">
-            <button onclick="switchTab('cards')" class="text-[11px] text-purple-400 hover:text-purple-300 font-semibold">Ver Meus Cartões</button>
-          </div>
-        </div>
-
-        <!-- CARD 4: SALDO DISPONÍVEL -->
+        <!-- CARD 3: SALDO DISPONÍVEL -->
         <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start">
@@ -243,6 +216,29 @@
             <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div id="cardProgressBar" class="h-full bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
             </div>
+          </div>
+        </div>
+
+        <!-- CARD 4: LIMITE INDIVIDUAL DOS CARTÕES (ÚLTIMO PONTO, AO LADO DO SALDO) -->
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-start mb-2">
+              <div>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Limite dos Cartões</span>
+                <p class="text-[10px] text-slate-400">Limite disponível por cartão</p>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-base">
+                <i class="fa-solid fa-credit-card"></i>
+              </div>
+            </div>
+
+            <!-- LISTAGEM INDIVIDUAL DINÂMICA DE CARTÕES -->
+            <div id="cardIndividualLimitsList" class="space-y-2 max-h-24 overflow-y-auto custom-scroll pr-1"></div>
+          </div>
+
+          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center text-[11px]">
+            <span id="cardTotalGlobalLabel" class="text-slate-400 text-[10px]"></span>
+            <button onclick="switchTab('cards')" class="text-purple-400 hover:text-purple-300 font-semibold text-[11px]">Ver Cartões</button>
           </div>
         </div>
 
@@ -498,7 +494,7 @@
         <input type="hidden" id="cardIdInput">
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nome do Cartão</label>
-          <input type="text" id="cardNameInput" required placeholder="Ex: Nubank, C6 Carbon, Itaú..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-purple-500">
+          <input type="text" id="cardNameInput" required placeholder="Ex: Nubank, Inter, C6 Carbon..." class="w-full px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-purple-500">
         </div>
         
         <div class="grid grid-cols-2 gap-3">
@@ -554,7 +550,7 @@
           </button>
         </div>
 
-        <!-- SELEÇÃO DA FORMA DE PAGAMENTO -->
+        <!-- FORMA DE PAGAMENTO -->
         <div id="txPaymentMethodContainer">
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Como você pagou?</label>
           <div class="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-[11px] font-semibold">
@@ -823,7 +819,6 @@
               transactions: cloudData.transactions || [],
               cards: cloudData.cards || []
             };
-            // Assegura categoria de fatura
             if (!appData.categories.some(c => c.id === 'cat_fatura')) {
               appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0 });
             }
@@ -1009,34 +1004,19 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      // Gastos diretos da conta (débito, pix, dinheiro) que NÃO são pagamentos de fatura (para evitar duplicidade se a fatura já está listada)
-      const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit' && t.categoryId !== 'cat_fatura')
+      // Saídas diretas da conta (PIX, débito, dinheiro - INCLUINDO pagamentos de fatura que saíram do bolso)
+      const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Faturas de Cartão de Crédito que vencem neste mês
-      const creditExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit')
+      // Faturas de compras a crédito que vencem neste mês (apenas as que ainda estão em aberto)
+      const creditExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit' && t.status !== 'card_paid')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Total de Despesas do Mês = Direto + Faturas
+      // Total de despesas reais do mês
       const totalOutflow = cashDebitExpenses + creditExpenses;
       const salaryRemaining = baseSalary - totalOutflow;
       const totalRemainingWithExtras = salaryRemaining + extraIncome;
       const percent = baseSalary > 0 ? Math.min(100, Math.round((totalOutflow / baseSalary) * 100)) : 0;
-
-      // CÁLCULO GERAL DO LIMITE DOS CARTÕES
-      let totalLimitsAllCards = 0;
-      let totalUsedAllCards = 0;
-
-      (appData.cards || []).forEach(c => {
-        totalLimitsAllCards += Number(c.totalLimit || 0);
-        const cardExpenses = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === c.id && t.status !== 'card_paid')
-          .reduce((a, b) => a + Number(b.amount), 0);
-        totalUsedAllCards += (Number(c.initialUsedLimit || 0) + cardExpenses);
-      });
-
-      const totalAvailableAllCards = Math.max(0, totalLimitsAllCards - totalUsedAllCards);
-      const pctCardUsed = totalLimitsAllCards > 0 ? Math.min(100, Math.round((totalUsedAllCards / totalLimitsAllCards) * 100)) : 0;
 
       document.getElementById('cardBaseSalary').textContent = formatCurrency(baseSalary);
       document.getElementById('cardExtraIncome').textContent = formatCurrency(extraIncome);
@@ -1044,21 +1024,56 @@
       document.getElementById('cardCreditExpenses').textContent = formatCurrency(creditExpenses);
       document.getElementById('cardDirectExpenses').textContent = formatCurrency(cashDebitExpenses);
 
-      // Caixinha dos Cartões
-      document.getElementById('cardAvailableLimit').textContent = formatCurrency(totalAvailableAllCards);
-      document.getElementById('cardTotalLimitLabel').textContent = `${formatCurrency(totalUsedAllCards)} de ${formatCurrency(totalLimitsAllCards)}`;
-      const cardBar = document.getElementById('cardCreditProgressBar');
-      cardBar.style.width = `${pctCardUsed}%`;
-      cardBar.className = `h-full transition-all duration-300 ${pctCardUsed > 85 ? 'bg-rose-500' : 'bg-purple-500'}`;
-
       const remEl = document.getElementById('cardRemaining');
       remEl.textContent = formatCurrency(salaryRemaining);
       remEl.className = `text-xl sm:text-2xl font-bold mt-0.5 ${salaryRemaining >= 0 ? 'text-indigo-500' : 'text-rose-500'}`;
-
       document.getElementById('cardRemainingWithExtras').textContent = formatCurrency(totalRemainingWithExtras);
+
       const bar = document.getElementById('cardProgressBar');
       bar.style.width = `${percent}%`;
       bar.className = `h-full transition-all duration-300 ${percent > 90 ? 'bg-rose-500' : percent > 70 ? 'bg-amber-500' : 'bg-indigo-500'}`;
+
+      // RENDERIZAÇÃO DO CARD 4: LIMITE INDIVIDUAL DE CADA CARTÃO
+      const individualListEl = document.getElementById('cardIndividualLimitsList');
+      if (!appData.cards || appData.cards.length === 0) {
+        individualListEl.innerHTML = `<p class="text-[11px] text-slate-400 py-1">Nenhum cartão cadastrado.</p>`;
+        document.getElementById('cardTotalGlobalLabel').textContent = '';
+      } else {
+        let globalTotalLimit = 0;
+        let globalTotalUsed = 0;
+
+        individualListEl.innerHTML = appData.cards.map(c => {
+          const cardExpenses = appData.transactions
+            .filter(t => t.paymentMethod === 'credit' && t.cardId === c.id && t.status !== 'card_paid')
+            .reduce((a, b) => a + Number(b.amount), 0);
+
+          const used = Number(c.initialUsedLimit || 0) + cardExpenses;
+          const total = Number(c.totalLimit || 0);
+          const available = Math.max(0, total - used);
+          const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
+
+          globalTotalLimit += total;
+          globalTotalUsed += used;
+
+          return `
+            <div class="space-y-0.5">
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="font-medium flex items-center gap-1.5 text-slate-700 dark:text-slate-300">
+                  <span class="w-2 h-2 rounded-full" style="background:${c.brandColor || '#8b5cf6'}"></span>
+                  ${c.name}:
+                </span>
+                <strong class="text-emerald-500 font-bold">${formatCurrency(available)}</strong>
+              </div>
+              <div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-300" style="width: ${pct}%; background:${pct > 85 ? '#ef4444' : (c.brandColor || '#8b5cf6')}"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const globalAvailable = Math.max(0, globalTotalLimit - globalTotalUsed);
+        document.getElementById('cardTotalGlobalLabel').textContent = `Total Livre: ${formatCurrency(globalAvailable)}`;
+      }
     }
 
     function populateCategorySelects() {
@@ -1432,16 +1447,25 @@
       if (currentTxType === 'expense' && categoryId === 'cat_fatura') {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
+        const targetCard = appData.cards.find(c => c.id === invoiceCardId);
 
-        // Marca as parcelas/compras dessa fatura como quitadas
-        appData.transactions.forEach(t => {
-          if (t.paymentMethod === 'credit' && t.cardId === invoiceCardId && t.billingMonth === invoiceMonth) {
-            t.status = 'card_paid';
+        if (targetCard) {
+          let foundTx = false;
+          appData.transactions.forEach(t => {
+            if (t.paymentMethod === 'credit' && t.cardId === invoiceCardId && t.billingMonth === invoiceMonth) {
+              t.status = 'card_paid';
+              foundTx = true;
+            }
+          });
+
+          // Abate também do limite inicial comprometido para restabelecer o limite total
+          if (!foundTx || totalAmount > 0) {
+            targetCard.initialUsedLimit = Math.max(0, Number(targetCard.initialUsedLimit || 0) - totalAmount);
           }
-        });
+        }
       }
 
-      // Se for compra parcelada no crédito e um novo lançamento: gera cada parcela como registro
+      // Se for compra parcelada no crédito: gera cada parcela individualmente
       if (currentPaymentMethod === 'credit' && cardId && installments > 1 && !id) {
         const installmentAmount = Number((totalAmount / installments).toFixed(2));
         const groupId = 'group_' + Date.now();
@@ -1716,8 +1740,8 @@
       appData.monthlySalaries[currentMonthKey] = 6500;
       appData.monthlySalaries[prevKey] = 6500;
       appData.cards = [
-        { id: 'card_nubank', name: 'Nubank Roxinho', totalLimit: 5000, initialUsedLimit: 850, closingDay: 25, dueDay: 5, brandColor: '#8a05be' },
-        { id: 'card_c6', name: 'C6 Carbon', totalLimit: 8000, initialUsedLimit: 0, closingDay: 15, dueDay: 22, brandColor: '#242424' }
+        { id: 'card_nubank', name: 'Nubank', totalLimit: 5000, initialUsedLimit: 850, closingDay: 25, dueDay: 5, brandColor: '#8a05be' },
+        { id: 'card_inter', name: 'Inter', totalLimit: 3000, initialUsedLimit: 200, closingDay: 15, dueDay: 22, brandColor: '#f97316' }
       ];
       appData.transactions = [
         { id: 'ex1', type: 'expense', paymentMethod: 'pix', description: 'Aluguel + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, billingMonth: currentMonthKey, categoryId: 'cat_moradia', status: 'paid' },
@@ -1788,8 +1812,8 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extras = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      const cashDebit = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit' && t.categoryId !== 'cat_fatura').reduce((a, b) => a + Number(b.amount), 0);
-      const creditTotal = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit').reduce((a, b) => a + Number(b.amount), 0);
+      const cashDebit = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit').reduce((a, b) => a + Number(b.amount), 0);
+      const creditTotal = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit' && t.status !== 'card_paid').reduce((a, b) => a + Number(b.amount), 0);
       const saldo = (baseSalary - (cashDebit + creditTotal)) + extras;
 
       const cardsSummary = (appData.cards || []).map(c => {
