@@ -154,7 +154,7 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
       
-      <!-- OS 4 CARDS NO DASHBOARD: SALÁRIO, SAÍDAS, SALDO E LIMITE DOS CARTÕES -->
+      <!-- OS 4 CARDS NO DASHBOARD -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         <!-- CARD 1: SALÁRIO -->
@@ -226,7 +226,7 @@
           </div>
         </div>
 
-        <!-- CARD 4: LIMITE INDIVIDUAL DOS CARTÕES (DO LADO DO SALDO DISPONÍVEL) -->
+        <!-- CARD 4: LIMITE INDIVIDUAL DOS CARTÕES -->
         <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start mb-2">
@@ -238,8 +238,6 @@
                 <i class="fa-solid fa-credit-card"></i>
               </div>
             </div>
-
-            <!-- LISTAGEM DINÂMICA DE CADA CARTÃO -->
             <div id="cardIndividualLimitsList" class="space-y-2 max-h-24 overflow-y-auto custom-scroll pr-1"></div>
           </div>
 
@@ -249,6 +247,95 @@
           </div>
         </div>
 
+      </div>
+
+      <!-- NOVO COMPONENTE: DISTRIBUIÇÃO RECOMENDADA (REGRA 50 / 30 / 20) -->
+      <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">Distribuição Recomendada (Regra 50 / 30 / 20)</h3>
+              <p class="text-[11px] text-slate-400">Diretriz ideal baseada no seu Salário Líquido do mês (<span id="rule50BaseSalary" class="font-semibold text-slate-300">R$ 0,00</span>)</p>
+            </div>
+          </div>
+          <span class="text-[11px] font-semibold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full self-start sm:self-auto">Metodologia Padrão Ouro</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- BLOCO 50%: NECESSIDADES BÁSICAS -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-shield text-xs"></i> 50% Necessidades
+                </span>
+                <span id="rule50Target" class="text-xs font-bold text-slate-700 dark:text-slate-200">Teto: R$ 0,00</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mb-3">Moradia, Contas, Mercado, Saúde e Transporte essencial.</p>
+              <div class="flex justify-between items-baseline mb-1">
+                <span class="text-[11px] text-slate-400">Gasto Atual:</span>
+                <span id="rule50Spent" class="text-sm font-bold text-indigo-400">R$ 0,00</span>
+              </div>
+            </div>
+            <div>
+              <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                <div id="rule50Bar" class="h-full bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
+              </div>
+              <span id="rule50Status" class="text-[10px] text-slate-400 mt-1.5 block">0% utilizado</span>
+            </div>
+          </div>
+
+          <!-- BLOCO 30%: ESTILO DE VIDA -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-amber-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-mug-hot text-xs"></i> 30% Estilo de Vida
+                </span>
+                <span id="rule30Target" class="text-xs font-bold text-slate-700 dark:text-slate-200">Teto: R$ 0,00</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mb-3">Lazer, Restaurantes, Hobbies, Assinaturas e Compras.</p>
+              <div class="flex justify-between items-baseline mb-1">
+                <span class="text-[11px] text-slate-400">Gasto Atual:</span>
+                <span id="rule30Spent" class="text-sm font-bold text-amber-400">R$ 0,00</span>
+              </div>
+            </div>
+            <div>
+              <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                <div id="rule30Bar" class="h-full bg-amber-500 transition-all duration-300" style="width: 0%"></div>
+              </div>
+              <span id="rule30Status" class="text-[10px] text-slate-400 mt-1.5 block">0% utilizado</span>
+            </div>
+          </div>
+
+          <!-- BLOCO 20%: OBJETIVOS & INVESTIMENTOS -->
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold text-emerald-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <i class="fa-solid fa-piggy-bank text-xs"></i> 20% Metas & Reserva
+                </span>
+                <span id="rule20Target" class="text-xs font-bold text-slate-700 dark:text-slate-200">Meta: R$ 0,00</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mb-3">Reserva de emergência, Aportes, Futuro e Poupança.</p>
+              <div class="flex justify-between items-baseline mb-1">
+                <span class="text-[11px] text-slate-400">Guardado / Aportado:</span>
+                <span id="rule20Spent" class="text-sm font-bold text-emerald-400">R$ 0,00</span>
+              </div>
+            </div>
+            <div>
+              <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                <div id="rule20Bar" class="h-full bg-emerald-500 transition-all duration-300" style="width: 0%"></div>
+              </div>
+              <span id="rule20Status" class="text-[10px] text-slate-400 mt-1.5 block">Meta mensal para poupar</span>
+            </div>
+          </div>
+
+        </div>
       </div>
 
       <!-- BOTÕES DE NAVEGAÇÃO ENTRE ABAS -->
@@ -409,7 +496,7 @@
             <h3 class="font-bold text-base text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <i class="fa-solid fa-sliders text-indigo-500"></i> Suas Categorias
             </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Edite cores, nomes, limites mensais ou adicione novas categorias.</p>
+            <p class="text-xs text-slate-400 mt-0.5">Defina as cores, ícones, limites e o grupo da regra 50/30/20.</p>
           </div>
           <button onclick="openCategoryModal()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-500/20 transition flex items-center gap-2">
             <i class="fa-solid fa-plus"></i> Criar Nova Categoria
@@ -592,7 +679,7 @@
                 <input type="month" id="txInvoiceMonthInput" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               </div>
             </div>
-            <p class="text-[10px] text-purple-300">💡 Se pagar um valor maior que a fatura atual, o excedente abaterá automaticamente as parcelas dos meses seguintes e liberará seu limite!</p>
+            <p class="text-[10px] text-purple-300">💡 Se você pagar um valor maior que a fatura atual, o saldo excedente abaterá automaticamente as parcelas dos meses seguintes e liberará o seu limite!</p>
           </div>
 
           <div class="flex justify-end gap-2 pt-3">
@@ -603,7 +690,7 @@
       </div>
     </div>
 
-    <!-- MODAL CATEGORIA -->
+    <!-- MODAL CATEGORIA (COM GRUPO 50/30/20) -->
     <div id="categoryModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade">
         <div class="flex justify-between items-center mb-4">
@@ -616,6 +703,16 @@
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Nome da Categoria</label>
             <input type="text" id="catNameInput" required placeholder="Ex: Combustível, Assinaturas..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none">
           </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Grupo da Regra 50/30/20</label>
+            <select id="catGroupInput" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium focus:outline-none">
+              <option value="needs">50% - Necessidades Básicas (Essencial)</option>
+              <option value="wants">30% - Estilo de Vida (Desejos / Lazer)</option>
+              <option value="savings">20% - Metas, Reserva & Futuro</option>
+            </select>
+          </div>
+
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Cor</label>
@@ -653,14 +750,14 @@
     ];
 
     const DEFAULT_CATEGORIES = [
-      { id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0 },
-      { id: 'cat_moradia', name: 'Moradia & Contas', color: '#6366f1', icon: 'fa-house', budget: 1800 },
-      { id: 'cat_mercado', name: 'Alimentação & Mercado', color: '#10b981', icon: 'fa-cart-shopping', budget: 1200 },
-      { id: 'cat_transporte', name: 'Transporte & Carro', color: '#f59e0b', icon: 'fa-car', budget: 700 },
-      { id: 'cat_saude', name: 'Saúde & Farmácia', color: '#ef4444', icon: 'fa-heart-pulse', budget: 400 },
-      { id: 'cat_lazer', name: 'Lazer & Restaurantes', color: '#ec4899', icon: 'fa-gamepad', budget: 500 },
-      { id: 'cat_estudos', name: 'Estudos & Cursos', color: '#06b6d4', icon: 'fa-graduation-cap', budget: 450 },
-      { id: 'cat_invest', name: 'Reserva & Investimentos', color: '#8b5cf6', icon: 'fa-piggy-bank', budget: 800 }
+      { id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' },
+      { id: 'cat_moradia', name: 'Moradia & Contas', color: '#6366f1', icon: 'fa-house', budget: 1800, group: 'needs' },
+      { id: 'cat_mercado', name: 'Alimentação & Mercado', color: '#10b981', icon: 'fa-cart-shopping', budget: 1200, group: 'needs' },
+      { id: 'cat_transporte', name: 'Transporte & Carro', color: '#f59e0b', icon: 'fa-car', budget: 700, group: 'needs' },
+      { id: 'cat_saude', name: 'Saúde & Farmácia', color: '#ef4444', icon: 'fa-heart-pulse', budget: 400, group: 'needs' },
+      { id: 'cat_lazer', name: 'Lazer & Restaurantes', color: '#ec4899', icon: 'fa-gamepad', budget: 500, group: 'wants' },
+      { id: 'cat_estudos', name: 'Estudos & Cursos', color: '#06b6d4', icon: 'fa-graduation-cap', budget: 450, group: 'wants' },
+      { id: 'cat_invest', name: 'Reserva & Investimentos', color: '#8b5cf6', icon: 'fa-piggy-bank', budget: 800, group: 'savings' }
     ];
 
     let appData = {
@@ -784,7 +881,7 @@
               cards: cloudData.cards || []
             };
             if (!appData.categories.some(c => c.id === 'cat_fatura')) {
-              appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0 });
+              appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' });
             }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
             renderAll();
@@ -849,7 +946,7 @@
             cards: parsed.cards || []
           };
           if (!appData.categories.some(c => c.id === 'cat_fatura')) {
-            appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0 });
+            appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' });
           }
         } catch (err) { console.error(err); }
       }
@@ -955,6 +1052,7 @@
       populateCardSelect();
       updateFilterBadgeUI();
       renderSummaryCards();
+      renderRule503020();
       renderTransactionsTable();
       renderCategoryLimits();
       renderDoughnutChart();
@@ -968,15 +1066,12 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      // Saídas diretas da conta (PIX, débito, dinheiro - INCLUINDO pagamentos de fatura que saíram do bolso)
       const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Faturas de compras a crédito que vencem neste mês (apenas as que ainda estão em aberto)
       const creditExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit' && t.status !== 'card_paid')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Total de despesas reais do mês
       const totalOutflow = cashDebitExpenses + creditExpenses;
       const salaryRemaining = baseSalary - totalOutflow;
       const totalRemainingWithExtras = salaryRemaining + extraIncome;
@@ -1038,6 +1133,60 @@
         const globalAvailable = Math.max(0, globalTotalLimit - globalTotalUsed);
         document.getElementById('cardTotalGlobalLabel').textContent = `Total Livre: ${formatCurrency(globalAvailable)}`;
       }
+    }
+
+    // CÁLCULO E RENDERIZAÇÃO DA REGRA 50 / 30 / 20
+    function renderRule503020() {
+      const baseSalary = getSalaryForMonth(currentMonthKey);
+      document.getElementById('rule50BaseSalary').textContent = formatCurrency(baseSalary);
+
+      const target50 = baseSalary * 0.50;
+      const target30 = baseSalary * 0.30;
+      const target20 = baseSalary * 0.20;
+
+      document.getElementById('rule50Target').textContent = `Teto: ${formatCurrency(target50)}`;
+      document.getElementById('rule30Target').textContent = `Teto: ${formatCurrency(target30)}`;
+      document.getElementById('rule20Target').textContent = `Meta: ${formatCurrency(target20)}`;
+
+      // Soma de gastos do mês por grupo
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
+
+      let spent50 = 0;
+      let spent30 = 0;
+      let spent20 = 0;
+
+      monthExpenses.forEach(t => {
+        const cat = appData.categories.find(c => c.id === t.categoryId);
+        const group = (cat && cat.group) ? cat.group : 'needs';
+        const val = Number(t.amount || 0);
+
+        if (group === 'needs') spent50 += val;
+        else if (group === 'wants') spent30 += val;
+        else if (group === 'savings') spent20 += val;
+      });
+
+      document.getElementById('rule50Spent').textContent = formatCurrency(spent50);
+      document.getElementById('rule30Spent').textContent = formatCurrency(spent30);
+      document.getElementById('rule20Spent').textContent = formatCurrency(spent20);
+
+      const pct50 = target50 > 0 ? Math.min(100, Math.round((spent50 / target50) * 100)) : 0;
+      const pct30 = target30 > 0 ? Math.min(100, Math.round((spent30 / target30) * 100)) : 0;
+      const pct20 = target20 > 0 ? Math.min(100, Math.round((spent20 / target20) * 100)) : 0;
+
+      const bar50 = document.getElementById('rule50Bar');
+      bar50.style.width = `${pct50}%`;
+      bar50.className = `h-full transition-all duration-300 ${spent50 > target50 ? 'bg-rose-500' : 'bg-indigo-500'}`;
+      document.getElementById('rule50Status').textContent = `${pct50}% utilizado (${spent50 > target50 ? 'Estourou o teto' : 'Dentro do limite'})`;
+
+      const bar30 = document.getElementById('rule30Bar');
+      bar30.style.width = `${pct30}%`;
+      bar30.className = `h-full transition-all duration-300 ${spent30 > target30 ? 'bg-rose-500' : 'bg-amber-500'}`;
+      document.getElementById('rule30Status').textContent = `${pct30}% utilizado (${spent30 > target30 ? 'Estourou o teto' : 'Dentro do limite'})`;
+
+      const bar20 = document.getElementById('rule20Bar');
+      bar20.style.width = `${pct20}%`;
+      bar20.className = `h-full transition-all duration-300 ${pct20 >= 100 ? 'bg-emerald-400' : 'bg-emerald-500'}`;
+      document.getElementById('rule20Status').textContent = `${pct20}% da meta atingida (${formatCurrency(Math.max(0, target20 - spent20))} restante)`;
     }
 
     function populateCategorySelects() {
@@ -1397,7 +1546,7 @@
       document.getElementById('transactionModal').classList.add('hidden');
     }
 
-    // SALVAR LANÇAMENTO COM ABATIMENTO INTELIGENTE EM CADEIA PARA FATURAS
+    // SALVAR LANÇAMENTO COM ABATIMENTO INTELIGENTE EM CADEIA
     function saveTransaction(e) {
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
@@ -1415,14 +1564,14 @@
         const targetCard = appData.cards.find(c => c.id === invoiceCardId);
 
         if (targetCard) {
-          let pool = totalAmount; // Montante disponível para liquidar faturas
+          let pool = totalAmount; // Valor pago disponível para quitar faturas
 
-          // 1. Pega todas as compras/parcelas em aberto deste cartão, ordenadas cronologicamente
+          // 1. Pega todas as contas em aberto do cartão ordenadas por mês
           const pendingCardTxs = appData.transactions
             .filter(t => t.paymentMethod === 'credit' && t.cardId === invoiceCardId && t.status !== 'card_paid')
             .sort((a, b) => (a.billingMonth || a.date).localeCompare(b.billingMonth || b.date));
 
-          // 2. Dá prioridade primeiro às contas do mês da fatura selecionada
+          // 2. Prioriza a fatura do mês selecionado e depois as faturas seguintes
           const currentMonthTxs = pendingCardTxs.filter(t => (t.billingMonth || t.date.slice(0, 7)) === invoiceMonth);
           const futureMonthTxs = pendingCardTxs.filter(t => (t.billingMonth || t.date.slice(0, 7)) > invoiceMonth);
 
@@ -1433,18 +1582,18 @@
             const txAmt = Number(tx.amount);
 
             if (pool >= txAmt) {
-              // Quita totalmente esta parcela/despesa
+              // Quita totalmente esta parcela
               tx.status = 'card_paid';
               pool -= txAmt;
             } else {
-              // Quita parcialmente abatendo o valor restante na fatura futura
+              // Abate o excedente na parcela seguinte
               tx.amount = Number((txAmt - pool).toFixed(2));
               pool = 0;
               break;
             }
           }
 
-          // 3. Se ainda sobrou dinheiro do pagamento, desconta do limite inicial comprometido
+          // 3. Se ainda sobrou saldo do pagamento, desconta do limite inicial comprometido
           if (pool > 0 && targetCard.initialUsedLimit > 0) {
             targetCard.initialUsedLimit = Math.max(0, Number(targetCard.initialUsedLimit) - pool);
           }
@@ -1641,18 +1790,25 @@
     }
 
     function renderCategoriesTab() {
-      document.getElementById('categoriesGrid').innerHTML = appData.categories.map(cat => `
-        <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center text-lg" style="background:${cat.color}20; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i></div>
-            <div><h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${cat.name}</h4><p class="text-xs text-slate-400">Teto mensal: <strong class="text-slate-600 dark:text-slate-300">${cat.budget > 0 ? formatCurrency(cat.budget) : 'Sem limite'}</strong></p></div>
+      document.getElementById('categoriesGrid').innerHTML = appData.categories.map(cat => {
+        const groupLabel = cat.group === 'wants' ? '30% Estilo de Vida' : cat.group === 'savings' ? '20% Metas & Futuro' : '50% Essencial';
+        return `
+          <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center text-lg" style="background:${cat.color}20; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i></div>
+              <div>
+                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${cat.name}</h4>
+                <span class="text-[10px] font-semibold text-slate-400 block">${groupLabel}</span>
+                <p class="text-xs text-slate-400 mt-0.5">Teto mensal: <strong class="text-slate-600 dark:text-slate-300">${cat.budget > 0 ? formatCurrency(cat.budget) : 'Sem limite'}</strong></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
+              ${cat.id !== 'cat_fatura' ? `<button onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>` : ''}
+            </div>
           </div>
-          <div class="flex items-center gap-1">
-            <button onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
-            ${cat.id !== 'cat_fatura' ? `<button onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>` : ''}
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function renderIconPicker() {
@@ -1678,36 +1834,55 @@
         const cat = appData.categories.find(c => c.id === catId);
         if (!cat) return;
         document.getElementById('catModalTitle').textContent = 'Editar Categoria';
-        document.getElementById('catIdInput').value = cat.id; document.getElementById('catNameInput').value = cat.name;
-        document.getElementById('catColorInput').value = cat.color; document.getElementById('catBudgetInput').value = cat.budget || 0;
+        document.getElementById('catIdInput').value = cat.id;
+        document.getElementById('catNameInput').value = cat.name;
+        document.getElementById('catColorInput').value = cat.color;
+        document.getElementById('catBudgetInput').value = cat.budget || 0;
+        document.getElementById('catGroupInput').value = cat.group || 'needs';
         selectedIcon = cat.icon;
       } else {
         document.getElementById('catModalTitle').textContent = 'Nova Categoria';
-        document.getElementById('catIdInput').value = ''; document.getElementById('catNameInput').value = '';
-        document.getElementById('catColorInput').value = '#6366f1'; document.getElementById('catBudgetInput').value = '';
+        document.getElementById('catIdInput').value = '';
+        document.getElementById('catNameInput').value = '';
+        document.getElementById('catColorInput').value = '#6366f1';
+        document.getElementById('catBudgetInput').value = '';
+        document.getElementById('catGroupInput').value = 'needs';
         selectedIcon = 'fa-tag';
       }
-      renderIconPicker(); document.getElementById('categoryModal').classList.remove('hidden');
+      renderIconPicker();
+      document.getElementById('categoryModal').classList.remove('hidden');
     }
+
     function closeCategoryModal() { document.getElementById('categoryModal').classList.add('hidden'); }
 
     function saveCategory(e) {
       e.preventDefault();
       const id = document.getElementById('catIdInput').value;
       const catObj = {
-        id: id || 'cat_' + Date.now(), name: document.getElementById('catNameInput').value.trim(),
-        color: document.getElementById('catColorInput').value, budget: Number(document.getElementById('catBudgetInput').value || 0), icon: selectedIcon
+        id: id || 'cat_' + Date.now(),
+        name: document.getElementById('catNameInput').value.trim(),
+        color: document.getElementById('catColorInput').value,
+        budget: Number(document.getElementById('catBudgetInput').value || 0),
+        group: document.getElementById('catGroupInput').value,
+        icon: selectedIcon
       };
-      if (id) { const idx = appData.categories.findIndex(c => c.id === id); if (idx > -1) appData.categories[idx] = catObj; }
-      else { appData.categories.push(catObj); }
-      saveToStorage(); closeCategoryModal(); renderAll();
+      if (id) {
+        const idx = appData.categories.findIndex(c => c.id === id);
+        if (idx > -1) appData.categories[idx] = catObj;
+      } else {
+        appData.categories.push(catObj);
+      }
+      saveToStorage();
+      closeCategoryModal();
+      renderAll();
     }
 
     function deleteCategory(id) {
       if (appData.categories.length <= 1) { alert('Precisa de manter pelo menos uma categoria.'); return; }
       if (!confirm('Eliminar esta categoria?')) return;
       appData.categories = appData.categories.filter(c => c.id !== id);
-      saveToStorage(); renderAll();
+      saveToStorage();
+      renderAll();
     }
 
     function toggleTheme() {
@@ -1735,7 +1910,9 @@
         { id: 'ex3', type: 'expense', paymentMethod: 'debit', description: 'Combustível Posto Ipiranga', amount: 280, date: `${currentMonthKey}-12`, billingMonth: currentMonthKey, categoryId: 'cat_transporte', status: 'paid' },
         { id: 'ex4', type: 'income', paymentMethod: 'income', description: 'Freelance & Consultoria', amount: 1200, date: `${currentMonthKey}-18`, billingMonth: currentMonthKey, categoryId: null, status: 'paid' }
       ];
-      saveToStorage(); renderAll(); document.getElementById('settingsMenu').classList.add('hidden');
+      saveToStorage();
+      renderAll();
+      document.getElementById('settingsMenu').classList.add('hidden');
     }
 
     function exportData() {
