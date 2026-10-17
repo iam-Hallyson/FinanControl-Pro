@@ -35,7 +35,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
 
-  <!-- TELA DE AUTENTICAÇÃO GOOGLE (SEM MODO LOCAL) -->
+  <!-- TELA DE AUTENTICAÇÃO GOOGLE / ACESSO SALVO -->
   <div id="authGateScreen" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white dark:bg-darkCard max-w-md w-full rounded-3xl p-8 border border-slate-200 dark:border-darkBorder shadow-2xl text-center space-y-6 animate-fade">
       <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-indigo-500/30 mx-auto">
@@ -52,7 +52,8 @@
           <span>Entrar com Conta Google</span>
         </button>
 
-        <button onclick="bypassAuthForSeamlessAccess()" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium text-xs transition flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 cursor-pointer">
+        <!-- FUNÇÃO CORRIGIDA PARA ABRIR O PAINEL DIRETAMENTE -->
+        <button onclick="unlockApp()" class="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-medium text-xs transition flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 cursor-pointer">
           <i class="fa-solid fa-arrow-right-to-bracket"></i> Acessar Painel Salvo
         </button>
       </div>
@@ -118,7 +119,7 @@
             <i id="themeIcon" class="fa-solid fa-sun"></i>
           </button>
           
-          <!-- MENU ENGRENAGEM (CORRIGIDO) -->
+          <!-- MENU ENGRENAGEM -->
           <div class="relative">
             <button id="settingsGearBtn" onclick="toggleSettingsMenu(event)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Opções">
               <i class="fa-solid fa-gear pointer-events-none"></i>
@@ -755,7 +756,7 @@
             <select id="txCatInput" onchange="toggleInvoicePaymentFields()" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none"></select>
           </div>
 
-          <!-- QUITAÇÃO DE FATURA DE CARTÃO -->
+          <!-- QUITAÇÃO DE FATURA DE CARTÃO (COM CÁLCULO DE DIFERENÇA E AMORTIZAÇÃO DE EXCEDENTE) -->
           <div id="txInvoicePaymentContainer" class="hidden space-y-3 p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
             <div class="text-xs font-semibold text-purple-400 flex items-center gap-1.5">
               <i class="fa-solid fa-receipt"></i> Quitação de Fatura do Cartão
@@ -770,7 +771,7 @@
                 <input type="month" id="txInvoiceMonthInput" onchange="autoFillInvoiceAmount()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               </div>
             </div>
-            <p class="text-[10px] text-purple-300">💡 O valor da fatura é preenchido automaticamente, mas você pode editá-lo livremente. Valores parciais geram resquício pendente e valores maiores amortizam o mês seguinte.</p>
+            <p class="text-[10px] text-purple-300">💡 O valor da fatura é preenchido automaticamente, mas você pode editá-lo. Se pagar a menos, o resquício permanece pendente. Se pagar a mais, o excedente amortiza automaticamente as faturas seguintes.</p>
           </div>
 
           <!-- BAIXA DE BOLETO -->
@@ -849,7 +850,7 @@
     const CLIENT_ID = '36156789113-4ckjb57b2ulfoebtgm83kqrm29q8cmc1.apps.googleusercontent.com';
     const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
     const FILE_NAME = 'financontrol_data.json';
-    const STORAGE_KEY = 'financontrol_pro_v11_data'; // Chave de persistência estável
+    const STORAGE_KEY = 'financontrol_pro_v12_data'; // Chave persistente e imutável para não perder dados ao atualizar
     const MONTH_NAMES = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const MONTH_SHORT = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
     const AVAILABLE_ICONS = [
@@ -914,8 +915,8 @@
 
       try {
         tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: '36156789113-4ckjb57b2ulfoebtgm83kqrm29q8cmc1.apps.googleusercontent.com',
-          scope: 'https://www.googleapis.com/auth/drive.appdata',
+          client_id: CLIENT_ID,
+          scope: SCOPES,
           callback: async (resp) => {
             if (resp.error !== undefined) { 
               const statusEl = document.getElementById('authStatusMsg');
@@ -928,9 +929,7 @@
             await loadFromDrive();
           }
         });
-      } catch (err) {
-        console.warn('Google Identity Services:', err);
-      }
+      } catch (err) {}
 
       if (accessToken) {
         unlockApp();
@@ -944,13 +943,7 @@
       }
       try {
         tokenClient.requestAccessToken({ prompt: '' });
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    function bypassAuthForSeamlessAccess() {
-      unlockApp();
+      } catch (err) {}
     }
 
     function unlockApp() {
@@ -1055,7 +1048,7 @@
       loadFromStorage();
       initGoogleAuth();
 
-      // Auto-desbloqueio se já houver dados salvos no navegador, dispensando login obrigatório se desejado
+      // Auto-desbloqueio imediato se houver dados salvos no navegador (mantendo persistência intacta)
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         unlockApp();
@@ -1077,10 +1070,10 @@
     }
 
     function loadFromStorage() {
-      // Procura primeiro na nova chave v11, se não achar tenta chaves anteriores para não perder dados salvos do usuário
+      // Recupera dados salvos preservando histórico de versões anteriores
       let raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) {
-        raw = localStorage.getItem('financontrol_pro_v10_data') || localStorage.getItem('financontrol_pro_v9_data') || localStorage.getItem('financontrol_pro_v7_data') || localStorage.getItem('financontrol_data');
+        raw = localStorage.getItem('financontrol_pro_v11_data') || localStorage.getItem('financontrol_pro_v10_data') || localStorage.getItem('financontrol_pro_v9_data') || localStorage.getItem('financontrol_pro_v7_data') || localStorage.getItem('financontrol_data');
       }
       if (raw) {
         try {
@@ -1771,7 +1764,6 @@
       });
     }
 
-    // RENDERIZAR CARTÕES NA ABA DEDICADA (CORRIGIDO PARA EXIBIR SEMPRE)
     function renderCardsTab() {
       const container = document.getElementById('cardsListContainer');
       if (!appData.cards || appData.cards.length === 0) {
@@ -1901,3 +1893,670 @@
 
       if (!appData.cards) appData.cards = [];
       if (id) {
+        const idx = appData.cards.findIndex(c => c.id === id);
+        if (idx > -1) appData.cards[idx] = cardObj;
+      } else {
+        appData.cards.push(cardObj);
+      }
+
+      saveToStorage();
+      closeCardModal();
+      renderAll();
+    }
+
+    function deleteCard(id) {
+      if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
+      appData.cards = appData.cards.filter(c => c.id !== id);
+      saveToStorage();
+      renderAll();
+    }
+
+    function setPaymentMode(mode) {
+      paymentMode = mode;
+      const btnAvista = document.getElementById('btnModeAvista');
+      const btnParcelado = document.getElementById('btnModeParcelado');
+      const avistaSub = document.getElementById('txAvistaSubContainer');
+      const parceladoSub = document.getElementById('txParceladoSubContainer');
+
+      if (mode === 'avista') {
+        btnAvista.className = 'py-2 rounded-lg text-center transition cursor-pointer bg-indigo-600 text-white shadow-sm';
+        btnParcelado.className = 'py-2 rounded-lg text-center transition text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer';
+        avistaSub.classList.remove('hidden');
+        parceladoSub.classList.add('hidden');
+      } else {
+        btnParcelado.className = 'py-2 rounded-lg text-center transition cursor-pointer bg-purple-600 text-white shadow-sm';
+        btnAvista.className = 'py-2 rounded-lg text-center transition text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer';
+        parceladoSub.classList.remove('hidden');
+        avistaSub.classList.add('hidden');
+        setParceladoSubType(parceladoSubType);
+      }
+      toggleInvoicePaymentFields();
+    }
+
+    function setAvistaSubMethod(method) {
+      avistaSubMethod = method;
+      ['cash', 'pix', 'debit', 'credit', 'boleto'].forEach(m => {
+        const btn = document.getElementById(`btnAvista${m.charAt(0).toUpperCase() + m.slice(1)}`);
+        if (!btn) return;
+        if (m === method) {
+          btn.className = 'py-1.5 rounded-lg text-center transition cursor-pointer bg-indigo-600 text-white font-bold';
+        } else {
+          btn.className = 'py-1.5 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-300';
+        }
+      });
+
+      const cardWrapper = document.getElementById('txAvistaCardWrapper');
+      if (method === 'credit') {
+        cardWrapper.classList.remove('hidden');
+      } else {
+        cardWrapper.classList.add('hidden');
+      }
+
+      toggleInvoicePaymentFields();
+    }
+
+    function setParceladoSubType(subType) {
+      parceladoSubType = subType;
+      const btnBoleto = document.getElementById('btnParceladoBoleto');
+      const btnCredit = document.getElementById('btnParceladoCredit');
+      const cardSelectWrapper = document.getElementById('txCardSelectWrapper');
+      const amountLabel = document.getElementById('txAmountLabel');
+      const dateLabel = document.getElementById('txDateLabel');
+
+      if (subType === 'boleto') {
+        btnBoleto.className = 'py-2 rounded-lg text-center transition cursor-pointer bg-purple-600 text-white';
+        btnCredit.className = 'py-2 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700 text-slate-400';
+        cardSelectWrapper.classList.add('hidden');
+        amountLabel.textContent = 'Valor Total do Carnê / Boleto (R$)';
+        dateLabel.textContent = 'Vencimento do 1º Boleto';
+      } else {
+        btnCredit.className = 'py-2 rounded-lg text-center transition cursor-pointer bg-purple-600 text-white';
+        btnBoleto.className = 'py-2 rounded-lg text-center transition cursor-pointer bg-slate-200 dark:bg-slate-700 text-slate-400';
+        cardSelectWrapper.classList.remove('hidden');
+        amountLabel.textContent = 'Valor Total da Compra (R$)';
+        dateLabel.textContent = 'Data da Compra';
+      }
+      updateBillingNotice();
+    }
+
+    function updateBillingNotice() {
+      if (paymentMode !== 'parcelado') return;
+      const dateVal = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
+      const installments = Number(document.getElementById('txInstallmentsInput').value || 2);
+      const totalAmount = Number(document.getElementById('txAmountInput').value || 0);
+      const notice = document.getElementById('txBillingNotice');
+      const previewAmount = document.getElementById('installmentPreviewAmount');
+
+      const installmentValue = installments > 0 ? (totalAmount / installments) : totalAmount;
+      previewAmount.textContent = `${installments}x de ${formatCurrency(installmentValue)}`;
+
+      if (parceladoSubType === 'credit') {
+        const cardId = document.getElementById('txCardIdInput').value;
+        if (!cardId) {
+          notice.textContent = 'Cadastre um cartão para vincular compras a prazo.';
+          return;
+        }
+        const res = calculateCardBilling(cardId, dateVal, 0);
+        const [by, bm] = res.billingMonth.split('-').map(Number);
+        const lastRes = calculateCardBilling(cardId, dateVal, installments - 1);
+        const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
+        notice.innerHTML = `📅 Cartão: 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. Limite de ${formatCurrency(totalAmount)} comprometido.`;
+      } else {
+        const firstRes = calculateBoletoBilling(dateVal, 0);
+        const [by, bm] = firstRes.billingMonth.split('-').map(Number);
+        const lastRes = calculateBoletoBilling(dateVal, installments - 1);
+        const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
+        notice.innerHTML = `📄 Boleto/Carnê: 1º vencimento em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong> (sem vínculo de limite).`;
+      }
+    }
+
+    function openTransactionModal() {
+      document.getElementById('txModalTitle').textContent = 'Novo Lançamento';
+      document.getElementById('txIdInput').value = '';
+      document.getElementById('txDescInput').value = '';
+      document.getElementById('txAmountInput').value = '';
+      document.getElementById('txDateInput').value = `${currentMonthKey}-10`;
+      document.getElementById('txInstallmentsInput').value = '2';
+      setTxType('expense');
+      setPaymentMode('avista');
+      setAvistaSubMethod('pix');
+      setParceladoSubType('boleto');
+      populateCardSelect();
+      toggleInvoicePaymentFields();
+      document.getElementById('transactionModal').classList.remove('hidden');
+    }
+
+    function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
+
+    // SALVAR LANÇAMENTO (COM CÁLCULO PRECISO DE RESQUÍCIO E ABATIMENTO DE FATURA)
+    function saveTransaction(e) {
+      e.preventDefault();
+      const id = document.getElementById('txIdInput').value;
+      const txDate = document.getElementById('txDateInput').value;
+      const desc = document.getElementById('txDescInput').value.trim();
+      const totalAmount = Number(document.getElementById('txAmountInput').value);
+      const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
+
+      let paymentMethod = avistaSubMethod;
+      let cardId = null;
+      let installments = 1;
+
+      if (paymentMode === 'avista') {
+        if (avistaSubMethod === 'credit') {
+          cardId = document.getElementById('txAvistaCardIdInput').value;
+        }
+      } else {
+        installments = Number(document.getElementById('txInstallmentsInput').value || 2);
+        if (parceladoSubType === 'credit') {
+          paymentMethod = 'credit';
+          cardId = document.getElementById('txCardIdInput').value;
+        } else {
+          paymentMethod = 'boleto';
+        }
+      }
+
+      if (id) {
+        const existingTx = appData.transactions.find(t => t.id === id || t.groupId === id);
+        if (existingTx && existingTx.groupId) {
+          appData.transactions = appData.transactions.filter(t => t.groupId !== existingTx.groupId);
+        } else {
+          appData.transactions = appData.transactions.filter(t => t.id !== id);
+        }
+      }
+
+      // QUITAÇÃO DE FATURA DE CARTÃO (COM RESQUÍCIO SE PAGAR PARCIAL E AMORTIZAÇÃO SE PAGAR A MAIS)
+      if (currentTxType === 'expense' && categoryId === 'cat_fatura' && paymentMode === 'avista') {
+        const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
+        const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
+        const targetCard = appData.cards.find(c => c.id === invoiceCardId);
+
+        if (!targetCard) {
+          alert('Por favor, selecione um cartão válido para realizar o pagamento da fatura.');
+          return;
+        }
+
+        const cardExpenses = appData.transactions
+          .filter(t => t.paymentMethod === 'credit' && t.cardId === invoiceCardId && !isCardSettled(t));
+        
+        let pool = totalAmount;
+        const currentMonthTxs = cardExpenses.filter(t => (t.billingMonth || (t.date || '').slice(0, 7)) === invoiceMonth);
+        
+        for (const tx of currentMonthTxs) {
+          if (pool <= 0) break;
+          const pending = getTxPendingAmount(tx);
+          if (pool >= pending) {
+            tx.status = 'card_paid';
+            pool -= pending;
+          } else {
+            tx.discountAmount = Number(((tx.discountAmount || 0) + pool).toFixed(2));
+            pool = 0;
+            break;
+          }
+        }
+
+        if (pool > 0) {
+          const futureMonthTxs = cardExpenses
+            .filter(t => (t.billingMonth || (t.date || '').slice(0, 7)) > invoiceMonth)
+            .sort((a, b) => (a.billingMonth || a.date).localeCompare(b.billingMonth || b.date));
+
+          for (const tx of futureMonthTxs) {
+            if (pool <= 0) break;
+            const pending = getTxPendingAmount(tx);
+            if (pool >= pending) {
+              tx.status = 'card_paid';
+              pool -= pending;
+            } else {
+              tx.discountAmount = Number(((tx.discountAmount || 0) + pool).toFixed(2));
+              pool = 0;
+              break;
+            }
+          }
+        }
+
+        if (pool > 0 && Number(targetCard.initialUsedLimit || 0) > 0) {
+          targetCard.initialUsedLimit = Math.max(0, Number(targetCard.initialUsedLimit) - pool);
+        }
+      }
+
+      if (currentTxType === 'expense' && categoryId === 'cat_boleto' && paymentMode === 'avista') {
+        const targetBoletoId = document.getElementById('txBoletoTargetSelect').value;
+        if (targetBoletoId) {
+          const targetBoleto = appData.transactions.find(t => t.id === targetBoletoId);
+          if (targetBoleto) {
+            targetBoleto.boletoPaid = true;
+          }
+        }
+      }
+
+      if (paymentMode === 'parcelado' && installments > 1) {
+        if (paymentMethod === 'credit' && !cardId) {
+          alert('Selecione um cartão de crédito válido.');
+          return;
+        }
+
+        const installmentAmount = Number((totalAmount / installments).toFixed(2));
+        const groupId = 'group_' + Date.now();
+
+        for (let i = 0; i < installments; i++) {
+          const billing = paymentMethod === 'credit'
+            ? calculateCardBilling(cardId, txDate, i).billingMonth
+            : calculateBoletoBilling(txDate, i).billingMonth;
+
+          appData.transactions.push({
+            id: 'tx_' + Date.now() + '_' + i,
+            groupId: groupId,
+            type: 'expense',
+            paymentMethod: paymentMethod,
+            cardId: paymentMethod === 'credit' ? cardId : null,
+            billingMonth: billing,
+            description: `${desc} (${i + 1}/${installments})`,
+            amount: installmentAmount,
+            originalTotalAmount: totalAmount,
+            discountAmount: 0,
+            date: txDate,
+            categoryId: categoryId,
+            installmentsTotal: installments,
+            installmentNumber: i + 1,
+            status: 'pending',
+            boletoPaid: false
+          });
+        }
+      } else {
+        let billingMonth = txDate.slice(0, 7);
+        if (paymentMethod === 'credit' && cardId) {
+          billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
+        } else if (paymentMethod === 'boleto') {
+          billingMonth = calculateBoletoBilling(txDate, 0).billingMonth;
+        }
+
+        const txObj = {
+          id: id || 'tx_' + Date.now(),
+          type: currentTxType,
+          paymentMethod: currentTxType === 'expense' ? paymentMethod : 'income',
+          cardId: (paymentMethod === 'credit') ? cardId : null,
+          billingMonth: billingMonth,
+          description: desc,
+          amount: totalAmount,
+          originalTotalAmount: totalAmount,
+          discountAmount: 0,
+          date: txDate,
+          categoryId: categoryId,
+          installmentsTotal: 1,
+          installmentNumber: 1,
+          status: isDeferredMethod(paymentMethod) ? 'pending' : 'paid',
+          boletoPaid: false
+        };
+
+        appData.transactions.push(txObj);
+      }
+
+      saveToStorage();
+      closeTransactionModal();
+      renderAll();
+    }
+
+    function editTransaction(id) {
+      const tx = appData.transactions.find(t => t.id === id || t.groupId === id);
+      if (!tx) return;
+      document.getElementById('txModalTitle').textContent = 'Editar Lançamento';
+      document.getElementById('txIdInput').value = tx.groupId || tx.id;
+      document.getElementById('txDescInput').value = tx.description.replace(/\s\(\d+\/\d+\)$/, '');
+      document.getElementById('txAmountInput').value = tx.originalTotalAmount || tx.amount;
+      document.getElementById('txDateInput').value = tx.date;
+      setTxType(tx.type);
+      if (tx.type === 'expense') {
+        document.getElementById('txCatInput').value = tx.categoryId;
+        if (isDeferredMethod(tx.paymentMethod) && (tx.installmentsTotal || 1) > 1) {
+          setPaymentMode('parcelado');
+          if (tx.paymentMethod === 'credit') {
+            setParceladoSubType('credit');
+            if (tx.cardId) document.getElementById('txCardIdInput').value = tx.cardId;
+          } else {
+            setParceladoSubType('boleto');
+          }
+          document.getElementById('txInstallmentsInput').value = tx.installmentsTotal || 2;
+        } else {
+          setPaymentMode('avista');
+          setAvistaSubMethod(tx.paymentMethod);
+          if (tx.paymentMethod === 'credit' && tx.cardId) {
+            document.getElementById('txAvistaCardIdInput').value = tx.cardId;
+          }
+        }
+        toggleInvoicePaymentFields();
+      }
+      document.getElementById('transactionModal').classList.remove('hidden');
+    }
+
+    function deleteTransaction(id) {
+      const tx = appData.transactions.find(t => t.id === id);
+      if (!tx) return;
+
+      if (tx.groupId) {
+        if (confirm('Este lançamento é um parcelamento. Deseja excluir esta compra e todas as suas parcelas?')) {
+          appData.transactions = appData.transactions.filter(t => t.groupId !== tx.groupId);
+          saveToStorage();
+          renderAll();
+          return;
+        }
+      }
+
+      if (!confirm('Eliminar este lançamento?')) return;
+      appData.transactions = appData.transactions.filter(t => t.id !== id);
+      saveToStorage();
+      renderAll();
+    }
+
+    function setTxType(type) {
+      currentTxType = type;
+      const btnExp = document.getElementById('btnTypeExpense'), btnInc = document.getElementById('btnTypeIncome');
+      const catContainer = document.getElementById('txCategoryContainer'), payContainer = document.getElementById('txPaymentMethodContainer');
+      if (type === 'expense') {
+        btnExp.className = 'py-2 rounded-lg text-xs font-bold bg-rose-500 text-white transition cursor-pointer';
+        btnInc.className = 'py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition cursor-pointer';
+        catContainer.style.display = 'block';
+        payContainer.style.display = 'block';
+        document.getElementById('txCatInput').setAttribute('required', 'true');
+      } else {
+        btnInc.className = 'py-2 rounded-lg text-xs font-bold bg-emerald-500 text-white transition cursor-pointer';
+        btnExp.className = 'py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition cursor-pointer';
+        catContainer.style.display = 'none';
+        payContainer.style.display = 'none';
+        document.getElementById('txAvistaSubContainer').classList.add('hidden');
+        document.getElementById('txParceladoSubContainer').classList.add('hidden');
+        document.getElementById('txPaymentMethodContainer').style.display = 'none';
+        document.getElementById('txInvoicePaymentContainer').classList.add('hidden');
+        document.getElementById('txBoletoPaymentContainer').classList.add('hidden');
+        document.getElementById('txCatInput').removeAttribute('required');
+      }
+    }
+
+    function switchTab(tabName) {
+      ['overview', 'cards', 'comparison', 'categories'].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (t === tabName) {
+          btn.className = 'tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-500/20 transition flex items-center gap-2 cursor-pointer';
+        } else {
+          btn.className = 'tab-btn px-4 py-2 rounded-xl text-sm font-semibold bg-white dark:bg-darkCard text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-darkBorder transition flex items-center gap-2 cursor-pointer';
+        }
+      });
+      if (tabName === 'comparison') renderComparisonDashboard();
+      if (tabName === 'cards') renderCardsTab();
+    }
+
+    function setupComparisonDefaults() {
+      const [y, m] = currentMonthKey.split('-').map(Number);
+      let prevY = y, prevM = m - 1; if (prevM < 1) { prevM = 12; prevY--; }
+      document.getElementById('compareMonthA').value = `${prevY}-${String(prevM).padStart(2, '0')}`;
+      document.getElementById('compareMonthB').value = currentMonthKey;
+    }
+
+    function renderComparisonDashboard() {
+      const [curY, curM] = currentMonthKey.split('-').map(Number);
+      const last6Keys = [];
+      for (let i = 5; i >= 0; i--) { let m = curM - i, y = curY; while (m < 1) { m += 12; y--; } last6Keys.push(`${y}-${String(m).padStart(2, '0')}`); }
+      const labels6 = last6Keys.map(k => { const [y, m] = k.split('-').map(Number); return `${MONTH_SHORT[m - 1]}/${String(y).slice(2)}`; });
+      const incomes6 = [], expenses6 = [], leftovers6 = [];
+      last6Keys.forEach(k => {
+        const sal = getSalaryForMonth(k), txs = appData.transactions.filter(t => getEffectiveMonthKey(t) === k);
+        const inc = sal + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
+        const exp = txs.filter(t => t.type === 'expense' && !isDeferredMethod(t.paymentMethod)).reduce((a, b) => a + Number(b.amount), 0);
+        incomes6.push(inc); expenses6.push(exp); leftovers6.push((sal - exp) + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0));
+      });
+      const ctxBar = document.getElementById('sixMonthsBarChart').getContext('2d');
+      if (barChart) barChart.destroy();
+      barChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: { labels: labels6, datasets: [{ label: 'Salário + Entradas', data: incomes6, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Saídas Efetivas', data: expenses6, backgroundColor: '#f43f5e', borderRadius: 6 }, { label: 'Saldo', data: leftovers6, backgroundColor: '#6366f1', borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8' }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#33415533' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
+      });
+
+      const monthA = document.getElementById('compareMonthA').value || currentMonthKey;
+      const monthB = document.getElementById('compareMonthB').value || currentMonthKey;
+      document.getElementById('thMonthA').textContent = formatMonthLabel(monthA);
+      document.getElementById('thMonthB').textContent = formatMonthLabel(monthB);
+
+      const expA = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthA && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
+      const expB = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthB && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
+      const totalA = expA.reduce((a, b) => a + Number(b.amount), 0), totalB = expB.reduce((a, b) => a + Number(b.amount), 0), diffTotal = totalB - totalA;
+
+      document.getElementById('comparisonSummaryCards').innerHTML = `
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total em ${formatMonthLabel(monthA)}</span><p class="text-xl font-bold text-indigo-400 mt-1">${formatCurrency(totalA)}</p></div>
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Total em ${formatMonthLabel(monthB)}</span><p class="text-xl font-bold text-purple-400 mt-1">${formatCurrency(totalB)}</p></div>
+        <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700"><span class="text-xs text-slate-400">Resultado</span><p class="text-xl font-bold mt-1 ${diffTotal <= 0 ? 'text-emerald-500' : 'text-rose-500'}">${diffTotal <= 0 ? `Poupou ${formatCurrency(Math.abs(diffTotal))}` : `Gastou +${formatCurrency(diffTotal)}`}</p></div>
+      `;
+
+      document.getElementById('comparisonTableBody').innerHTML = appData.categories.map(cat => {
+        const valA = expA.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        const valB = expB.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
+        if (valA === 0 && valB === 0) return '';
+        const diff = valB - valA;
+        return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+          <td class="py-3 px-3 font-medium flex items-center gap-2"><span class="w-7 h-7 rounded-lg flex items-center justify-center text-xs" style="background:${cat.color}20; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i></span>${cat.name}</td>
+          <td class="py-3 px-3 text-right font-medium">${formatCurrency(valA)}</td>
+          <td class="py-3 px-3 text-right font-medium">${formatCurrency(valB)}</td>
+          <td class="py-3 px-3 text-right font-bold ${diff <= 0 ? 'text-emerald-500' : 'text-rose-500'}">${diff > 0 ? '+' : ''}${formatCurrency(diff)}</td>
+          <td class="py-3 px-3 text-center"><span class="px-2.5 py-1 rounded-full text-xs font-semibold ${diff < 0 ? 'bg-emerald-500/10 text-emerald-500' : diff > 0 ? 'bg-rose-500/10 text-rose-500' : 'bg-slate-500/10 text-slate-400'}">${diff < 0 ? 'Gastou menos' : diff > 0 ? 'Gastou mais' : 'Igual'}</span></td>
+        </tr>`;
+      }).join('') || `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">Sem dados para comparar nestes meses.</td></tr>`;
+    }
+
+    function renderCategoriesTab() {
+      document.getElementById('categoriesGrid').innerHTML = appData.categories.map(cat => {
+        const groupLabel = cat.group === 'wants' ? 'Estilo de Vida' : cat.group === 'savings' ? 'Metas & Futuro' : 'Necessidades Básicas';
+        const isSysCat = cat.id === 'cat_fatura' || cat.id === 'cat_boleto';
+        return `
+          <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl flex items-center justify-center text-lg" style="background:${cat.color}20; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i></div>
+              <div>
+                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">${cat.name}</h4>
+                <span class="text-[10px] font-semibold text-slate-400 block">${groupLabel}</span>
+                <p class="text-xs text-slate-400 mt-0.5">Teto mensal: <strong class="text-slate-600 dark:text-slate-300">${cat.budget > 0 ? formatCurrency(cat.budget) : 'Sem limite'}</strong></p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition cursor-pointer" title="Editar Categoria"><i class="fa-solid fa-pen pointer-events-none"></i></button>
+              ${!isSysCat ? `<button type="button" onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition cursor-pointer" title="Excluir"><i class="fa-solid fa-trash pointer-events-none"></i></button>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderIconPicker() {
+      document.getElementById('iconPickerGrid').innerHTML = AVAILABLE_ICONS.map(icon => `
+        <button type="button" onclick="selectCatIcon('${icon}')" class="p-2.5 rounded-xl border flex items-center justify-center transition cursor-pointer ${selectedIcon === icon ? 'bg-indigo-600 text-white border-indigo-500' : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-500'}"><i class="fa-solid ${icon}"></i></button>
+      `).join('');
+    }
+
+    function selectCatIcon(icon) { selectedIcon = icon; renderIconPicker(); }
+
+    function openSalaryModal() {
+      document.getElementById('salaryInput').value = getSalaryForMonth(currentMonthKey) || '';
+      document.getElementById('salaryModal').classList.remove('hidden');
+    }
+
+    function closeSalaryModal() { document.getElementById('salaryModal').classList.add('hidden'); }
+
+    function saveSalary(e) {
+      e.preventDefault();
+      const val = Number(document.getElementById('salaryInput').value || 0);
+      appData.monthlySalaries[currentMonthKey] = val;
+      if (document.getElementById('salaryDefaultCheckbox').checked) {
+        appData.defaultSalary = val;
+      }
+      saveToStorage();
+      closeSalaryModal();
+      renderAll();
+    }
+
+    function openCategoryModal(catId = null) {
+      if (catId) {
+        const cat = appData.categories.find(c => c.id === catId);
+        if (!cat) return;
+        document.getElementById('catModalTitle').textContent = 'Editar Categoria';
+        document.getElementById('catIdInput').value = cat.id;
+        document.getElementById('catNameInput').value = cat.name;
+        document.getElementById('catColorInput').value = cat.color;
+        document.getElementById('catBudgetInput').value = cat.budget || 0;
+        document.getElementById('catGroupInput').value = cat.group || 'needs';
+        selectedIcon = cat.icon;
+      } else {
+        document.getElementById('catModalTitle').textContent = 'Nova Categoria';
+        document.getElementById('catIdInput').value = '';
+        document.getElementById('catNameInput').value = '';
+        document.getElementById('catColorInput').value = '#6366f1';
+        document.getElementById('catBudgetInput').value = '';
+        document.getElementById('catGroupInput').value = 'needs';
+        selectedIcon = 'fa-tag';
+      }
+      renderIconPicker();
+      document.getElementById('categoryModal').classList.remove('hidden');
+    }
+
+    function closeCategoryModal() { document.getElementById('categoryModal').classList.add('hidden'); }
+
+    function saveCategory(e) {
+      e.preventDefault();
+      const id = document.getElementById('catIdInput').value;
+      const catObj = {
+        id: id || 'cat_' + Date.now(),
+        name: document.getElementById('catNameInput').value.trim(),
+        color: document.getElementById('catColorInput').value,
+        budget: Number(document.getElementById('catBudgetInput').value || 0),
+        group: document.getElementById('catGroupInput').value,
+        icon: selectedIcon
+      };
+      if (id) {
+        const idx = appData.categories.findIndex(c => c.id === id);
+        if (idx > -1) appData.categories[idx] = catObj;
+      } else {
+        appData.categories.push(catObj);
+      }
+      saveToStorage();
+      closeCategoryModal();
+      renderAll();
+    }
+
+    function deleteCategory(id) {
+      if (appData.categories.length <= 1) { alert('Precisa de manter pelo menos uma categoria.'); return; }
+      if (!confirm('Eliminar esta categoria?')) return;
+      appData.categories = appData.categories.filter(c => c.id !== id);
+      saveToStorage();
+      renderAll();
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement; html.classList.toggle('dark');
+      document.getElementById('themeIcon').className = html.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    }
+
+    function toggleSettingsMenu(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('settingsMenu');
+      if (menu) {
+        menu.classList.toggle('hidden');
+      }
+    }
+
+    function loadSampleData() {
+      if (!confirm('Carregar dados de exemplo?')) { document.getElementById('settingsMenu').classList.add('hidden'); return; }
+      const [y, m] = currentMonthKey.split('-').map(Number);
+      let prevY = y, prevM = m - 1; if (prevM < 1) { prevM = 12; prevY--; }
+      const prevKey = `${prevY}-${String(prevM).padStart(2, '0')}`;
+      appData.defaultSalary = 6500;
+      appData.monthlySalaries[currentMonthKey] = 6500;
+      appData.monthlySalaries[prevKey] = 6500;
+      appData.cards = [
+        { id: 'card_nubank', name: 'Nubank', totalLimit: 5000, initialUsedLimit: 850, closingDay: 25, dueDay: 5, brandColor: '#8a05be' },
+        { id: 'card_inter', name: 'Inter', totalLimit: 3000, initialUsedLimit: 200, closingDay: 15, dueDay: 22, brandColor: '#f97316' }
+      ];
+      appData.transactions = [
+        { id: 'ex1', type: 'expense', paymentMethod: 'pix', description: 'Aluguel + Condomínio', amount: 1450, date: `${currentMonthKey}-05`, billingMonth: currentMonthKey, categoryId: 'cat_moradia' },
+        { id: 'ex2', type: 'expense', paymentMethod: 'credit', cardId: 'card_nubank', billingMonth: currentMonthKey, description: 'Supermercado Mensal', amount: 820, originalTotalAmount: 820, discountAmount: 0, date: `${currentMonthKey}-10`, categoryId: 'cat_mercado', status: 'pending' },
+        { id: 'ex3', type: 'expense', paymentMethod: 'debit', description: 'Combustível Posto Ipiranga', amount: 280, date: `${currentMonthKey}-12`, billingMonth: currentMonthKey, categoryId: 'cat_transporte' },
+        { id: 'ex4', type: 'income', paymentMethod: 'income', description: 'Freelance & Consultoria', amount: 1200, date: `${currentMonthKey}-18`, billingMonth: currentMonthKey, categoryId: null }
+      ];
+      saveToStorage();
+      renderAll();
+      document.getElementById('settingsMenu').classList.add('hidden');
+    }
+
+    function exportData() {
+      const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob), a = document.createElement('a');
+      a.href = url; a.download = `financontrol_${currentMonthKey}.json`; a.click(); URL.revokeObjectURL(url);
+    }
+
+    function importData(e) {
+      const file = e.target.files[0]; if (!file) return;
+      if (!confirm('Restaurar este backup?')) { e.target.value = ''; return; }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          if (imported.categories && imported.transactions) {
+            appData = imported;
+            ensureSystemCategories();
+            saveToStorage();
+            renderAll();
+            alert('Backup restaurado!');
+          }
+        } catch (err) { alert('Arquivo inválido.'); }
+      };
+      reader.readAsText(file);
+    }
+
+    function clearCurrentMonthData() {
+      const monthLabel = formatMonthLabel(currentMonthKey);
+      if (!confirm(`Deseja apagar os lançamentos avulsos de ${monthLabel}?\n\n🛡️ PROTEÇÃO TOTAL ATIVA:\nNenhuma compra no crédito, carnê de boleto ou parcela será apagada.`)) {
+        document.getElementById('settingsMenu').classList.add('hidden');
+        return;
+      }
+
+      appData.transactions = appData.transactions.filter(t => {
+        const isFromThisMonth = getEffectiveMonthKey(t) === currentMonthKey || isTxPurchasedInMonth(t, currentMonthKey);
+        const isProtectedMethod = isDeferredMethod(t.paymentMethod);
+        const isInstallment = (t.installmentsTotal && t.installmentsTotal > 1) || !!t.groupId;
+
+        if (isProtectedMethod || isInstallment) {
+          return true;
+        }
+
+        if (isFromThisMonth) {
+          return false;
+        }
+
+        return true;
+      });
+
+      if (appData.monthlySalaries && appData.monthlySalaries[currentMonthKey] !== undefined) {
+        delete appData.monthlySalaries[currentMonthKey];
+      }
+
+      saveToStorage();
+      renderAll();
+      document.getElementById('settingsMenu').classList.add('hidden');
+      alert(`Lançamentos avulsos de ${monthLabel} foram limpos. Suas contas de cartão, boletos e parcelamentos foram 100% preservados!`);
+    }
+
+    function clearAllData() {
+      if (!confirm('ATENÇÃO: Deseja apagar o histórico de TODOS os meses, cartões e registros do app? Esta ação é irreversível.')) {
+        document.getElementById('settingsMenu').classList.add('hidden');
+        return;
+      }
+      appData.defaultSalary = 0;
+      appData.monthlySalaries = {};
+      appData.transactions = [];
+      appData.cards = [];
+      saveToStorage();
+      renderAll();
+      document.getElementById('settingsMenu').classList.add('hidden');
+      alert('Todos os dados foram resetados com sucesso.');
+    }
+
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
