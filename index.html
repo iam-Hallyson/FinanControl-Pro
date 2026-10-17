@@ -199,8 +199,8 @@
             </div>
             
             <div class="mt-2.5 p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between text-[11px]">
-              <span class="text-purple-400 font-medium flex items-center gap-1.5" title="Soma das faturas previstas para o mês (não deduz do saldo até o pagamento ser lançado)">
-                <i class="fa-solid fa-receipt"></i> Previsão de Faturas:
+              <span class="text-purple-400 font-medium flex items-center gap-1.5" title="Soma das faturas e boletos previstos para o mês (não deduz do saldo até o pagamento ser lançado)">
+                <i class="fa-solid fa-receipt"></i> Previsão Faturas/Boletos:
               </span>
               <strong id="cardTotalInvoicesExpected" class="text-purple-400 font-bold">R$ 0,00</strong>
             </div>
@@ -429,7 +429,7 @@
                 <thead>
                   <tr class="border-b border-slate-200 dark:border-slate-700/70 text-[11px] uppercase tracking-wider text-slate-400">
                     <th class="py-3 px-2">Pagamento / Status</th>
-                    <th class="py-3 px-2">Data da Compra</th>
+                    <th class="py-3 px-2">Data</th>
                     <th class="py-3 px-2">Descrição</th>
                     <th class="py-3 px-2">Categoria</th>
                     <th class="py-3 px-2 text-right">Valor</th>
@@ -632,9 +632,9 @@
       </div>
     </div>
 
-    <!-- MODAL LANÇAMENTO DE GASTO / ENTRADA -->
+    <!-- MODAL LANÇAMENTO DE GASTO / ENTRADA (COM OPÇÃO DE CARTÃO E BOLETO PARCELADO) -->
     <div id="transactionModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade">
+      <div class="bg-white dark:bg-darkCard w-full max-w-md rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade max-h-[92vh] overflow-y-auto custom-scroll">
         <div class="flex justify-between items-center mb-4">
           <h3 id="txModalTitle" class="font-bold text-lg">Novo Lançamento</h3>
           <button onclick="closeTransactionModal()" class="text-slate-400 hover:text-slate-200 cursor-pointer"><i class="fa-solid fa-xmark text-lg"></i></button>
@@ -650,29 +650,31 @@
             </button>
           </div>
 
-          <!-- FORMA DE PAGAMENTO -->
+          <!-- FORMA DE PAGAMENTO (5 OPÇÕES INCLUINDO BOLETO) -->
           <div id="txPaymentMethodContainer">
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Como você pagou?</label>
-            <div class="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-[11px] font-semibold">
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1.5">Como você pagou / contratou?</label>
+            <div class="grid grid-cols-5 gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-[11px] font-semibold">
               <button type="button" onclick="setPaymentMethod('cash')" id="btnMethodCash" class="py-1.5 rounded-lg text-center transition cursor-pointer">Dinheiro</button>
               <button type="button" onclick="setPaymentMethod('pix')" id="btnMethodPix" class="py-1.5 rounded-lg text-center transition cursor-pointer">PIX</button>
               <button type="button" onclick="setPaymentMethod('debit')" id="btnMethodDebit" class="py-1.5 rounded-lg text-center transition cursor-pointer">Débito</button>
               <button type="button" onclick="setPaymentMethod('credit')" id="btnMethodCredit" class="py-1.5 rounded-lg text-center transition cursor-pointer">Crédito</button>
+              <button type="button" onclick="setPaymentMethod('boleto')" id="btnMethodBoleto" class="py-1.5 rounded-lg text-center transition cursor-pointer">Boleto</button>
             </div>
           </div>
 
-          <!-- SELECIONAR CARTÃO E PARCELAS (CRÉDITO) -->
-          <div id="txCreditCardSelectContainer" class="hidden space-y-3">
-            <div>
+          <!-- SELECIONAR CARTÃO E PARCELAS (CRÉDITO OU BOLETO) -->
+          <div id="txInstallmentConfigContainer" class="hidden space-y-3 p-3 rounded-2xl bg-purple-500/5 border border-purple-500/20">
+            <!-- Só exibe seletor de cartão quando for Crédito -->
+            <div id="txCardSelectWrapper">
               <label class="block text-xs font-semibold uppercase text-purple-400 mb-1">Qual cartão você usou?</label>
               <select id="txCardIdInput" onchange="updateBillingNotice()" class="w-full px-3.5 py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-semibold text-sm focus:outline-none"></select>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-xs font-semibold uppercase text-purple-400 mb-1">Parcelamento</label>
+                <label id="txInstallmentLabel" class="block text-xs font-semibold uppercase text-purple-400 mb-1">Parcelamento</label>
                 <select id="txInstallmentsInput" onchange="updateBillingNotice()" class="w-full px-3 py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-600 dark:text-purple-300 font-semibold text-xs focus:outline-none">
-                  <option value="1">1x (À vista na fatura)</option>
+                  <option value="1">1x (À vista)</option>
                   <option value="2">2x</option>
                   <option value="3">3x</option>
                   <option value="4">4x</option>
@@ -696,7 +698,7 @@
 
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Descrição</label>
-            <input type="text" id="txDescInput" required placeholder="Ex: Supermercado, Pagamento Fatura Nubank..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-indigo-500">
+            <input type="text" id="txDescInput" required placeholder="Ex: Supermercado, Notebook, Fatura Nubank..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-indigo-500">
           </div>
           <div class="grid grid-cols-2 gap-3">
             <div>
@@ -704,7 +706,7 @@
               <input type="number" step="0.01" min="0.01" id="txAmountInput" required oninput="updateBillingNotice()" placeholder="0,00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
             </div>
             <div>
-              <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Data da Compra</label>
+              <label id="txDateLabel" class="block text-xs font-semibold uppercase text-slate-400 mb-1">Data da Compra</label>
               <input type="date" id="txDateInput" required onchange="updateBillingNotice()" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
             </div>
           </div>
@@ -713,7 +715,7 @@
             <select id="txCatInput" onchange="toggleInvoicePaymentFields()" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none"></select>
           </div>
 
-          <!-- CAMPOS EXCLUSIVOS PARA PAGAMENTO DE FATURA -->
+          <!-- CAMPOS EXCLUSIVOS PARA PAGAMENTO DE FATURA DE CARTÃO -->
           <div id="txInvoicePaymentContainer" class="hidden space-y-3 p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
             <div class="text-xs font-semibold text-purple-400 flex items-center gap-1.5">
               <i class="fa-solid fa-receipt"></i> Quitação de Fatura do Cartão
@@ -728,7 +730,25 @@
                 <input type="month" id="txInvoiceMonthInput" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               </div>
             </div>
-            <p class="text-[10px] text-purple-300">💡 O pagamento quitará as contas deste cartão. Qualquer excedente amortizará a fatura seguinte sem alterar o valor original da compra cadastrada.</p>
+            <p class="text-[10px] text-purple-300">💡 O pagamento quitará as contas deste cartão. Qualquer excedente amortizará a fatura seguinte sem alterar o valor original da compra.</p>
+          </div>
+
+          <!-- CAMPOS EXCLUSIVOS PARA PAGAMENTO DE BOLETO PARCELADO -->
+          <div id="txBoletoPaymentContainer" class="hidden space-y-3 p-3 bg-amber-500/10 rounded-2xl border border-amber-500/20">
+            <div class="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-barcode"></i> Baixa de Boleto Pendente
+            </div>
+            <div class="grid grid-cols-1 gap-2">
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Mês de Vencimento do Boleto</label>
+                <input type="month" id="txBoletoMonthInput" onchange="populatePendingBoletosSelect()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+              </div>
+              <div>
+                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Selecione o Boleto a Quitar</label>
+                <select id="txBoletoTargetSelect" onchange="onSelectPendingBoleto()" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold"></select>
+              </div>
+            </div>
+            <p class="text-[10px] text-amber-300">💡 Diferente do cartão, o pagamento de boleto quita estritamente a parcela selecionada, sem gerar resquício ou abatimento nos boletos dos meses seguintes.</p>
           </div>
 
           <div class="flex justify-end gap-2 pt-3">
@@ -795,11 +815,12 @@
     const AVAILABLE_ICONS = [
       'fa-house', 'fa-cart-shopping', 'fa-utensils', 'fa-car', 'fa-gas-pump', 'fa-heart-pulse',
       'fa-graduation-cap', 'fa-gamepad', 'fa-plane', 'fa-shirt', 'fa-bolt', 'fa-wifi',
-      'fa-mobile-screen', 'fa-paw', 'fa-gift', 'fa-piggy-bank', 'fa-credit-card', 'fa-briefcase'
+      'fa-mobile-screen', 'fa-paw', 'fa-gift', 'fa-piggy-bank', 'fa-credit-card', 'fa-barcode', 'fa-briefcase'
     ];
 
     const DEFAULT_CATEGORIES = [
       { id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' },
+      { id: 'cat_boleto', name: 'Pagamento de Boleto', color: '#f59e0b', icon: 'fa-barcode', budget: 0, group: 'needs' },
       { id: 'cat_moradia', name: 'Moradia & Contas', color: '#6366f1', icon: 'fa-house', budget: 1800, group: 'needs' },
       { id: 'cat_mercado', name: 'Alimentação & Mercado', color: '#10b981', icon: 'fa-cart-shopping', budget: 1200, group: 'needs' },
       { id: 'cat_transporte', name: 'Transporte & Carro', color: '#f59e0b', icon: 'fa-car', budget: 700, group: 'needs' },
@@ -830,6 +851,16 @@
     let tokenClient = null;
     let accessToken = localStorage.getItem('gdrive_access_token') || null;
     let driveFileId = null;
+
+    function ensureSystemCategories() {
+      if (!appData.categories.some(c => c.id === 'cat_fatura')) {
+        appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' });
+      }
+      if (!appData.categories.some(c => c.id === 'cat_boleto')) {
+        appData.categories.splice(1, 0, { id: 'cat_boleto', name: 'Pagamento de Boleto', color: '#f59e0b', icon: 'fa-barcode', budget: 0, group: 'needs' });
+      }
+      appData.categories.forEach(c => { if (!c.group) c.group = 'needs'; });
+    }
 
     function initGoogleAuth() {
       if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
@@ -967,10 +998,7 @@
               cards: cloudData.cards || [],
               ruleConfig: cloudData.ruleConfig || { needs: 50, wants: 30, savings: 20 }
             };
-            appData.categories.forEach(c => { if (!c.group) c.group = 'needs'; });
-            if (!appData.categories.some(c => c.id === 'cat_fatura')) {
-              appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' });
-            }
+            ensureSystemCategories();
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
             renderAll();
           }
@@ -1016,7 +1044,6 @@
       loadFromStorage();
       initGoogleAuth();
 
-      // Se já estava usando o app localmente, abre automaticamente
       const hasPreviousSession = localStorage.getItem('financontrol_unlocked_local') === 'true';
       if (hasPreviousSession && !accessToken) {
         unlockApp('Modo Local');
@@ -1045,13 +1072,12 @@
             cards: Array.isArray(parsed.cards) ? parsed.cards : [],
             ruleConfig: parsed.ruleConfig || { needs: 50, wants: 30, savings: 20 }
           };
-          appData.categories.forEach(c => { if (!c.group) c.group = 'needs'; });
-          if (!appData.categories.some(c => c.id === 'cat_fatura')) {
-            appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0, group: 'needs' });
-          }
+          ensureSystemCategories();
         } catch (err) {
           console.error(err);
         }
+      } else {
+        ensureSystemCategories();
       }
     }
 
@@ -1114,11 +1140,15 @@
       } else { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
     }
 
+    function isDeferredMethod(method) {
+      return method === 'credit' || method === 'boleto';
+    }
+
     function getEffectiveMonthKey(tx) {
-      if (tx.type === 'expense' && tx.paymentMethod === 'credit' && tx.billingMonth) {
+      if (tx.type === 'expense' && isDeferredMethod(tx.paymentMethod) && tx.billingMonth) {
         return tx.billingMonth;
       }
-      return tx.date.slice(0, 7);
+      return (tx.date || '').slice(0, 7);
     }
 
     function isTxPurchasedInMonth(tx, monthKey) {
@@ -1153,8 +1183,28 @@
       };
     }
 
+    // Cálculo de meses para carnê/boleto a partir da data do 1º vencimento
+    function calculateBoletoBilling(txDateStr, monthOffset = 0) {
+      const [y, m] = txDateStr.split('-').map(Number);
+      let targetYear = y;
+      let targetMonth = m + monthOffset;
+
+      while (targetMonth > 12) {
+        targetMonth -= 12;
+        targetYear += 1;
+      }
+
+      return {
+        billingMonth: `${targetYear}-${String(targetMonth).padStart(2, '0')}`
+      };
+    }
+
+    function isTxSettled(tx) {
+      return tx.status === 'card_paid' || tx.status === 'boleto_paid';
+    }
+
     function getTxPendingAmount(tx) {
-      if (tx.status === 'card_paid') return 0;
+      if (isTxSettled(tx)) return 0;
       const orig = Number(tx.amount || 0);
       const disc = Number(tx.discountAmount || 0);
       return Math.max(0, orig - disc);
@@ -1181,10 +1231,12 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      const cashOutflows = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
+      // Saídas efetivas da conta (PIX, dinheiro, débito, faturas pagas e boletos pagos)
+      const cashOutflows = monthTxs.filter(t => t.type === 'expense' && !isDeferredMethod(t.paymentMethod))
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      const totalCreditInvoices = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit' && t.status !== 'card_paid')
+      // Previsão de faturas de cartão + boletos pendentes que vencem neste mês
+      const totalDeferredPending = monthTxs.filter(t => t.type === 'expense' && isDeferredMethod(t.paymentMethod) && !isTxSettled(t))
         .reduce((a, b) => a + getTxPendingAmount(b), 0);
 
       const totalOutflow = cashOutflows;
@@ -1195,7 +1247,7 @@
       document.getElementById('cardBaseSalary').textContent = formatCurrency(baseSalary);
       document.getElementById('cardExtraIncome').textContent = formatCurrency(extraIncome);
       document.getElementById('cardTotalExpenses').textContent = formatCurrency(totalOutflow);
-      document.getElementById('cardTotalInvoicesExpected').textContent = formatCurrency(totalCreditInvoices);
+      document.getElementById('cardTotalInvoicesExpected').textContent = formatCurrency(totalDeferredPending);
       document.getElementById('cardDirectExpenses').textContent = formatCurrency(cashOutflows);
 
       const remEl = document.getElementById('cardRemaining');
@@ -1270,7 +1322,7 @@
       document.getElementById('rule30Target').textContent = `Teto: ${formatCurrency(target30)}`;
       document.getElementById('rule20Target').textContent = `Meta: ${formatCurrency(target20)}`;
 
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && t.paymentMethod !== 'credit');
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
 
       let spent50 = 0;
       let spent30 = 0;
@@ -1370,18 +1422,64 @@
       invoiceCardSelect.innerHTML = opts;
     }
 
-    function toggleInvoicePaymentFields() {
-      const catVal = document.getElementById('txCatInput').value;
-      const invContainer = document.getElementById('txInvoicePaymentContainer');
-      if (catVal === 'cat_fatura') {
-        invContainer.classList.remove('hidden');
-        document.getElementById('txInvoiceMonthInput').value = currentMonthKey;
-      } else {
-        invContainer.classList.add('hidden');
+    function populatePendingBoletosSelect() {
+      const boletoMonth = document.getElementById('txBoletoMonthInput').value || currentMonthKey;
+      const selectEl = document.getElementById('txBoletoTargetSelect');
+
+      const pendingBoletos = appData.transactions.filter(t =>
+        t.paymentMethod === 'boleto' &&
+        !isTxSettled(t) &&
+        (t.billingMonth || t.date.slice(0, 7)) === boletoMonth
+      );
+
+      if (pendingBoletos.length === 0) {
+        selectEl.innerHTML = `<option value="">Nenhum boleto pendente para este mês</option>`;
+        return;
+      }
+
+      selectEl.innerHTML = pendingBoletos.map(b =>
+        `<option value="${b.id}" data-amt="${b.amount}" data-desc="${b.description}">${b.description} - ${formatCurrency(b.amount)}</option>`
+      ).join('');
+
+      onSelectPendingBoleto();
+    }
+
+    function onSelectPendingBoleto() {
+      const selectEl = document.getElementById('txBoletoTargetSelect');
+      const selectedOpt = selectEl.options[selectEl.selectedIndex];
+      if (selectedOpt && selectedOpt.value) {
+        const amt = selectedOpt.getAttribute('data-amt');
+        const desc = selectedOpt.getAttribute('data-desc');
+        if (!document.getElementById('txAmountInput').value) {
+          document.getElementById('txAmountInput').value = amt;
+        }
+        if (!document.getElementById('txDescInput').value) {
+          document.getElementById('txDescInput').value = `Pgto Boleto: ${desc}`;
+        }
       }
     }
 
-    // TABELA PRINCIPAL COM ALERTA PARA FATURAS PENDENTES E BLOQUEIO DE AÇÕES
+    function toggleInvoicePaymentFields() {
+      const catVal = document.getElementById('txCatInput').value;
+      const invContainer = document.getElementById('txInvoicePaymentContainer');
+      const bolContainer = document.getElementById('txBoletoPaymentContainer');
+
+      if (catVal === 'cat_fatura' && !isDeferredMethod(currentPaymentMethod)) {
+        invContainer.classList.remove('hidden');
+        bolContainer.classList.add('hidden');
+        document.getElementById('txInvoiceMonthInput').value = currentMonthKey;
+      } else if (catVal === 'cat_boleto' && !isDeferredMethod(currentPaymentMethod)) {
+        bolContainer.classList.remove('hidden');
+        invContainer.classList.add('hidden');
+        document.getElementById('txBoletoMonthInput').value = currentMonthKey;
+        populatePendingBoletosSelect();
+      } else {
+        invContainer.classList.add('hidden');
+        bolContainer.classList.add('hidden');
+      }
+    }
+
+    // TABELA PRINCIPAL COM SUPORTE UNIFICADO A CARTÃO E BOLETO PARCELADO
     function renderTransactionsTable() {
       const tbody = document.getElementById('transactionsTableBody');
       const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
@@ -1402,7 +1500,8 @@
         const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
         const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
 
-        if (t.paymentMethod === 'credit' && t.installmentsTotal > 1 && isPurchasedHere && !isEffectiveHere) {
+        // Se for compra parcelada (Cartão ou Boleto) no mês da compra mas vencendo nos meses seguintes -> Consolida em 1 linha informativa
+        if (isDeferredMethod(t.paymentMethod) && t.installmentsTotal > 1 && isPurchasedHere && !isEffectiveHere) {
           if (t.groupId) {
             if (seenGroups.has(t.groupId)) return;
             seenGroups.add(t.groupId);
@@ -1424,7 +1523,7 @@
         renderedList.push(t);
       });
 
-      renderedList.sort((a, b) => b.date.localeCompare(a.date));
+      renderedList.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
       if (renderedList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 block opacity-40"></i>Nenhum lançamento com registro em <strong>${formatMonthLabel(currentMonthKey)}</strong>.</td></tr>`;
@@ -1443,7 +1542,7 @@
           paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-arrow-up"></i> Recebido</span>`;
         } else if (t.paymentMethod === 'credit') {
           const card = appData.cards.find(c => c.id === t.cardId);
-          const isPaid = t.status === 'card_paid';
+          const isPaid = isTxSettled(t);
 
           if (t.isConsolidatedSummary) {
             paymentBadge = `
@@ -1488,6 +1587,49 @@
               `;
             }
           }
+        } else if (t.paymentMethod === 'boleto') {
+          const isPaid = isTxSettled(t);
+
+          if (t.isConsolidatedSummary) {
+            paymentBadge = `
+              <div class="inline-flex flex-col">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  <i class="fa-solid fa-barcode"></i> Boleto Parcelado
+                </span>
+                <span class="text-[10px] text-amber-400 font-semibold mt-0.5">
+                  Parcelado em ${t.installmentsTotal}x de ${formatCurrency(t.installmentVal)}
+                </span>
+              </div>
+            `;
+          } else if (isPurchasedHere && !isEffectiveHere) {
+            const [by, bm] = (t.billingMonth || '').split('-').map(Number);
+            paymentBadge = `
+              <div class="inline-flex flex-col">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <i class="fa-solid fa-barcode"></i> Informativo (Boleto)
+                </span>
+                <span class="text-[10px] text-amber-300 font-semibold mt-0.5">Vence em: ${MONTH_SHORT[bm - 1]}/${by}</span>
+              </div>
+            `;
+          } else {
+            const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
+            if (isPaid) {
+              paymentBadge = `
+                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400" title="Boleto Pago">
+                  <i class="fa-solid fa-circle-check"></i> Boleto${installmentTag} (Pago)
+                </span>
+              `;
+            } else {
+              paymentBadge = `
+                <div class="inline-flex flex-col">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse" title="Boleto aguardando pagamento">
+                    <i class="fa-solid fa-barcode"></i> Boleto${installmentTag}
+                  </span>
+                  <span class="text-[9px] text-amber-300 font-medium mt-0.5">⚠️ Boleto em aberto (Pendente)</span>
+                </div>
+              `;
+            }
+          }
         } else if (t.paymentMethod === 'debit') {
           paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-blue-500/15 text-blue-400"><i class="fa-solid fa-money-check"></i> Débito</span>`;
         } else if (t.paymentMethod === 'cash') {
@@ -1501,11 +1643,11 @@
           return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium" style="background:${cat.color}18; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i> ${cat.name}</span>`; 
         })() : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-chart-line"></i> Extra</span>`;
 
-        // AÇÕES: BLOQUEIA EDIÇÃO E EXCLUSÃO DE PARCELAS NO MÊS DE VENCIMENTO
+        // AÇÕES: BLOQUEIA EDIÇÃO E EXCLUSÃO DE PARCELAS (CARTÃO OU BOLETO) FORA DO MÊS DE COMPRA
         let actionsHtml = '';
         if (isInstallmentChild) {
           actionsHtml = `
-            <button onclick="warnInstallmentLock('${t.date.slice(0, 7)}')" class="p-1.5 text-amber-400 hover:text-amber-300 transition cursor-pointer" title="Bloqueado: Para alterar ou excluir esta compra parcelada, acerte no mês da compra original.">
+            <button onclick="warnInstallmentLock('${t.date.slice(0, 7)}')" class="p-1.5 text-amber-400 hover:text-amber-300 transition cursor-pointer" title="Bloqueado: Para alterar ou excluir este parcelamento, acerte no mês da compra original.">
               <i class="fa-solid fa-lock"></i>
             </button>
           `;
@@ -1516,7 +1658,7 @@
           `;
         }
 
-        const displayVal = (t.paymentMethod === 'credit' && !t.isConsolidatedSummary) ? getTxPendingAmount(t) : t.amount;
+        const displayVal = (isDeferredMethod(t.paymentMethod) && !t.isConsolidatedSummary) ? getTxPendingAmount(t) : t.amount;
 
         return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
           <td class="py-3 px-2">${paymentBadge}</td>
@@ -1530,12 +1672,12 @@
     }
 
     function warnInstallmentLock(origMonthKey) {
-      alert(`Esta parcela faz parte de uma compra parcelada realizada em ${formatMonthLabel(origMonthKey)}.\n\nPara cancelar ou alterar esta compra, faça o ajuste diretamente no mês em que ela foi realizada.`);
+      alert(`Esta parcela faz parte de um parcelamento registrado em ${formatMonthLabel(origMonthKey)}.\n\nPara cancelar ou alterar esta compra, faça o ajuste diretamente no mês em que ela foi registrada.`);
     }
 
     function renderCategoryLimits() {
       const container = document.getElementById('categoryLimitsList');
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && t.paymentMethod !== 'credit');
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
       container.innerHTML = appData.categories.map(cat => {
         const spent = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
         const budget = Number(cat.budget || 0);
@@ -1550,7 +1692,7 @@
 
     function renderDoughnutChart() {
       const ctx = document.getElementById('categoryDoughnutChart').getContext('2d');
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && t.paymentMethod !== 'credit');
+      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
       const labels = [], data = [], colors = [], categoryIds = [];
       appData.categories.forEach(cat => {
         const sum = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
@@ -1731,8 +1873,9 @@
 
     function setPaymentMethod(method) {
       currentPaymentMethod = method;
-      ['cash', 'pix', 'debit', 'credit'].forEach(m => {
+      ['cash', 'pix', 'debit', 'credit', 'boleto'].forEach(m => {
         const btn = document.getElementById(`btnMethod${m.charAt(0).toUpperCase() + m.slice(1)}`);
+        if (!btn) return;
         if (m === method) {
           btn.className = 'py-1.5 rounded-lg text-center transition bg-purple-600 text-white font-bold shadow-sm cursor-pointer';
         } else {
@@ -1740,22 +1883,34 @@
         }
       });
 
-      const cardContainer = document.getElementById('txCreditCardSelectContainer');
+      const configContainer = document.getElementById('txInstallmentConfigContainer');
+      const cardSelectWrapper = document.getElementById('txCardSelectWrapper');
       const amountLabel = document.getElementById('txAmountLabel');
+      const dateLabel = document.getElementById('txDateLabel');
 
       if (method === 'credit') {
-        cardContainer.classList.remove('hidden');
+        configContainer.classList.remove('hidden');
+        cardSelectWrapper.classList.remove('hidden');
         amountLabel.textContent = 'Valor Total da Compra (R$)';
+        dateLabel.textContent = 'Data da Compra';
+        updateBillingNotice();
+      } else if (method === 'boleto') {
+        configContainer.classList.remove('hidden');
+        cardSelectWrapper.classList.add('hidden');
+        amountLabel.textContent = 'Valor Total do Boleto / Carnê (R$)';
+        dateLabel.textContent = 'Vencimento do 1º Boleto';
         updateBillingNotice();
       } else {
-        cardContainer.classList.add('hidden');
+        configContainer.classList.add('hidden');
         amountLabel.textContent = 'Valor (R$)';
+        dateLabel.textContent = 'Data do Pagamento';
       }
+
+      toggleInvoicePaymentFields();
     }
 
     function updateBillingNotice() {
-      if (currentPaymentMethod !== 'credit') return;
-      const cardId = document.getElementById('txCardIdInput').value;
+      if (!isDeferredMethod(currentPaymentMethod)) return;
       const dateVal = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
       const installments = Number(document.getElementById('txInstallmentsInput').value || 1);
       const totalAmount = Number(document.getElementById('txAmountInput').value || 0);
@@ -1765,20 +1920,34 @@
       const installmentValue = installments > 0 ? (totalAmount / installments) : totalAmount;
       previewAmount.textContent = `${installments}x de ${formatCurrency(installmentValue)}`;
 
-      if (!cardId) {
-        notice.textContent = 'Cadastre um cartão na aba Cartões para vincular compras a prazo.';
-        return;
-      }
+      if (currentPaymentMethod === 'credit') {
+        const cardId = document.getElementById('txCardIdInput').value;
+        if (!cardId) {
+          notice.textContent = 'Cadastre um cartão na aba Cartões para vincular compras a prazo.';
+          return;
+        }
 
-      const res = calculateCardBilling(cardId, dateVal, 0);
-      const [by, bm] = res.billingMonth.split('-').map(Number);
+        const res = calculateCardBilling(cardId, dateVal, 0);
+        const [by, bm] = res.billingMonth.split('-').map(Number);
 
-      if (installments === 1) {
-        notice.innerHTML = `📅 Compra feita nesta data. Ela cairá na <strong>Fatura de ${MONTH_NAMES[bm - 1]} de ${by}</strong> (não desconta do saldo imediato em conta).`;
-      } else {
-        const lastRes = calculateCardBilling(cardId, dateVal, installments - 1);
-        const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
-        notice.innerHTML = `📅 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até a última em <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. O limite de ${formatCurrency(totalAmount)} é comprometido agora.`;
+        if (installments === 1) {
+          notice.innerHTML = `📅 Compra no cartão. Cairá na <strong>Fatura de ${MONTH_NAMES[bm - 1]} de ${by}</strong> (não desconta do saldo até a fatura ser paga).`;
+        } else {
+          const lastRes = calculateCardBilling(cardId, dateVal, installments - 1);
+          const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
+          notice.innerHTML = `📅 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até a última em <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. O limite de ${formatCurrency(totalAmount)} é comprometido agora.`;
+        }
+      } else if (currentPaymentMethod === 'boleto') {
+        const firstRes = calculateBoletoBilling(dateVal, 0);
+        const [by, bm] = firstRes.billingMonth.split('-').map(Number);
+
+        if (installments === 1) {
+          notice.innerHTML = `📄 Boleto agendado para <strong>${MONTH_NAMES[bm - 1]} de ${by}</strong>. Ficará com alerta pendente até você registrar o pagamento.`;
+        } else {
+          const lastRes = calculateBoletoBilling(dateVal, installments - 1);
+          const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
+          notice.innerHTML = `📄 Carnê/Boleto em ${installments}x: 1º vencimento em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até o último em <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong> (sem vínculo de limite de cartão e sem resquício de saldo entre parcelas).`;
+        }
       }
     }
 
@@ -1808,10 +1977,10 @@
       const totalAmount = Number(document.getElementById('txAmountInput').value);
       const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
       const cardId = currentPaymentMethod === 'credit' ? document.getElementById('txCardIdInput').value : null;
-      const installments = (currentTxType === 'expense' && currentPaymentMethod === 'credit') ? Number(document.getElementById('txInstallmentsInput').value || 1) : 1;
+      const installments = (currentTxType === 'expense' && isDeferredMethod(currentPaymentMethod)) ? Number(document.getElementById('txInstallmentsInput').value || 1) : 1;
 
-      // VALIDAÇÃO E LIQUIDAÇÃO DE FATURA COM PRESERVAÇÃO DE VALOR ORIGINAL
-      if (currentTxType === 'expense' && categoryId === 'cat_fatura') {
+      // 1. VALIDAÇÃO E LIQUIDAÇÃO DE FATURA DE CARTÃO (COM ABATIMENTO DE EXCEDENTE NO MÊS SEGUINTE)
+      if (currentTxType === 'expense' && categoryId === 'cat_fatura' && !isDeferredMethod(currentPaymentMethod)) {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
         const targetCard = appData.cards.find(c => c.id === invoiceCardId);
@@ -1838,7 +2007,6 @@
 
         let pool = totalAmount;
 
-        // 1. Quita a fatura do mês selecionado
         const currentMonthTxs = cardExpenses.filter(t => (t.billingMonth || t.date.slice(0, 7)) === invoiceMonth);
         for (const tx of currentMonthTxs) {
           if (pool <= 0) break;
@@ -1853,7 +2021,6 @@
           }
         }
 
-        // 2. Se houver excedente, abate na fatura do mês seguinte sem tocar no valor original da compra
         if (pool > 0) {
           const futureMonthTxs = cardExpenses
             .filter(t => (t.billingMonth || t.date.slice(0, 7)) > invoiceMonth)
@@ -1900,19 +2067,40 @@
         }
       }
 
-      // LANÇAMENTO DE COMPRA PARCELADA NO CRÉDITO
-      if (currentPaymentMethod === 'credit' && cardId && installments > 1 && !id) {
+      // 2. VALIDAÇÃO E BAIXA DE BOLETO PENDENTE (SEM RESQUÍCIO DE SALDO PARA OUTROS MESES)
+      if (currentTxType === 'expense' && categoryId === 'cat_boleto' && !isDeferredMethod(currentPaymentMethod)) {
+        const targetBoletoId = document.getElementById('txBoletoTargetSelect').value;
+        if (!targetBoletoId) {
+          alert('Não há boleto pendente selecionado para dar baixa neste mês.');
+          return;
+        }
+        const targetBoleto = appData.transactions.find(t => t.id === targetBoletoId);
+        if (targetBoleto) {
+          targetBoleto.status = 'boleto_paid';
+        }
+      }
+
+      // 3. CRIAÇÃO DE PARCELAMENTO (CRÉDITO OU BOLETO)
+      if (isDeferredMethod(currentPaymentMethod) && installments > 1 && !id) {
+        if (currentPaymentMethod === 'credit' && !cardId) {
+          alert('Selecione um cartão de crédito válido.');
+          return;
+        }
+
         const installmentAmount = Number((totalAmount / installments).toFixed(2));
         const groupId = 'group_' + Date.now();
 
         for (let i = 0; i < installments; i++) {
-          const billing = calculateCardBilling(cardId, txDate, i).billingMonth;
+          const billing = currentPaymentMethod === 'credit'
+            ? calculateCardBilling(cardId, txDate, i).billingMonth
+            : calculateBoletoBilling(txDate, i).billingMonth;
+
           appData.transactions.push({
             id: 'tx_' + Date.now() + '_' + i,
             groupId: groupId,
             type: 'expense',
-            paymentMethod: 'credit',
-            cardId: cardId,
+            paymentMethod: currentPaymentMethod,
+            cardId: currentPaymentMethod === 'credit' ? cardId : null,
             billingMonth: billing,
             description: `${desc} (${i + 1}/${installments})`,
             amount: installmentAmount,
@@ -1929,13 +2117,15 @@
         let billingMonth = txDate.slice(0, 7);
         if (currentPaymentMethod === 'credit' && cardId) {
           billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
+        } else if (currentPaymentMethod === 'boleto') {
+          billingMonth = calculateBoletoBilling(txDate, 0).billingMonth;
         }
 
         const txObj = {
           id: id || 'tx_' + Date.now(),
           type: currentTxType,
           paymentMethod: currentTxType === 'expense' ? currentPaymentMethod : 'income',
-          cardId: cardId,
+          cardId: currentPaymentMethod === 'credit' ? cardId : null,
           billingMonth: billingMonth,
           description: desc,
           amount: totalAmount,
@@ -1945,7 +2135,7 @@
           categoryId: categoryId,
           installmentsTotal: 1,
           installmentNumber: 1,
-          status: currentPaymentMethod === 'credit' ? 'pending' : 'paid'
+          status: isDeferredMethod(currentPaymentMethod) ? 'pending' : 'paid'
         };
 
         if (id) {
@@ -1975,6 +2165,8 @@
         setPaymentMethod(tx.paymentMethod || 'pix');
         if (tx.paymentMethod === 'credit' && tx.cardId) {
           document.getElementById('txCardIdInput').value = tx.cardId;
+        }
+        if (isDeferredMethod(tx.paymentMethod)) {
           document.getElementById('txInstallmentsInput').value = tx.installmentsTotal || 1;
         }
         toggleInvoicePaymentFields();
@@ -1987,7 +2179,7 @@
       if (!tx) return;
 
       if (tx.groupId) {
-        if (confirm('Este lançamento é a compra original parcelada. Deseja excluir esta compra e todas as suas parcelas?')) {
+        if (confirm('Este lançamento é um parcelamento. Deseja excluir esta compra e todas as suas parcelas futuras?')) {
           appData.transactions = appData.transactions.filter(t => t.groupId !== tx.groupId);
           saveToStorage();
           renderAll();
@@ -2016,8 +2208,9 @@
         btnExp.className = 'py-2 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 transition cursor-pointer';
         catContainer.style.display = 'none';
         payContainer.style.display = 'none';
-        document.getElementById('txCreditCardSelectContainer').classList.add('hidden');
+        document.getElementById('txInstallmentConfigContainer').classList.add('hidden');
         document.getElementById('txInvoicePaymentContainer').classList.add('hidden');
+        document.getElementById('txBoletoPaymentContainer').classList.add('hidden');
         document.getElementById('txCatInput').removeAttribute('required');
       }
     }
@@ -2052,7 +2245,7 @@
       last6Keys.forEach(k => {
         const sal = getSalaryForMonth(k), txs = appData.transactions.filter(t => getEffectiveMonthKey(t) === k);
         const inc = sal + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
-        const exp = txs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit').reduce((a, b) => a + Number(b.amount), 0);
+        const exp = txs.filter(t => t.type === 'expense' && !isDeferredMethod(t.paymentMethod)).reduce((a, b) => a + Number(b.amount), 0);
         incomes6.push(inc); expenses6.push(exp); leftovers6.push((sal - exp) + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0));
       });
       const ctxBar = document.getElementById('sixMonthsBarChart').getContext('2d');
@@ -2068,8 +2261,8 @@
       document.getElementById('thMonthA').textContent = formatMonthLabel(monthA);
       document.getElementById('thMonthB').textContent = formatMonthLabel(monthB);
 
-      const expA = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthA && t.type === 'expense' && t.paymentMethod !== 'credit');
-      const expB = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthB && t.type === 'expense' && t.paymentMethod !== 'credit');
+      const expA = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthA && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
+      const expB = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthB && t.type === 'expense' && !isDeferredMethod(t.paymentMethod));
       const totalA = expA.reduce((a, b) => a + Number(b.amount), 0), totalB = expB.reduce((a, b) => a + Number(b.amount), 0), diffTotal = totalB - totalA;
 
       document.getElementById('comparisonSummaryCards').innerHTML = `
@@ -2096,6 +2289,7 @@
     function renderCategoriesTab() {
       document.getElementById('categoriesGrid').innerHTML = appData.categories.map(cat => {
         const groupLabel = cat.group === 'wants' ? 'Estilo de Vida' : cat.group === 'savings' ? 'Metas & Futuro' : 'Necessidades Básicas';
+        const isSysCat = cat.id === 'cat_fatura' || cat.id === 'cat_boleto';
         return `
           <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -2108,7 +2302,7 @@
             </div>
             <div class="flex items-center gap-1">
               <button type="button" onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition cursor-pointer"><i class="fa-solid fa-pen pointer-events-none"></i></button>
-              ${cat.id !== 'cat_fatura' ? `<button type="button" onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition cursor-pointer"><i class="fa-solid fa-trash pointer-events-none"></i></button>` : ''}
+              ${!isSysCat ? `<button type="button" onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition cursor-pointer"><i class="fa-solid fa-trash pointer-events-none"></i></button>` : ''}
             </div>
           </div>
         `;
@@ -2243,7 +2437,13 @@
       reader.onload = (ev) => {
         try {
           const imported = JSON.parse(ev.target.result);
-          if (imported.categories && imported.transactions) { appData = imported; saveToStorage(); renderAll(); alert('Backup restaurado!'); }
+          if (imported.categories && imported.transactions) {
+            appData = imported;
+            ensureSystemCategories();
+            saveToStorage();
+            renderAll();
+            alert('Backup restaurado!');
+          }
         } catch (err) { alert('Arquivo inválido.'); }
       };
       reader.readAsText(file);
@@ -2251,17 +2451,17 @@
 
     function clearCurrentMonthData() {
       const monthLabel = formatMonthLabel(currentMonthKey);
-      if (!confirm(`Deseja apagar os lançamentos avulsos de ${monthLabel}?\n\n🛡️ PROTEÇÃO TOTAL ATIVA:\nNenhuma compra no crédito ou parcela de cartão será apagada.`)) {
+      if (!confirm(`Deseja apagar os lançamentos avulsos de ${monthLabel}?\n\n🛡️ PROTEÇÃO TOTAL ATIVA:\nNenhuma compra no crédito, carnê de boleto ou parcela será apagada.`)) {
         document.getElementById('settingsMenu').classList.add('hidden');
         return;
       }
 
       appData.transactions = appData.transactions.filter(t => {
         const isFromThisMonth = getEffectiveMonthKey(t) === currentMonthKey || isTxPurchasedInMonth(t, currentMonthKey);
-        const isCreditPurchase = t.paymentMethod === 'credit';
+        const isProtectedMethod = isDeferredMethod(t.paymentMethod);
         const isInstallment = (t.installmentsTotal && t.installmentsTotal > 1) || !!t.groupId;
 
-        if (isCreditPurchase || isInstallment) {
+        if (isProtectedMethod || isInstallment) {
           return true;
         }
 
@@ -2279,7 +2479,7 @@
       saveToStorage();
       renderAll();
       document.getElementById('settingsMenu').classList.add('hidden');
-      alert(`Lançamentos avulsos de ${monthLabel} foram limpos. Suas contas de cartão e parcelamentos foram 100% preservados!`);
+      alert(`Lançamentos avulsos de ${monthLabel} foram limpos. Suas contas de cartão, boletos e parcelamentos foram 100% preservados!`);
     }
 
     function clearAllData() {
