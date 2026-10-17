@@ -53,7 +53,7 @@
         <p>Seus dados financeiros ficam gravados exclusivamente na pasta privada da sua conta Google Drive pessoal.</p>
       </div>
 
-      <button id="googleLoginBtn" onclick="handleAuthClick()" class="w-full py-3.5 px-4 rounded-xl bg-white text-slate-800 font-semibold text-sm shadow-md hover:bg-slate-100 transition flex items-center justify-center gap-3 border border-slate-300 active:scale-[0.98]">
+      <button id="googleLoginBtn" onclick="handleAuthClick()" class="w-full py-3.5 px-4 rounded-xl bg-white text-slate-800 font-semibold text-sm shadow-md hover:bg-slate-100 transition flex items-center justify-center gap-3 border border-slate-300 active:scale-[0.98] cursor-pointer">
         <i class="fa-brands fa-google text-red-500 text-lg"></i>
         <span>Entrar com Conta Google</span>
       </button>
@@ -78,7 +78,7 @@
 
         <!-- SELETOR DE MÊS -->
         <div class="relative flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700">
-          <button onclick="changeMonth(-1)" title="Mês Anterior" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300">
+          <button onclick="changeMonth(-1)" title="Mês Anterior" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300 cursor-pointer">
             <i class="fa-solid fa-chevron-left text-xs"></i>
           </button>
           <button id="calendarTriggerBtn" onclick="toggleDatePicker(event)" title="Escolher Mês/Ano" class="px-3 py-1.5 flex items-center gap-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition cursor-pointer group">
@@ -86,24 +86,24 @@
             <span id="currentMonthLabel" class="font-semibold text-sm min-w-[125px] text-center capitalize">Carregando...</span>
             <i class="fa-solid fa-caret-down text-xs text-slate-400"></i>
           </button>
-          <button onclick="changeMonth(1)" title="Próximo Mês" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300">
+          <button onclick="changeMonth(1)" title="Próximo Mês" class="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition text-slate-600 dark:text-slate-300 cursor-pointer">
             <i class="fa-solid fa-chevron-right text-xs"></i>
           </button>
 
           <div id="datePickerPopover" class="hidden absolute top-14 left-1/2 -translate-x-1/2 w-72 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-4 z-50 animate-fade">
             <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-700">
-              <button onclick="changePickerYear(-1, event)" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+              <button onclick="changePickerYear(-1, event)" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
               </button>
               <span id="pickerYearLabel" class="font-bold text-base text-indigo-500">2026</span>
-              <button onclick="changePickerYear(1, event)" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition">
+              <button onclick="changePickerYear(1, event)" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
               </button>
             </div>
             <div id="pickerMonthsGrid" class="grid grid-cols-3 gap-2 text-xs font-medium"></div>
             <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
-              <button onclick="goToCurrentMonth(event)" class="text-xs text-indigo-500 hover:underline font-medium">Ir para o mês atual</button>
-              <button onclick="closeDatePicker()" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">Fechar</button>
+              <button onclick="goToCurrentMonth(event)" class="text-xs text-indigo-500 hover:underline font-medium cursor-pointer">Ir para o mês atual</button>
+              <button onclick="closeDatePicker()" class="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">Fechar</button>
             </div>
           </div>
         </div>
@@ -112,38 +112,38 @@
           <div id="googleUserSection" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
             <span id="syncIndicator" title="Sincronizado com Google Drive" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
             <span id="userEmailLabel" class="text-xs font-medium max-w-[130px] truncate text-slate-600 dark:text-slate-300">Conectado ao Drive</span>
-            <button onclick="handleSignoutClick()" title="Desconectar" class="text-slate-400 hover:text-rose-500 text-xs ml-1"><i class="fa-solid fa-right-from-bracket"></i></button>
+            <button onclick="handleSignoutClick()" title="Desconectar" class="text-slate-400 hover:text-rose-500 text-xs ml-1 cursor-pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
           </div>
 
-          <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" title="Alternar Tema Claro/Escuro">
+          <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Alternar Tema Claro/Escuro">
             <i id="themeIcon" class="fa-solid fa-sun"></i>
           </button>
           
           <!-- MENU ENGRENAGEM -->
           <div class="relative">
-            <button id="settingsGearBtn" onclick="toggleSettingsMenu(event)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition" title="Opções">
+            <button id="settingsGearBtn" onclick="toggleSettingsMenu(event)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Opções">
               <i class="fa-solid fa-gear pointer-events-none"></i>
             </button>
             <div id="settingsMenu" class="hidden absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 py-2 z-50 text-sm animate-fade">
               <div class="px-4 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider">Google Drive & Dados</div>
-              <button onclick="syncToDriveManual()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-indigo-500 font-medium">
+              <button onclick="syncToDriveManual()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-indigo-500 font-medium cursor-pointer">
                 <i class="fa-solid fa-arrows-rotate w-4 text-emerald-500"></i> Sincronizar Agora
               </button>
-              <button onclick="exportData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5">
+              <button onclick="exportData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 cursor-pointer">
                 <i class="fa-solid fa-download text-indigo-500 w-4"></i> Exportar Arquivo Local
               </button>
               <label class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 cursor-pointer">
                 <i class="fa-solid fa-upload text-emerald-500 w-4"></i> Importar Arquivo
                 <input type="file" accept=".json" class="hidden" onchange="importData(event)">
               </label>
-              <button onclick="loadSampleData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-amber-500">
+              <button onclick="loadSampleData()" class="w-full px-4 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center gap-2.5 text-amber-500 cursor-pointer">
                 <i class="fa-solid fa-wand-magic-sparkles w-4"></i> Carregar Exemplo
               </button>
               <hr class="my-1 border-slate-200 dark:border-slate-700">
-              <button onclick="clearCurrentMonthData()" class="w-full px-4 py-2 text-left hover:bg-amber-500/10 text-amber-500 flex items-center gap-2.5">
+              <button onclick="clearCurrentMonthData()" class="w-full px-4 py-2 text-left hover:bg-amber-500/10 text-amber-500 flex items-center gap-2.5 cursor-pointer">
                 <i class="fa-solid fa-calendar-xmark w-4"></i> Limpar Dados Deste Mês
               </button>
-              <button onclick="clearAllData()" class="w-full px-4 py-2 text-left hover:bg-rose-500/10 text-rose-500 flex items-center gap-2.5">
+              <button onclick="clearAllData()" class="w-full px-4 py-2 text-left hover:bg-rose-500/10 text-rose-500 flex items-center gap-2.5 cursor-pointer">
                 <i class="fa-solid fa-trash-can w-4"></i> Resetar Tudo (Geral)
               </button>
             </div>
@@ -722,7 +722,7 @@
                 <input type="month" id="txInvoiceMonthInput" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               </div>
             </div>
-            <p class="text-[10px] text-purple-300">💡 O pagamento quitará as contas deste cartão. Qualquer excedente será amortizado estritamente na fatura do mês seguinte deste mesmo cartão.</p>
+            <p class="text-[10px] text-purple-300">💡 O pagamento quitará as contas deste cartão. Qualquer excedente amortizará a fatura seguinte sem alterar o valor original da compra cadastrada.</p>
           </div>
 
           <div class="flex justify-end gap-2 pt-3">
@@ -1061,7 +1061,7 @@
         const mKey = `${pickerYear}-${String(mNum).padStart(2, '0')}`;
         const hasData = appData.transactions.some(t => getEffectiveMonthKey(t) === mKey || isTxPurchasedInMonth(t, mKey)) || appData.monthlySalaries[mKey] !== undefined;
         const isSelected = (pickerYear === activeY && mNum === activeM);
-        return `<button onclick="selectMonthFromPicker(${pickerYear}, ${mNum})" class="py-2.5 px-2 rounded-xl transition relative flex flex-col items-center justify-center border ${isSelected ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-500/30' : 'bg-slate-50 dark:bg-slate-700/50 hover:bg-indigo-500/10 text-slate-700 dark:text-slate-200 border-transparent'}"><span>${mName}</span>${hasData ? `<span class="w-1.5 h-1.5 rounded-full mt-1 ${isSelected ? 'bg-white' : 'bg-emerald-400'}"></span>` : '<span class="w-1.5 h-1.5 mt-1"></span>'}</button>`;
+        return `<button onclick="selectMonthFromPicker(${pickerYear}, ${mNum})" class="py-2.5 px-2 rounded-xl transition relative flex flex-col items-center justify-center border ${isSelected ? 'bg-indigo-600 text-white border-indigo-500 font-bold shadow-md shadow-indigo-500/30' : 'bg-slate-50 dark:bg-slate-700/50 hover:bg-indigo-500/10 text-slate-700 dark:text-slate-200 border-transparent'} cursor-pointer"><span>${mName}</span>${hasData ? `<span class="w-1.5 h-1.5 rounded-full mt-1 ${isSelected ? 'bg-white' : 'bg-emerald-400'}"></span>` : '<span class="w-1.5 h-1.5 mt-1"></span>'}</button>`;
       }).join('');
     }
 
@@ -1129,6 +1129,14 @@
       };
     }
 
+    // Calcula o valor a pagar real de uma transação considerando abatimentos aplicados
+    function getTxPendingAmount(tx) {
+      if (tx.status === 'card_paid') return 0;
+      const orig = Number(tx.amount || 0);
+      const disc = Number(tx.discountAmount || 0);
+      return Math.max(0, orig - disc);
+    }
+
     function renderAll() {
       document.getElementById('currentMonthLabel').textContent = formatMonthLabel(currentMonthKey);
       document.getElementById('tableCurrentMonthTitle').textContent = formatMonthLabel(currentMonthKey);
@@ -1153,9 +1161,9 @@
       const cashOutflows = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Soma dinâmica das faturas previstas para o mês
+      // Soma dinâmica das faturas previstas para o mês (respeitando abatimentos já recebidos)
       const totalCreditInvoices = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit' && t.status !== 'card_paid')
-        .reduce((a, b) => a + Number(b.amount), 0);
+        .reduce((a, b) => a + getTxPendingAmount(b), 0);
 
       const totalOutflow = cashOutflows;
       const salaryRemaining = baseSalary - totalOutflow;
@@ -1188,7 +1196,7 @@
         individualListEl.innerHTML = appData.cards.map(c => {
           const cardExpenses = appData.transactions
             .filter(t => t.paymentMethod === 'credit' && t.cardId === c.id && t.status !== 'card_paid')
-            .reduce((a, b) => a + Number(b.amount), 0);
+            .reduce((a, b) => a + getTxPendingAmount(b), 0);
 
           const used = Number(c.initialUsedLimit || 0) + cardExpenses;
           const total = Number(c.totalLimit || 0);
@@ -1351,7 +1359,7 @@
       }
     }
 
-    // TABELA PRINCIPAL COM ALERTA PARA FATURAS PENDENTES E BLOQUEIO DE AÇÕES
+    // TABELA PRINCIPAL
     function renderTransactionsTable() {
       const tbody = document.getElementById('transactionsTableBody');
       const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
@@ -1372,14 +1380,14 @@
         const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
         const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
 
-        // Consolidação no mês de origem da compra parcelada
+        // Consolidação no mês de origem da compra parcelada (mantém os valores totais imutáveis)
         if (t.paymentMethod === 'credit' && t.installmentsTotal > 1 && isPurchasedHere && !isEffectiveHere) {
           if (t.groupId) {
             if (seenGroups.has(t.groupId)) return;
             seenGroups.add(t.groupId);
 
-            const groupTxs = appData.transactions.filter(x => x.groupId === t.groupId);
-            const totalGroupAmount = groupTxs.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            // Usa o valor cadastrado original ou o total de parcelas
+            const totalGroupAmount = t.originalTotalAmount ? Number(t.originalTotalAmount) : Number(t.amount) * Number(t.installmentsTotal);
             const cleanDesc = t.description.replace(/\s\(\d+\/\d+\)$/, '');
 
             renderedList.push({
@@ -1447,13 +1455,15 @@
                 </span>
               `;
             } else {
-              // DESTAQUE AMARELO COM ALERTA PARA FATURAS PENDENTES
+              const hasDiscount = Number(t.discountAmount || 0) > 0;
+              const discNote = hasDiscount ? `<span class="text-[9px] text-emerald-400 font-semibold mt-0.5">Amortizado: -${formatCurrency(t.discountAmount)}</span>` : '';
               paymentBadge = `
                 <div class="inline-flex flex-col">
                   <span class="px-2.5 py-1 rounded-full text-[11px] font-bold inline-flex items-center gap-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 animate-pulse" title="Fatura em aberto aguardando quitação">
                     <i class="fa-solid fa-triangle-exclamation"></i> ${card ? card.name : 'Crédito'}${installmentTag}
                   </span>
                   <span class="text-[9px] text-amber-300 font-medium mt-0.5">⚠️ Fatura em aberto (Pendente)</span>
+                  ${discNote}
                 </div>
               `;
             }
@@ -1471,7 +1481,6 @@
           return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium" style="background:${cat.color}18; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i> ${cat.name}</span>`; 
         })() : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-chart-line"></i> Extra</span>`;
 
-        // AÇÕES: BLOQUEIA EDIÇÃO/EXCLUSÃO DE PARCELAS NO MÊS DE VENCIMENTO
         let actionsHtml = '';
         if (isInstallmentChild) {
           actionsHtml = `
@@ -1486,12 +1495,15 @@
           `;
         }
 
+        // Exibe o valor líquido a pagar quando for parcela com desconto
+        const displayVal = (t.paymentMethod === 'credit' && !t.isConsolidatedSummary) ? getTxPendingAmount(t) : t.amount;
+
         return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
           <td class="py-3 px-2">${paymentBadge}</td>
           <td class="py-3 px-2 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${d}/${m}/${y}</td>
           <td class="py-3 px-2 font-medium text-slate-800 dark:text-slate-100">${t.description}</td>
           <td class="py-3 px-2">${catBadge}</td>
-          <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${isExpense ? 'text-rose-500' : 'text-emerald-500'}">${isExpense ? '-' : '+'} ${formatCurrency(t.amount)}</td>
+          <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${isExpense ? 'text-rose-500' : 'text-emerald-500'}">${isExpense ? '-' : '+'} ${formatCurrency(displayVal)}</td>
           <td class="py-3 px-2 text-center whitespace-nowrap">${actionsHtml}</td>
         </tr>`;
       }).join('');
@@ -1566,11 +1578,11 @@
       container.innerHTML = appData.cards.map(card => {
         const cardExpenses = appData.transactions
           .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.status !== 'card_paid')
-          .reduce((a, b) => a + Number(b.amount), 0);
+          .reduce((a, b) => a + getTxPendingAmount(b), 0);
 
         const currentMonthInvoice = appData.transactions
           .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.billingMonth === currentMonthKey && t.status !== 'card_paid')
-          .reduce((a, b) => a + Number(b.amount), 0);
+          .reduce((a, b) => a + getTxPendingAmount(b), 0);
 
         const totalUsed = Number(card.initialUsedLimit || 0) + cardExpenses;
         const totalLimit = Number(card.totalLimit || 0);
@@ -1756,20 +1768,4 @@
       document.getElementById('txDescInput').value = '';
       document.getElementById('txAmountInput').value = '';
       document.getElementById('txDateInput').value = `${currentMonthKey}-10`;
-      document.getElementById('txInstallmentsInput').value = '1';
-      setTxType('expense');
-      setPaymentMethod('pix');
-      populateCardSelect();
-      toggleInvoicePaymentFields();
-      document.getElementById('transactionModal').classList.remove('hidden');
-    }
-
-    function closeTransactionModal() {
-      document.getElementById('transactionModal').classList.add('hidden');
-    }
-
-    function saveTransaction(e) {
-      e.preventDefault();
-      const id = document.getElementById('txIdInput').value;
-      const txDate = document.getElementById('txDateInput').value;
-      const desc = document.getElementById('
+      document.getElementById('txInstallmentsInput').value
