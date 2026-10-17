@@ -35,7 +35,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-darkBg text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
 
-  <!-- TELA DE LOGIN OBRIGATÓRIA (LOGIN GATE) -->
+  <!-- TELA DE LOGIN OBRIGATÓRIA -->
   <div id="authGateScreen" class="fixed inset-0 z-50 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4">
     <div class="bg-white dark:bg-darkCard max-w-md w-full rounded-3xl p-8 border border-slate-200 dark:border-darkBorder shadow-2xl text-center space-y-6 animate-fade">
       <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-indigo-500/30 mx-auto">
@@ -147,79 +147,105 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      <!-- CARDS DE SALDO E DESPESAS -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm relative overflow-hidden flex flex-col justify-between">
+      <!-- 4 CARDS NO DASHBOARD: SALÁRIO, SAÍDAS REAIS, LIMITES DOS CARTÕES E SALDO DISPONÍVEL -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- CARD 1: SALÁRIO -->
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start">
               <div>
-                <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Salário Base do Mês</span>
-                <h2 id="cardBaseSalary" class="text-2xl sm:text-3xl font-bold text-emerald-500 mt-1">R$ 0,00</h2>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Salário Base</span>
+                <h2 id="cardBaseSalary" class="text-xl sm:text-2xl font-bold text-emerald-500 mt-0.5">R$ 0,00</h2>
               </div>
-              <div class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-lg">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center text-base">
                 <i class="fa-solid fa-sack-dollar"></i>
               </div>
             </div>
-            <div class="mt-4 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-xs">
-              <span class="text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1.5">
-                <i class="fa-solid fa-chart-line"></i> Extras & Rendimentos:
-              </span>
+            <div class="mt-3 p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-between text-[11px]">
+              <span class="text-emerald-600 dark:text-emerald-400 font-medium">Extras:</span>
               <strong id="cardExtraIncome" class="text-emerald-600 dark:text-emerald-400 font-bold">R$ 0,00</strong>
             </div>
           </div>
-          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end text-xs">
-            <button onclick="openSalaryModal()" class="text-indigo-500 hover:text-indigo-400 font-semibold flex items-center gap-1">
-              <i class="fa-solid fa-pen"></i> Configurar Salário
-            </button>
+          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-right">
+            <button onclick="openSalaryModal()" class="text-[11px] text-indigo-500 hover:text-indigo-400 font-semibold">Configurar Salário</button>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <!-- CARD 2: SAÍDAS GERAIS DO MÊS -->
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start">
               <div>
-                <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Saídas Diretas da Conta (Débito/PIX)</span>
-                <h2 id="cardTotalExpenses" class="text-2xl sm:text-3xl font-bold text-rose-500 mt-1">R$ 0,00</h2>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Total de Despesas</span>
+                <h2 id="cardTotalExpenses" class="text-xl sm:text-2xl font-bold text-rose-500 mt-0.5">R$ 0,00</h2>
               </div>
-              <div class="w-11 h-11 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-lg">
+              <div class="w-9 h-9 rounded-xl bg-rose-500/10 text-rose-500 flex items-center justify-center text-base">
                 <i class="fa-solid fa-arrow-trend-down"></i>
               </div>
             </div>
+            <div class="mt-3 p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-between text-[11px]">
+              <span class="text-rose-600 dark:text-rose-400 font-medium">Faturas do Mês:</span>
+              <strong id="cardCreditExpenses" class="text-rose-600 dark:text-rose-400 font-bold">R$ 0,00</strong>
+            </div>
           </div>
-          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-            <span class="text-purple-400 font-medium"><i class="fa-regular fa-credit-card mr-1"></i>Faturas Deste Mês: <strong id="cardCreditExpenses">R$ 0,00</strong></span>
-            <span class="text-amber-500"><i class="fa-solid fa-clock mr-1"></i>Pendente: <strong id="cardPendingExpenses">R$ 0,00</strong></span>
+          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 flex justify-between">
+            <span>Direto da Conta:</span>
+            <strong id="cardDirectExpenses" class="text-slate-600 dark:text-slate-300">R$ 0,00</strong>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm relative overflow-hidden flex flex-col justify-between">
+        <!-- CARD 3: LIMITE DOS CARTÕES DE CRÉDITO -->
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start">
               <div>
-                <span class="text-xs font-medium uppercase tracking-wider text-slate-400">Saldo Disponível em Conta</span>
-                <h2 id="cardRemaining" class="text-2xl sm:text-3xl font-bold text-indigo-500 mt-1">R$ 0,00</h2>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Limite Livre Cartões</span>
+                <h2 id="cardAvailableLimit" class="text-xl sm:text-2xl font-bold text-purple-400 mt-0.5">R$ 0,00</h2>
               </div>
-              <div class="w-11 h-11 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-lg">
+              <div class="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-base">
+                <i class="fa-solid fa-credit-card"></i>
+              </div>
+            </div>
+            <div class="mt-3">
+              <div class="flex justify-between text-[10px] text-slate-400 mb-1">
+                <span>Comprometido Total</span>
+                <span id="cardTotalLimitLabel">R$ 0,00</span>
+              </div>
+              <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div id="cardCreditProgressBar" class="h-full bg-purple-500 transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-right">
+            <button onclick="switchTab('cards')" class="text-[11px] text-purple-400 hover:text-purple-300 font-semibold">Ver Meus Cartões</button>
+          </div>
+        </div>
+
+        <!-- CARD 4: SALDO DISPONÍVEL -->
+        <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Saldo Disponível</span>
+                <h2 id="cardRemaining" class="text-xl sm:text-2xl font-bold text-indigo-500 mt-0.5">R$ 0,00</h2>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-base">
                 <i class="fa-solid fa-scale-balanced"></i>
               </div>
             </div>
-            <div class="mt-4 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between text-xs">
-              <span class="text-indigo-600 dark:text-indigo-300 font-medium flex items-center gap-1.5">
-                <i class="fa-solid fa-plus-minus"></i> Saldo c/ Extras & Faturas:
-              </span>
+            <div class="mt-3 p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-between text-[11px]">
+              <span class="text-indigo-600 dark:text-indigo-300 font-medium">Saldo c/ Extras:</span>
               <strong id="cardRemainingWithExtras" class="text-indigo-600 dark:text-indigo-300 font-bold">R$ 0,00</strong>
             </div>
           </div>
-          <div class="mt-4">
-            <div class="flex justify-between text-xs mb-1">
-              <span class="text-slate-400">Comprometimento Mensal</span>
-              <span id="cardPercentUsed" class="font-semibold text-slate-600 dark:text-slate-300">0%</span>
-            </div>
-            <div class="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div class="mt-3">
+            <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
               <div id="cardProgressBar" class="h-full bg-indigo-500 transition-all duration-300" style="width: 0%"></div>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- BOTÕES DE NAVEGAÇÃO ENTRE ABAS -->
@@ -390,13 +416,12 @@
       </section>
     </main>
 
-    <!-- WIDGET FLUTUANTE DO ASSISTENTE GEMINI -->
+    <!-- ASSISTENTE GEMINI -->
     <div class="fixed bottom-6 right-6 z-40">
       <button onclick="toggleChatbot()" id="chatbotToggleBtn" class="w-14 h-14 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white shadow-2xl flex items-center justify-center text-2xl transition-all duration-300 hover:scale-110 active:scale-95 group">
         <i class="fa-solid fa-wand-magic-sparkles group-hover:rotate-12 transition-transform"></i>
       </button>
 
-      <!-- JANELA DO CHAT -->
       <div id="chatbotWindow" class="hidden absolute bottom-16 right-0 w-[90vw] sm:w-96 max-w-lg h-[500px] bg-white dark:bg-darkCard rounded-3xl border border-slate-200 dark:border-darkBorder shadow-2xl flex flex-col overflow-hidden animate-fade">
         <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between">
           <div class="flex items-center gap-2.5">
@@ -418,7 +443,6 @@
           </div>
         </div>
 
-        <!-- ATALHOS RÁPIDOS -->
         <div class="px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700/60 flex items-center gap-1.5 overflow-x-auto custom-scroll text-[11px] whitespace-nowrap">
           <button onclick="sendQuickPrompt('Como estão meus gastos e o limite dos meus cartões de crédito?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">📊 Resumo e Limites</button>
           <button onclick="sendQuickPrompt('Qual o valor da minha próxima fatura e onde posso economizar?')" class="px-2.5 py-1 rounded-full bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-indigo-500">💳 Fatura & Dicas</button>
@@ -576,7 +600,7 @@
 
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Descrição</label>
-          <input type="text" id="txDescInput" required placeholder="Ex: Supermercado, Celular..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-indigo-500">
+          <input type="text" id="txDescInput" required placeholder="Ex: Supermercado, Pagamento Fatura Nubank..." class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none focus:border-indigo-500">
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
@@ -584,14 +608,33 @@
             <input type="number" step="0.01" min="0.01" id="txAmountInput" required oninput="updateBillingNotice()" placeholder="0,00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Data da Compra</label>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Data</label>
             <input type="date" id="txDateInput" required onchange="updateBillingNotice()" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
           </div>
         </div>
         <div id="txCategoryContainer">
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Categoria do Gasto</label>
-          <select id="txCatInput" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none"></select>
+          <select id="txCatInput" onchange="toggleInvoicePaymentFields()" class="w-full px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm focus:outline-none"></select>
         </div>
+
+        <!-- CAMPOS EXCLUSIVOS PARA PAGAMENTO DE FATURA -->
+        <div id="txInvoicePaymentContainer" class="hidden space-y-3 p-3 bg-purple-500/10 rounded-2xl border border-purple-500/20">
+          <div class="text-xs font-semibold text-purple-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-receipt"></i> Quitação de Fatura do Cartão
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Cartão Pago</label>
+              <select id="txInvoiceCardSelect" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold"></select>
+            </div>
+            <div>
+              <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Mês da Fatura</label>
+              <input type="month" id="txInvoiceMonthInput" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+            </div>
+          </div>
+          <p class="text-[10px] text-purple-300">💡 Ao salvar, as parcelas deste mês serão marcadas como pagas e o limite deste cartão será liberado automaticamente.</p>
+        </div>
+
         <div class="flex justify-end gap-2 pt-3">
           <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800">Cancelar</button>
           <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white">Salvar Lançamento</button>
@@ -650,6 +693,7 @@
     ];
 
     const DEFAULT_CATEGORIES = [
+      { id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0 },
       { id: 'cat_moradia', name: 'Moradia & Contas', color: '#6366f1', icon: 'fa-house', budget: 1800 },
       { id: 'cat_mercado', name: 'Alimentação & Mercado', color: '#10b981', icon: 'fa-cart-shopping', budget: 1200 },
       { id: 'cat_transporte', name: 'Transporte & Carro', color: '#f59e0b', icon: 'fa-car', budget: 700 },
@@ -779,6 +823,10 @@
               transactions: cloudData.transactions || [],
               cards: cloudData.cards || []
             };
+            // Assegura categoria de fatura
+            if (!appData.categories.some(c => c.id === 'cat_fatura')) {
+              appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0 });
+            }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
             renderAll();
           }
@@ -841,6 +889,9 @@
             transactions: parsed.transactions || [],
             cards: parsed.cards || []
           };
+          if (!appData.categories.some(c => c.id === 'cat_fatura')) {
+            appData.categories.unshift({ id: 'cat_fatura', name: 'Pagamento de Fatura', color: '#a855f7', icon: 'fa-credit-card', budget: 0 });
+          }
         } catch (err) { console.error(err); }
       }
     }
@@ -903,7 +954,6 @@
       } else { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
     }
 
-    // RETORNA EM QUAL MÊS O LANÇAMENTO IMPACTA A CONTA / FATURA
     function getEffectiveMonthKey(tx) {
       if (tx.type === 'expense' && tx.paymentMethod === 'credit' && tx.billingMonth) {
         return tx.billingMonth;
@@ -911,7 +961,6 @@
       return tx.date.slice(0, 7);
     }
 
-    // CÁLCULO PRECISO DO CICLO DE FATURA DO CARTÃO (FECHAMENTO E VENCIMENTO)
     function calculateCardBilling(cardId, txDateStr, monthOffset = 0) {
       const card = appData.cards.find(c => c.id === cardId);
       if (!card) return { billingMonth: txDateStr.slice(0, 7) };
@@ -922,15 +971,12 @@
       let targetYear = y;
       let targetMonth = m;
 
-      // Se a compra foi feita antes do fechamento (ex: dia 17 e fecha dia 25): a fatura fecha no mês atual e vence no próximo mês
-      // Se a compra foi feita após o fechamento: a fatura só fecha no mês seguinte e vence a 2 meses
       if (d < closingDay) {
         targetMonth += 1;
       } else {
         targetMonth += 2;
       }
 
-      // Adiciona o mês de parcelamento
       targetMonth += monthOffset;
 
       while (targetMonth > 12) {
@@ -960,41 +1006,56 @@
 
     function renderSummaryCards() {
       const baseSalary = getSalaryForMonth(currentMonthKey);
-
-      // Transações que vencem ou impactam financeiramente este mês
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      // Gastos que saíram diretamente do dinheiro em conta (débito, pix, dinheiro)
-      const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
+      // Gastos diretos da conta (débito, pix, dinheiro) que NÃO são pagamentos de fatura (para evitar duplicidade se a fatura já está listada)
+      const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit' && t.categoryId !== 'cat_fatura')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Faturas de Cartão de Crédito com vencimento neste mês
+      // Faturas de Cartão de Crédito que vencem neste mês
       const creditExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit')
         .reduce((a, b) => a + Number(b.amount), 0);
 
-      // Total de despesas pendentes
-      const pendingExpenses = monthTxs.filter(t => t.type === 'expense' && t.status === 'pending')
-        .reduce((a, b) => a + Number(b.amount), 0);
-
-      // O saldo em dinheiro desconta as saídas diretas e as faturas que vencem neste mês
+      // Total de Despesas do Mês = Direto + Faturas
       const totalOutflow = cashDebitExpenses + creditExpenses;
       const salaryRemaining = baseSalary - totalOutflow;
       const totalRemainingWithExtras = salaryRemaining + extraIncome;
       const percent = baseSalary > 0 ? Math.min(100, Math.round((totalOutflow / baseSalary) * 100)) : 0;
 
+      // CÁLCULO GERAL DO LIMITE DOS CARTÕES
+      let totalLimitsAllCards = 0;
+      let totalUsedAllCards = 0;
+
+      (appData.cards || []).forEach(c => {
+        totalLimitsAllCards += Number(c.totalLimit || 0);
+        const cardExpenses = appData.transactions
+          .filter(t => t.paymentMethod === 'credit' && t.cardId === c.id && t.status !== 'card_paid')
+          .reduce((a, b) => a + Number(b.amount), 0);
+        totalUsedAllCards += (Number(c.initialUsedLimit || 0) + cardExpenses);
+      });
+
+      const totalAvailableAllCards = Math.max(0, totalLimitsAllCards - totalUsedAllCards);
+      const pctCardUsed = totalLimitsAllCards > 0 ? Math.min(100, Math.round((totalUsedAllCards / totalLimitsAllCards) * 100)) : 0;
+
       document.getElementById('cardBaseSalary').textContent = formatCurrency(baseSalary);
       document.getElementById('cardExtraIncome').textContent = formatCurrency(extraIncome);
-      document.getElementById('cardTotalExpenses').textContent = formatCurrency(cashDebitExpenses);
+      document.getElementById('cardTotalExpenses').textContent = formatCurrency(totalOutflow);
       document.getElementById('cardCreditExpenses').textContent = formatCurrency(creditExpenses);
-      document.getElementById('cardPendingExpenses').textContent = formatCurrency(pendingExpenses);
+      document.getElementById('cardDirectExpenses').textContent = formatCurrency(cashDebitExpenses);
+
+      // Caixinha dos Cartões
+      document.getElementById('cardAvailableLimit').textContent = formatCurrency(totalAvailableAllCards);
+      document.getElementById('cardTotalLimitLabel').textContent = `${formatCurrency(totalUsedAllCards)} de ${formatCurrency(totalLimitsAllCards)}`;
+      const cardBar = document.getElementById('cardCreditProgressBar');
+      cardBar.style.width = `${pctCardUsed}%`;
+      cardBar.className = `h-full transition-all duration-300 ${pctCardUsed > 85 ? 'bg-rose-500' : 'bg-purple-500'}`;
 
       const remEl = document.getElementById('cardRemaining');
       remEl.textContent = formatCurrency(salaryRemaining);
-      remEl.className = `text-2xl sm:text-3xl font-bold mt-1 ${salaryRemaining >= 0 ? 'text-indigo-500' : 'text-rose-500'}`;
+      remEl.className = `text-xl sm:text-2xl font-bold mt-0.5 ${salaryRemaining >= 0 ? 'text-indigo-500' : 'text-rose-500'}`;
 
       document.getElementById('cardRemainingWithExtras').textContent = formatCurrency(totalRemainingWithExtras);
-      document.getElementById('cardPercentUsed').textContent = `${percent}%`;
       const bar = document.getElementById('cardProgressBar');
       bar.style.width = `${percent}%`;
       bar.className = `h-full transition-all duration-300 ${percent > 90 ? 'bg-rose-500' : percent > 70 ? 'bg-amber-500' : 'bg-indigo-500'}`;
@@ -1014,11 +1075,26 @@
 
     function populateCardSelect() {
       const cardSelect = document.getElementById('txCardIdInput');
+      const invoiceCardSelect = document.getElementById('txInvoiceCardSelect');
       if (!appData.cards || appData.cards.length === 0) {
         cardSelect.innerHTML = `<option value="">Nenhum cartão cadastrado</option>`;
+        invoiceCardSelect.innerHTML = `<option value="">Nenhum cartão</option>`;
         return;
       }
-      cardSelect.innerHTML = appData.cards.map(c => `<option value="${c.id}">${c.name} (Fecha dia ${c.closingDay} / Vence dia ${c.dueDay})</option>`).join('');
+      const opts = appData.cards.map(c => `<option value="${c.id}">${c.name} (Fecha ${c.closingDay} / Vence ${c.dueDay})</option>`).join('');
+      cardSelect.innerHTML = opts;
+      invoiceCardSelect.innerHTML = opts;
+    }
+
+    function toggleInvoicePaymentFields() {
+      const catVal = document.getElementById('txCatInput').value;
+      const invContainer = document.getElementById('txInvoicePaymentContainer');
+      if (catVal === 'cat_fatura') {
+        invContainer.classList.remove('hidden');
+        document.getElementById('txInvoiceMonthInput').value = currentMonthKey;
+      } else {
+        invContainer.classList.add('hidden');
+      }
     }
 
     function renderTransactionsTable() {
@@ -1026,7 +1102,6 @@
       const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
       const catFilter = document.getElementById('filterCatSelect').value;
 
-      // Lista as transações que pertencem financeiramente a este mês selecionado
       let list = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey)
         .filter(t => t.description.toLowerCase().includes(search))
         .filter(t => catFilter === 'all' || (t.type === 'expense' && t.categoryId === catFilter))
@@ -1046,8 +1121,9 @@
           paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-arrow-up"></i> Recebido</span>`;
         } else if (t.paymentMethod === 'credit') {
           const card = appData.cards.find(c => c.id === t.cardId);
+          const isPaid = t.status === 'card_paid';
           const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
-          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-purple-500/15 text-purple-400" title="Vencimento na Fatura deste Mês"><i class="fa-solid fa-credit-card"></i> ${card ? card.name : 'Crédito'}${installmentTag}</span>`;
+          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 ${isPaid ? 'bg-emerald-500/15 text-emerald-400' : 'bg-purple-500/15 text-purple-400'}" title="${isPaid ? 'Fatura Liquidada' : 'Fatura em Aberto'}"><i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-credit-card'}"></i> ${card ? card.name : 'Crédito'}${installmentTag}</span>`;
         } else if (t.paymentMethod === 'debit') {
           paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-blue-500/15 text-blue-400"><i class="fa-solid fa-money-check"></i> Débito</span>`;
         } else if (t.paymentMethod === 'cash') {
@@ -1122,7 +1198,6 @@
       });
     }
 
-    // RENDERIZAÇÃO DA ABA DE CARTÕES DE CRÉDITO
     function renderCardsTab() {
       const container = document.getElementById('cardsListContainer');
       if (!appData.cards || appData.cards.length === 0) {
@@ -1130,7 +1205,7 @@
           <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-darkBorder p-8">
             <i class="fa-solid fa-credit-card text-4xl mb-3 text-purple-400 opacity-60"></i>
             <h4 class="font-bold text-base text-slate-700 dark:text-slate-200">Você ainda não tem cartões cadastrados</h4>
-            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-5">Cadastre o seu cartão para ter o controle do limite e separar os gastos em dinheiro dos gastos em fatura.</p>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-5">Cadastre o seu cartão para ter o controle do limite e acompanhar suas faturas.</p>
             <button onclick="openCardModal()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-md">
               <i class="fa-solid fa-plus mr-1"></i> Cadastrar Meu Primeiro Cartão
             </button>
@@ -1140,14 +1215,12 @@
       }
 
       container.innerHTML = appData.cards.map(card => {
-        // Todas as parcelas em aberto registradas no app que ainda não foram liquidadas
         const cardExpenses = appData.transactions
           .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.status !== 'card_paid')
           .reduce((a, b) => a + Number(b.amount), 0);
 
-        // Fatura do mês selecionado
         const currentMonthInvoice = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.billingMonth === currentMonthKey)
+          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.billingMonth === currentMonthKey && t.status !== 'card_paid')
           .reduce((a, b) => a + Number(b.amount), 0);
 
         const totalUsed = Number(card.initialUsedLimit || 0) + cardExpenses;
@@ -1174,7 +1247,6 @@
                 </div>
               </div>
 
-              <!-- INFORMAÇÕES DE LIMITES -->
               <div class="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/60">
                 <div class="flex justify-between items-center text-xs">
                   <span class="text-slate-400">Limite Disponível</span>
@@ -1189,15 +1261,13 @@
                 </div>
               </div>
 
-              <!-- FATURA DO MÊS ATUAL SELECIONADO -->
               <div class="mt-4 p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between text-xs">
                 <span class="text-purple-600 dark:text-purple-300 font-medium flex items-center gap-1.5">
-                  <i class="fa-solid fa-receipt"></i> Fatura em ${formatMonthLabel(currentMonthKey)}:
+                  <i class="fa-solid fa-receipt"></i> Fatura em Aberto (${formatMonthLabel(currentMonthKey)}):
                 </span>
                 <strong class="text-purple-600 dark:text-purple-300 font-bold text-sm">${formatCurrency(currentMonthInvoice)}</strong>
               </div>
 
-              <!-- DATAS DE CORTE E VENCIMENTO -->
               <div class="grid grid-cols-2 gap-3 mt-3 text-xs">
                 <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
                   <span class="text-[10px] uppercase text-slate-400 block font-semibold">Fechamento</span>
@@ -1209,18 +1279,11 @@
                 </div>
               </div>
             </div>
-
-            <div class="mt-5 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-              <button onclick="payCardInvoice('${card.id}')" class="w-full py-2.5 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 text-purple-500 dark:text-purple-300 font-semibold text-xs transition flex items-center justify-center gap-1.5">
-                <i class="fa-solid fa-check"></i> Liquidar Fatura de ${formatMonthLabel(currentMonthKey)}
-              </button>
-            </div>
           </div>
         `;
       }).join('');
     }
 
-    // MODAL DE CADASTRO DE CARTÃO
     function openCardModal(cardId = null) {
       if (cardId) {
         const card = appData.cards.find(c => c.id === cardId);
@@ -1284,22 +1347,6 @@
       renderAll();
     }
 
-    function payCardInvoice(cardId) {
-      const card = appData.cards.find(c => c.id === cardId);
-      if (!card) return;
-      if (confirm(`Deseja liquidar a fatura de ${formatMonthLabel(currentMonthKey)} do cartão "${card.name}" e liberar o respectivo limite?`)) {
-        appData.transactions.forEach(t => {
-          if (t.paymentMethod === 'credit' && t.cardId === cardId && t.billingMonth === currentMonthKey) {
-            t.status = 'card_paid';
-          }
-        });
-        saveToStorage();
-        renderAll();
-        alert(`Fatura de ${formatMonthLabel(currentMonthKey)} liquidada com sucesso!`);
-      }
-    }
-
-    // MODAL DE TRANSAÇÕES E SELEÇÃO DE MÉTODO DE PAGAMENTO
     function setPaymentMethod(method) {
       currentPaymentMethod = method;
       ['cash', 'pix', 'debit', 'credit'].forEach(m => {
@@ -1363,6 +1410,7 @@
       setTxType('expense');
       setPaymentMethod('pix');
       populateCardSelect();
+      toggleInvoicePaymentFields();
       document.getElementById('transactionModal').classList.remove('hidden');
     }
 
@@ -1379,6 +1427,19 @@
       const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
       const cardId = currentPaymentMethod === 'credit' ? document.getElementById('txCardIdInput').value : null;
       const installments = (currentTxType === 'expense' && currentPaymentMethod === 'credit') ? Number(document.getElementById('txInstallmentsInput').value || 1) : 1;
+
+      // SE FOR PAGAMENTO DE FATURA VIA PIX/DÉBITO/DINHEIRO
+      if (currentTxType === 'expense' && categoryId === 'cat_fatura') {
+        const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
+        const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
+
+        // Marca as parcelas/compras dessa fatura como quitadas
+        appData.transactions.forEach(t => {
+          if (t.paymentMethod === 'credit' && t.cardId === invoiceCardId && t.billingMonth === invoiceMonth) {
+            t.status = 'card_paid';
+          }
+        });
+      }
 
       // Se for compra parcelada no crédito e um novo lançamento: gera cada parcela como registro
       if (currentPaymentMethod === 'credit' && cardId && installments > 1 && !id) {
@@ -1453,6 +1514,7 @@
           document.getElementById('txCardIdInput').value = tx.cardId;
           document.getElementById('txInstallmentsInput').value = tx.installmentsTotal || 1;
         }
+        toggleInvoicePaymentFields();
       }
       document.getElementById('transactionModal').classList.remove('hidden');
     }
@@ -1492,11 +1554,11 @@
         catContainer.style.display = 'none';
         payContainer.style.display = 'none';
         document.getElementById('txCreditCardSelectContainer').classList.add('hidden');
+        document.getElementById('txInvoicePaymentContainer').classList.add('hidden');
         document.getElementById('txCatInput').removeAttribute('required');
       }
     }
 
-    // NAVEGAÇÃO DE ABAS
     function switchTab(tabName) {
       ['overview', 'cards', 'comparison', 'categories'].forEach(t => {
         document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
@@ -1577,7 +1639,7 @@
           </div>
           <div class="flex items-center gap-1">
             <button onclick="openCategoryModal('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>
+            ${cat.id !== 'cat_fatura' ? `<button onclick="deleteCategory('${cat.id}')" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>` : ''}
           </div>
         </div>
       `).join('');
@@ -1691,7 +1753,6 @@
       saveToStorage(); renderAll(); document.getElementById('settingsMenu').classList.add('hidden');
     }
 
-    // ====== LÓGICA DO ASSISTENTE FINANCEIRO GEMINI ======
     function toggleChatbot() {
       const win = document.getElementById('chatbotWindow');
       win.classList.toggle('hidden');
@@ -1727,7 +1788,7 @@
       const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
       const extras = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
       
-      const cashDebit = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit').reduce((a, b) => a + Number(b.amount), 0);
+      const cashDebit = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit' && t.categoryId !== 'cat_fatura').reduce((a, b) => a + Number(b.amount), 0);
       const creditTotal = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit').reduce((a, b) => a + Number(b.amount), 0);
       const saldo = (baseSalary - (cashDebit + creditTotal)) + extras;
 
@@ -1740,7 +1801,7 @@
       return `Dados financeiros do mês (${formatMonthLabel(currentMonthKey)}):
 - Salário Base: R$ ${baseSalary.toFixed(2)}
 - Rendas Extras: R$ ${extras.toFixed(2)}
-- Gastos em Débito/PIX/Dinheiro: R$ ${cashDebit.toFixed(2)}
+- Gastos Diretos (Débito/PIX): R$ ${cashDebit.toFixed(2)}
 - Faturas de Cartão com vencimento neste mês: R$ ${creditTotal.toFixed(2)}
 - Saldo Restante em Conta: R$ ${saldo.toFixed(2)}
 - Situação dos Cartões: ${cardsSummary || 'Nenhum cartão cadastrado.'}`;
