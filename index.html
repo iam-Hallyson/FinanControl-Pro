@@ -179,7 +179,7 @@
           </div>
         </div>
 
-        <!-- CARD 2: SAÍDAS GERAIS DO MÊS COM VISIBILIDADE DAS FATURAS -->
+        <!-- CARD 2: SAÍDAS GERAIS DO MÊS (APENAS CONTABILIZA O QUE REALMENTE SAIU DO BOLSO) -->
         <div class="bg-white dark:bg-darkCard rounded-2xl p-4 border border-slate-200 dark:border-darkBorder shadow-sm flex flex-col justify-between">
           <div>
             <div class="flex justify-between items-start">
@@ -192,15 +192,16 @@
               </div>
             </div>
             
+            <!-- LINHA INFORMATIVA: NÃO DEBITA DO SALDO ATÉ O PAGAMENTO SER REALIZADO -->
             <div class="mt-2.5 p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between text-[11px]">
-              <span class="text-purple-400 font-medium flex items-center gap-1.5">
-                <i class="fa-solid fa-receipt"></i> Faturas a Vencer:
+              <span class="text-purple-400 font-medium flex items-center gap-1.5" title="Soma das faturas previstas para o mês (não deduz do saldo até o pagamento ser lançado)">
+                <i class="fa-solid fa-receipt"></i> Previsão de Faturas:
               </span>
               <strong id="cardTotalInvoicesExpected" class="text-purple-400 font-bold">R$ 0,00</strong>
             </div>
           </div>
           <div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-400 flex justify-between">
-            <span>Saídas em Conta (PIX/Déb):</span>
+            <span>Saídas em Conta (Real):</span>
             <strong id="cardDirectExpenses" class="text-slate-600 dark:text-slate-300">R$ 0,00</strong>
           </div>
         </div>
@@ -372,7 +373,7 @@
             <div class="bg-white dark:bg-darkCard rounded-2xl p-5 border border-slate-200 dark:border-darkBorder shadow-sm">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
-                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Despesas deste Mês (c/ Faturas)
+                  <i class="fa-solid fa-chart-pie text-indigo-500"></i> Despesas deste Mês (Efetivas)
                 </h3>
                 <span class="text-[11px] text-slate-400">Clique para filtrar</span>
               </div>
@@ -722,7 +723,7 @@
                 <input type="month" id="txInvoiceMonthInput" class="w-full px-2.5 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
               </div>
             </div>
-            <p class="text-[10px] text-purple-300">💡 O pagamento quitará as contas deste cartão e qualquer excedente será abatido exclusivamente das faturas seguintes deste mesmo cartão.</p>
+            <p class="text-[10px] text-purple-300">💡 O pagamento quitará as contas deste cartão. Qualquer excedente será abatido na fatura do mês seguinte deste mesmo cartão.</p>
           </div>
 
           <div class="flex justify-end gap-2 pt-3">
@@ -825,7 +826,6 @@
     let accessToken = localStorage.getItem('gdrive_access_token') || null;
     let driveFileId = null;
 
-    // INICIALIZAÇÃO ROBUSTA DO GOOGLE AUTH
     function initGoogleAuth() {
       if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
         setTimeout(initGoogleAuth, 150);
@@ -1144,175 +1144,6 @@
       renderComparisonDashboard();
     }
 
-    function renderSummaryCards() {
-      const baseSalary = getSalaryForMonth(currentMonthKey);
-      const monthTxs = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey);
-      const extraIncome = monthTxs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
-      
-      const cashDebitExpenses = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit')
-        .reduce((a, b) => a + Number(b.amount), 0);
-
-      const totalCreditInvoices = monthTxs.filter(t => t.type === 'expense' && t.paymentMethod === 'credit')
-        .reduce((a, b) => a + Number(b.amount), 0);
-
-      const totalOutflow = cashDebitExpenses + totalCreditInvoices;
-      const salaryRemaining = baseSalary - totalOutflow;
-      const totalRemainingWithExtras = salaryRemaining + extraIncome;
-      const percent = baseSalary > 0 ? Math.min(100, Math.round((totalOutflow / baseSalary) * 100)) : 0;
-
-      document.getElementById('cardBaseSalary').textContent = formatCurrency(baseSalary);
-      document.getElementById('cardExtraIncome').textContent = formatCurrency(extraIncome);
-      document.getElementById('cardTotalExpenses').textContent = formatCurrency(totalOutflow);
-      document.getElementById('cardTotalInvoicesExpected').textContent = formatCurrency(totalCreditInvoices);
-      document.getElementById('cardDirectExpenses').textContent = formatCurrency(cashDebitExpenses);
-
-      const remEl = document.getElementById('cardRemaining');
-      remEl.textContent = formatCurrency(salaryRemaining);
-      remEl.className = `text-xl sm:text-2xl font-bold mt-0.5 ${salaryRemaining >= 0 ? 'text-indigo-500' : 'text-rose-500'}`;
-      document.getElementById('cardRemainingWithExtras').textContent = formatCurrency(totalRemainingWithExtras);
-
-      const bar = document.getElementById('cardProgressBar');
-      bar.style.width = `${percent}%`;
-      bar.className = `h-full transition-all duration-300 ${percent > 90 ? 'bg-rose-500' : percent > 70 ? 'bg-amber-500' : 'bg-indigo-500'}`;
-
-      const individualListEl = document.getElementById('cardIndividualLimitsList');
-      if (!appData.cards || appData.cards.length === 0) {
-        individualListEl.innerHTML = `<p class="text-[11px] text-slate-400 py-1">Nenhum cartão cadastrado.</p>`;
-        document.getElementById('cardTotalGlobalLabel').textContent = '';
-      } else {
-        let globalTotalLimit = 0;
-        let globalTotalUsed = 0;
-
-        individualListEl.innerHTML = appData.cards.map(c => {
-          const cardExpenses = appData.transactions
-            .filter(t => t.paymentMethod === 'credit' && t.cardId === c.id && t.status !== 'card_paid')
-            .reduce((a, b) => a + Number(b.amount), 0);
-
-          const used = Number(c.initialUsedLimit || 0) + cardExpenses;
-          const total = Number(c.totalLimit || 0);
-          const available = Math.max(0, total - used);
-          const pct = total > 0 ? Math.min(100, Math.round((used / total) * 100)) : 0;
-
-          globalTotalLimit += total;
-          globalTotalUsed += used;
-
-          return `
-            <div class="space-y-0.5">
-              <div class="flex items-center justify-between text-[11px]">
-                <span class="font-medium flex items-center gap-1.5 text-slate-700 dark:text-slate-300 truncate max-w-[120px]">
-                  <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${c.brandColor || '#8b5cf6'}"></span>
-                  ${c.name}:
-                </span>
-                <strong class="text-emerald-500 font-bold">${formatCurrency(available)}</strong>
-              </div>
-              <div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div class="h-full rounded-full transition-all duration-300" style="width: ${pct}%; background:${pct > 85 ? '#ef4444' : (c.brandColor || '#8b5cf6')}"></div>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        const globalAvailable = Math.max(0, globalTotalLimit - globalTotalUsed);
-        document.getElementById('cardTotalGlobalLabel').textContent = `Total Livre: ${formatCurrency(globalAvailable)}`;
-      }
-    }
-
-    function renderRule503020() {
-      const baseSalary = getSalaryForMonth(currentMonthKey);
-      document.getElementById('rule50BaseSalary').textContent = formatCurrency(baseSalary);
-
-      const cfg = appData.ruleConfig || { needs: 50, wants: 30, savings: 20 };
-      const pctN = cfg.needs || 50;
-      const pctW = cfg.wants || 30;
-      const pctS = cfg.savings || 20;
-
-      document.getElementById('labelRuleNeeds').innerHTML = `<i class="fa-solid fa-shield text-xs"></i> ${pctN}% Necessidades`;
-      document.getElementById('labelRuleWants').innerHTML = `<i class="fa-solid fa-mug-hot text-xs"></i> ${pctW}% Estilo de Vida`;
-      document.getElementById('labelRuleSavings').innerHTML = `<i class="fa-solid fa-piggy-bank text-xs"></i> ${pctS}% Metas & Futuro`;
-
-      const target50 = baseSalary * (pctN / 100);
-      const target30 = baseSalary * (pctW / 100);
-      const target20 = baseSalary * (pctS / 100);
-
-      document.getElementById('rule50Target').textContent = `Teto: ${formatCurrency(target50)}`;
-      document.getElementById('rule30Target').textContent = `Teto: ${formatCurrency(target30)}`;
-      document.getElementById('rule20Target').textContent = `Meta: ${formatCurrency(target20)}`;
-
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
-
-      let spent50 = 0;
-      let spent30 = 0;
-      let spent20 = 0;
-
-      monthExpenses.forEach(t => {
-        const cat = appData.categories.find(c => c.id === t.categoryId);
-        const group = (cat && cat.group) ? cat.group : 'needs';
-        const val = Number(t.amount || 0);
-
-        if (group === 'needs') spent50 += val;
-        else if (group === 'wants') spent30 += val;
-        else if (group === 'savings') spent20 += val;
-      });
-
-      document.getElementById('rule50Spent').textContent = formatCurrency(spent50);
-      document.getElementById('rule30Spent').textContent = formatCurrency(spent30);
-      document.getElementById('rule20Spent').textContent = formatCurrency(spent20);
-
-      const p50 = target50 > 0 ? Math.min(100, Math.round((spent50 / target50) * 100)) : 0;
-      const p30 = target30 > 0 ? Math.min(100, Math.round((spent30 / target30) * 100)) : 0;
-      const p20 = target20 > 0 ? Math.min(100, Math.round((spent20 / target20) * 100)) : 0;
-
-      const bar50 = document.getElementById('rule50Bar');
-      bar50.style.width = `${p50}%`;
-      bar50.className = `h-full transition-all duration-300 ${spent50 > target50 ? 'bg-rose-500' : 'bg-indigo-500'}`;
-      document.getElementById('rule50Status').textContent = `${p50}% utilizado (${spent50 > target50 ? 'Estourou o teto' : 'Dentro do teto'})`;
-
-      const bar30 = document.getElementById('rule30Bar');
-      bar30.style.width = `${p30}%`;
-      bar30.className = `h-full transition-all duration-300 ${spent30 > target30 ? 'bg-rose-500' : 'bg-amber-500'}`;
-      document.getElementById('rule30Status').textContent = `${p30}% utilizado (${spent30 > target30 ? 'Estourou o teto' : 'Dentro do teto'})`;
-
-      const bar20 = document.getElementById('rule20Bar');
-      bar20.style.width = `${p20}%`;
-      bar20.className = `h-full transition-all duration-300 ${p20 >= 100 ? 'bg-emerald-400' : 'bg-emerald-500'}`;
-      document.getElementById('rule20Status').textContent = `${p20}% da meta atingida (${formatCurrency(Math.max(0, target20 - spent20))} restante)`;
-    }
-
-    function openRuleModal() {
-      const cfg = appData.ruleConfig || { needs: 50, wants: 30, savings: 20 };
-      document.getElementById('ruleNeedsPctInput').value = cfg.needs || 50;
-      document.getElementById('ruleWantsPctInput').value = cfg.wants || 30;
-      document.getElementById('ruleSavingsPctInput').value = cfg.savings || 20;
-      document.getElementById('ruleModal').classList.remove('hidden');
-    }
-
-    function closeRuleModal() {
-      document.getElementById('ruleModal').classList.add('hidden');
-    }
-
-    function resetDefaultRule() {
-      document.getElementById('ruleNeedsPctInput').value = 50;
-      document.getElementById('ruleWantsPctInput').value = 30;
-      document.getElementById('ruleSavingsPctInput').value = 20;
-    }
-
-    function saveCustomRule(e) {
-      e.preventDefault();
-      const n = Number(document.getElementById('ruleNeedsPctInput').value || 0);
-      const w = Number(document.getElementById('ruleWantsPctInput').value || 0);
-      const s = Number(document.getElementById('ruleSavingsPctInput').value || 0);
-
-      if (n + w + s !== 100) {
-        alert(`A soma das porcentagens deve ser exatamente 100% (atualmente está em ${n + w + s}%).`);
-        return;
-      }
-
-      appData.ruleConfig = { needs: n, wants: w, savings: s };
-      saveToStorage();
-      closeRuleModal();
-      renderAll();
-    }
-
     function populateCategorySelects() {
       const filterSelect = document.getElementById('filterCatSelect');
       const curF = filterSelect.value || 'all';
@@ -1349,393 +1180,7 @@
       }
     }
 
-    function renderTransactionsTable() {
-      const tbody = document.getElementById('transactionsTableBody');
-      const search = (document.getElementById('searchTxInput').value || '').toLowerCase();
-      const catFilter = document.getElementById('filterCatSelect').value;
-
-      let rawList = appData.transactions.filter(t => {
-        const belongsToEffective = getEffectiveMonthKey(t) === currentMonthKey;
-        const belongsToPurchase = isTxPurchasedInMonth(t, currentMonthKey);
-        return belongsToEffective || belongsToPurchase;
-      })
-      .filter(t => t.description.toLowerCase().includes(search))
-      .filter(t => catFilter === 'all' || (t.type === 'expense' && t.categoryId === catFilter));
-
-      const renderedList = [];
-      const seenGroups = new Set();
-
-      rawList.forEach(t => {
-        const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
-        const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
-
-        if (t.paymentMethod === 'credit' && t.installmentsTotal > 1 && isPurchasedHere && !isEffectiveHere) {
-          if (t.groupId) {
-            if (seenGroups.has(t.groupId)) return;
-            seenGroups.add(t.groupId);
-
-            const groupTxs = appData.transactions.filter(x => x.groupId === t.groupId);
-            const totalGroupAmount = groupTxs.reduce((acc, curr) => acc + Number(curr.amount), 0);
-            const cleanDesc = t.description.replace(/\s\(\d+\/\d+\)$/, '');
-
-            renderedList.push({
-              ...t,
-              isConsolidatedSummary: true,
-              description: cleanDesc,
-              amount: totalGroupAmount,
-              installmentVal: Number(t.amount)
-            });
-            return;
-          }
-        }
-
-        renderedList.push(t);
-      });
-
-      renderedList.sort((a, b) => b.date.localeCompare(a.date));
-
-      if (renderedList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-slate-400 text-xs"><i class="fa-regular fa-folder-open text-2xl mb-2 block opacity-40"></i>Nenhum lançamento com registro em <strong>${formatMonthLabel(currentMonthKey)}</strong>.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = renderedList.map(t => {
-        const isExpense = t.type === 'expense';
-        const [y, m, d] = t.date.split('-');
-        const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
-        const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
-        
-        let paymentBadge = '';
-        if (!isExpense) {
-          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-arrow-up"></i> Recebido</span>`;
-        } else if (t.paymentMethod === 'credit') {
-          const card = appData.cards.find(c => c.id === t.cardId);
-          const isPaid = t.status === 'card_paid';
-
-          if (t.isConsolidatedSummary) {
-            paymentBadge = `
-              <div class="inline-flex flex-col">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  <i class="fa-solid fa-credit-card"></i> ${card ? card.name : 'Crédito'} (Compra Parcelada)
-                </span>
-                <span class="text-[10px] text-amber-400 font-semibold mt-0.5">
-                  Parcelado em ${t.installmentsTotal}x de ${formatCurrency(t.installmentVal)}
-                </span>
-              </div>
-            `;
-          } else if (isPurchasedHere && !isEffectiveHere) {
-            const [by, bm] = (t.billingMonth || '').split('-').map(Number);
-            paymentBadge = `
-              <div class="inline-flex flex-col">
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold inline-flex items-center gap-1 bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                  <i class="fa-solid fa-clock"></i> Informativo (Compra no Crédito)
-                </span>
-                <span class="text-[10px] text-purple-400 font-semibold mt-0.5">Vence na fatura de: ${MONTH_SHORT[bm - 1]}/${by}</span>
-              </div>
-            `;
-          } else {
-            const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
-            paymentBadge = `
-              <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 ${isPaid ? 'bg-emerald-500/15 text-emerald-400' : 'bg-purple-500/15 text-purple-400'}" title="${isPaid ? 'Fatura Liquidada' : 'Fatura em Aberto'}">
-                <i class="fa-solid ${isPaid ? 'fa-circle-check' : 'fa-credit-card'}"></i> ${card ? card.name : 'Crédito'}${installmentTag}
-              </span>
-            `;
-          }
-        } else if (t.paymentMethod === 'debit') {
-          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-blue-500/15 text-blue-400"><i class="fa-solid fa-money-check"></i> Débito</span>`;
-        } else if (t.paymentMethod === 'cash') {
-          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-amber-500/15 text-amber-500"><i class="fa-solid fa-money-bill-1"></i> Dinheiro</span>`;
-        } else {
-          paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-teal-500/15 text-teal-400"><i class="fa-brands fa-pix"></i> PIX</span>`;
-        }
-
-        let catBadge = isExpense ? (() => { 
-          const cat = appData.categories.find(c => c.id === t.categoryId) || { name: 'Geral', color: '#64748b', icon: 'fa-tag' }; 
-          return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium" style="background:${cat.color}18; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i> ${cat.name}</span>`; 
-        })() : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-chart-line"></i> Extra</span>`;
-
-        return `<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-          <td class="py-3 px-2">${paymentBadge}</td>
-          <td class="py-3 px-2 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${d}/${m}/${y}</td>
-          <td class="py-3 px-2 font-medium text-slate-800 dark:text-slate-100">${t.description}</td>
-          <td class="py-3 px-2">${catBadge}</td>
-          <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${isExpense ? 'text-rose-500' : 'text-emerald-500'}">${isExpense ? '-' : '+'} ${formatCurrency(t.amount)}</td>
-          <td class="py-3 px-2 text-center whitespace-nowrap">
-            <button onclick="editTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-indigo-500 transition"><i class="fa-solid fa-pen"></i></button>
-            <button onclick="deleteTransaction('${t.id}')" class="p-1.5 text-slate-400 hover:text-rose-500 transition"><i class="fa-solid fa-trash"></i></button>
-          </td>
-        </tr>`;
-      }).join('');
-    }
-
-    function renderCategoryLimits() {
-      const container = document.getElementById('categoryLimitsList');
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
-      container.innerHTML = appData.categories.map(cat => {
-        const spent = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
-        const budget = Number(cat.budget || 0);
-        if (spent === 0 && budget === 0) return '';
-        const pct = budget > 0 ? Math.min(100, Math.round((spent / budget) * 100)) : 100;
-        const over = budget > 0 && spent > budget;
-        return `<div class="space-y-1">
-          <div class="flex justify-between text-xs"><span class="font-medium flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:${cat.color}"></span>${cat.name}</span><span class="${over ? 'text-rose-500 font-bold' : 'text-slate-500 dark:text-slate-400'}">${formatCurrency(spent)} ${budget > 0 ? `/ ${formatCurrency(budget)}` : ''}</span></div>
-          <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all duration-300" style="width:${budget > 0 ? pct : 35}%; background:${over ? '#f43f5e' : cat.color}"></div></div>
-        </div>`;
-      }).join('') || `<p class="text-xs text-slate-400 text-center py-4">Sem gastos registrados neste mês.</p>`;
-    }
-
-    function renderDoughnutChart() {
-      const ctx = document.getElementById('categoryDoughnutChart').getContext('2d');
-      const monthExpenses = appData.transactions.filter(t => getEffectiveMonthKey(t) === currentMonthKey && t.type === 'expense');
-      const labels = [], data = [], colors = [], categoryIds = [];
-      appData.categories.forEach(cat => {
-        const sum = monthExpenses.filter(t => t.categoryId === cat.id).reduce((a, b) => a + Number(b.amount), 0);
-        if (sum > 0) { labels.push(cat.name); data.push(sum); colors.push(cat.color); categoryIds.push(cat.id); }
-      });
-      document.getElementById('emptyChartMsg').classList.toggle('hidden', data.length > 0);
-      if (doughnutChart) doughnutChart.destroy();
-      doughnutChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0, hoverOffset: 8 }] },
-        options: {
-          responsive: true, maintainAspectRatio: false, cutout: '68%',
-          onClick: (evt, elements) => {
-            if (elements && elements.length > 0) {
-              const clickedCatId = categoryIds[elements[0].index];
-              const filterSelect = document.getElementById('filterCatSelect');
-              if (filterSelect.value === clickedCatId && chartFilteredExpenseOnly) { clearCategoryFilter(); }
-              else { filterSelect.value = clickedCatId; chartFilteredExpenseOnly = true; updateFilterBadgeUI(); renderTransactionsTable(); }
-            }
-          },
-          plugins: {
-            legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 10, font: { size: 11 } } },
-            tooltip: { callbacks: { label: (c) => { const total = c.dataset.data.reduce((a, b) => a + Number(b), 0); const pct = total > 0 ? ((Number(c.raw) / total) * 100).toFixed(1).replace('.', ',') : '0,0'; return ` ${c.label}: ${pct}%`; } } }
-          }
-        }
-      });
-    }
-
-    function renderCardsTab() {
-      const container = document.getElementById('cardsListContainer');
-      if (!appData.cards || appData.cards.length === 0) {
-        container.innerHTML = `
-          <div class="col-span-full py-12 text-center text-slate-400 bg-white dark:bg-darkCard rounded-3xl border border-dashed border-slate-300 dark:border-darkBorder p-8">
-            <i class="fa-solid fa-credit-card text-4xl mb-3 text-purple-400 opacity-60"></i>
-            <h4 class="font-bold text-base text-slate-700 dark:text-slate-200">Você ainda não tem cartões cadastrados</h4>
-            <p class="text-xs text-slate-400 max-w-sm mx-auto mt-1 mb-5">Cadastre o seu cartão para ter o controle do limite e acompanhar suas faturas.</p>
-            <button onclick="openCardModal()" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold text-xs shadow-md">
-              <i class="fa-solid fa-plus mr-1"></i> Cadastrar Meu Primeiro Cartão
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = appData.cards.map(card => {
-        const cardExpenses = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.status !== 'card_paid')
-          .reduce((a, b) => a + Number(b.amount), 0);
-
-        const currentMonthInvoice = appData.transactions
-          .filter(t => t.paymentMethod === 'credit' && t.cardId === card.id && t.billingMonth === currentMonthKey && t.status !== 'card_paid')
-          .reduce((a, b) => a + Number(b.amount), 0);
-
-        const totalUsed = Number(card.initialUsedLimit || 0) + cardExpenses;
-        const totalLimit = Number(card.totalLimit || 0);
-        const available = Math.max(0, totalLimit - totalUsed);
-        const pctUsed = totalLimit > 0 ? Math.min(100, Math.round((totalUsed / totalLimit) * 100)) : 0;
-
-        return `
-          <div class="bg-white dark:bg-darkCard rounded-3xl p-6 border border-slate-200 dark:border-darkBorder shadow-xl relative overflow-hidden flex flex-col justify-between" style="border-top: 5px solid ${card.brandColor || '#8b5cf6'}">
-            <div>
-              <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-2.5">
-                  <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shadow-md" style="background:${card.brandColor || '#8b5cf6'}">
-                    <i class="fa-solid fa-credit-card"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-bold text-base text-slate-800 dark:text-slate-100">${card.name}</h4>
-                    <span class="text-[10px] text-slate-400 uppercase font-semibold">Crédito</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1">
-                  <button type="button" onclick="editCard('${card.id}')" class="p-2 text-slate-400 hover:text-purple-400 transition" title="Editar Cartão"><i class="fa-solid fa-pen pointer-events-none"></i></button>
-                  <button type="button" onclick="deleteCard('${card.id}')" class="p-2 text-slate-400 hover:text-rose-400 transition" title="Excluir"><i class="fa-solid fa-trash pointer-events-none"></i></button>
-                </div>
-              </div>
-
-              <div class="space-y-3 bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-700/60">
-                <div class="flex justify-between items-center text-xs">
-                  <span class="text-slate-400">Limite Disponível</span>
-                  <strong class="text-emerald-500 font-bold text-sm">${formatCurrency(available)}</strong>
-                </div>
-                <div class="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full transition-all duration-300" style="width: ${pctUsed}%; background: ${pctUsed > 85 ? '#ef4444' : card.brandColor || '#8b5cf6'}"></div>
-                </div>
-                <div class="flex justify-between items-center text-[11px] text-slate-400">
-                  <span>Comprometido Total: <strong class="text-slate-700 dark:text-slate-200">${formatCurrency(totalUsed)}</strong></span>
-                  <span>Limite: <strong>${formatCurrency(totalLimit)}</strong></span>
-                </div>
-              </div>
-
-              <div class="mt-4 p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-between text-xs">
-                <span class="text-purple-600 dark:text-purple-300 font-medium flex items-center gap-1.5">
-                  <i class="fa-solid fa-receipt"></i> Fatura em Aberto (${formatMonthLabel(currentMonthKey)}):
-                </span>
-                <strong class="text-purple-600 dark:text-purple-300 font-bold text-sm">${formatCurrency(currentMonthInvoice)}</strong>
-              </div>
-
-              <div class="grid grid-cols-2 gap-3 mt-3 text-xs">
-                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                  <span class="text-[10px] uppercase text-slate-400 block font-semibold">Fechamento</span>
-                  <span class="font-bold text-slate-700 dark:text-slate-200">Todo dia ${card.closingDay}</span>
-                </div>
-                <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800">
-                  <span class="text-[10px] uppercase text-slate-400 block font-semibold">Pagamento</span>
-                  <span class="font-bold text-indigo-400">Todo dia ${card.dueDay}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function openCardModal() {
-      document.getElementById('cardModalTitle').innerHTML = '<i class="fa-solid fa-credit-card text-purple-500"></i> Cadastrar Cartão';
-      document.getElementById('cardIdInput').value = '';
-      document.getElementById('cardNameInput').value = '';
-      document.getElementById('cardTotalLimitInput').value = '';
-      document.getElementById('cardUsedLimitInput').value = '0';
-      document.getElementById('cardClosingDayInput').value = '25';
-      document.getElementById('cardDueDayInput').value = '5';
-      document.getElementById('cardColorInput').value = '#8b5cf6';
-      document.getElementById('cardModal').classList.remove('hidden');
-    }
-
-    function editCard(cardId) {
-      const card = appData.cards.find(c => c.id === cardId);
-      if (!card) return;
-      document.getElementById('cardModalTitle').innerHTML = '<i class="fa-solid fa-credit-card text-purple-500"></i> Editar Cartão';
-      document.getElementById('cardIdInput').value = card.id;
-      document.getElementById('cardNameInput').value = card.name;
-      document.getElementById('cardTotalLimitInput').value = card.totalLimit;
-      document.getElementById('cardUsedLimitInput').value = card.initialUsedLimit || 0;
-      document.getElementById('cardClosingDayInput').value = card.closingDay;
-      document.getElementById('cardDueDayInput').value = card.dueDay;
-      document.getElementById('cardColorInput').value = card.brandColor || '#8b5cf6';
-      document.getElementById('cardModal').classList.remove('hidden');
-    }
-
-    function closeCardModal() {
-      document.getElementById('cardModal').classList.add('hidden');
-    }
-
-    function saveCard(e) {
-      e.preventDefault();
-      const id = document.getElementById('cardIdInput').value;
-      const cardObj = {
-        id: id || 'card_' + Date.now(),
-        name: document.getElementById('cardNameInput').value.trim(),
-        totalLimit: Number(document.getElementById('cardTotalLimitInput').value),
-        initialUsedLimit: Number(document.getElementById('cardUsedLimitInput').value || 0),
-        closingDay: Number(document.getElementById('cardClosingDayInput').value),
-        dueDay: Number(document.getElementById('cardDueDayInput').value),
-        brandColor: document.getElementById('cardColorInput').value
-      };
-
-      if (!appData.cards) appData.cards = [];
-
-      if (id) {
-        const idx = appData.cards.findIndex(c => c.id === id);
-        if (idx > -1) appData.cards[idx] = cardObj;
-      } else {
-        appData.cards.push(cardObj);
-      }
-
-      saveToStorage();
-      closeCardModal();
-      renderAll();
-    }
-
-    function deleteCard(id) {
-      if (!confirm('Tem certeza que deseja excluir este cartão?')) return;
-      appData.cards = appData.cards.filter(c => c.id !== id);
-      saveToStorage();
-      renderAll();
-    }
-
-    function setPaymentMethod(method) {
-      currentPaymentMethod = method;
-      ['cash', 'pix', 'debit', 'credit'].forEach(m => {
-        const btn = document.getElementById(`btnMethod${m.charAt(0).toUpperCase() + m.slice(1)}`);
-        if (m === method) {
-          btn.className = 'py-1.5 rounded-lg text-center transition bg-purple-600 text-white font-bold shadow-sm';
-        } else {
-          btn.className = 'py-1.5 rounded-lg text-center transition text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700';
-        }
-      });
-
-      const cardContainer = document.getElementById('txCreditCardSelectContainer');
-      const amountLabel = document.getElementById('txAmountLabel');
-
-      if (method === 'credit') {
-        cardContainer.classList.remove('hidden');
-        amountLabel.textContent = 'Valor Total da Compra (R$)';
-        updateBillingNotice();
-      } else {
-        cardContainer.classList.add('hidden');
-        amountLabel.textContent = 'Valor (R$)';
-      }
-    }
-
-    function updateBillingNotice() {
-      if (currentPaymentMethod !== 'credit') return;
-      const cardId = document.getElementById('txCardIdInput').value;
-      const dateVal = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
-      const installments = Number(document.getElementById('txInstallmentsInput').value || 1);
-      const totalAmount = Number(document.getElementById('txAmountInput').value || 0);
-      const notice = document.getElementById('txBillingNotice');
-      const previewAmount = document.getElementById('installmentPreviewAmount');
-
-      const installmentValue = installments > 0 ? (totalAmount / installments) : totalAmount;
-      previewAmount.textContent = `${installments}x de ${formatCurrency(installmentValue)}`;
-
-      if (!cardId) {
-        notice.textContent = 'Cadastre um cartão na aba Cartões para vincular compras a prazo.';
-        return;
-      }
-
-      const res = calculateCardBilling(cardId, dateVal, 0);
-      const [by, bm] = res.billingMonth.split('-').map(Number);
-
-      if (installments === 1) {
-        notice.innerHTML = `📅 Compra feita nesta data. Ela cairá na <strong>Fatura de ${MONTH_NAMES[bm - 1]} de ${by}</strong> (não desconta do saldo imediato em conta).`;
-      } else {
-        const lastRes = calculateCardBilling(cardId, dateVal, installments - 1);
-        const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
-        notice.innerHTML = `📅 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até a última em <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. O limite de ${formatCurrency(totalAmount)} é comprometido agora.`;
-      }
-    }
-
-    function openTransactionModal() {
-      document.getElementById('txModalTitle').textContent = 'Novo Lançamento';
-      document.getElementById('txIdInput').value = '';
-      document.getElementById('txDescInput').value = '';
-      document.getElementById('txAmountInput').value = '';
-      document.getElementById('txDateInput').value = `${currentMonthKey}-10`;
-      document.getElementById('txInstallmentsInput').value = '1';
-      setTxType('expense');
-      setPaymentMethod('pix');
-      populateCardSelect();
-      toggleInvoicePaymentFields();
-      document.getElementById('transactionModal').classList.remove('hidden');
-    }
-
-    function closeTransactionModal() {
-      document.getElementById('transactionModal').classList.add('hidden');
-    }
-
+    // SALVAR LANÇAMENTO: VALIDAÇÃO DE TETO MÁXIMO E ABATIMENTO NO MÊS SEGUINTE
     function saveTransaction(e) {
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
@@ -1746,7 +1191,7 @@
       const cardId = currentPaymentMethod === 'credit' ? document.getElementById('txCardIdInput').value : null;
       const installments = (currentTxType === 'expense' && currentPaymentMethod === 'credit') ? Number(document.getElementById('txInstallmentsInput').value || 1) : 1;
 
-      // VALIDAÇÃO: PAGAMENTO DE FATURA DE CARTÃO
+      // VALIDAÇÃO E LIQUIDAÇÃO DE FATURA
       if (currentTxType === 'expense' && categoryId === 'cat_fatura') {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
@@ -1757,9 +1202,11 @@
           return;
         }
 
+        // 1. Pega todas as faturas e parcelas em aberto DESTE cartão
         const cardExpenses = appData.transactions
           .filter(t => t.paymentMethod === 'credit' && t.cardId === invoiceCardId && t.status !== 'card_paid');
         
+        // Dívida total real existente deste cartão
         const totalPendingDebt = cardExpenses.reduce((a, b) => a + Number(b.amount), 0) + Number(targetCard.initialUsedLimit || 0);
 
         if (totalPendingDebt <= 0) {
@@ -1767,29 +1214,75 @@
           return;
         }
 
+        // 2. BLOQUEIO: Não permite pagar um valor maior que a dívida total existente do cartão
+        if (totalAmount > totalPendingDebt) {
+          alert(`O valor de ${formatCurrency(totalAmount)} excede o total a pagar deste cartão (${formatCurrency(totalPendingDebt)}).\n\nNão existem faturas futuras suficientes para amortizar este valor.`);
+          return;
+        }
+
         let pool = totalAmount;
 
+        // 3. Quita a fatura do mês selecionado deste cartão
         const currentMonthTxs = cardExpenses.filter(t => (t.billingMonth || t.date.slice(0, 7)) === invoiceMonth);
-        const futureMonthTxs = cardExpenses
-          .filter(t => (t.billingMonth || t.date.slice(0, 7)) > invoiceMonth)
-          .sort((a, b) => (a.billingMonth || a.date).localeCompare(b.billingMonth || b.date));
-
-        const orderedQueue = [...currentMonthTxs, ...futureMonthTxs];
-
-        for (const tx of orderedQueue) {
+        for (const tx of currentMonthTxs) {
           if (pool <= 0) break;
-          const txAmt = Number(tx.amount);
-
-          if (pool >= txAmt) {
+          const amt = Number(tx.amount);
+          if (pool >= amt) {
             tx.status = 'card_paid';
-            pool -= txAmt;
+            pool -= amt;
           } else {
-            tx.amount = Number((txAmt - pool).toFixed(2));
+            tx.amount = Number((amt - pool).toFixed(2));
             pool = 0;
             break;
           }
         }
 
+        // 4. Se houver excedente (pool > 0), abate integralmente na fatura do mês seguinte
+        if (pool > 0) {
+          const futureMonthTxs = cardExpenses
+            .filter(t => (t.billingMonth || t.date.slice(0, 7)) > invoiceMonth)
+            .sort((a, b) => (a.billingMonth || a.date).localeCompare(b.billingMonth || b.date));
+
+          // Agrupa as faturas mês a mês
+          const futureByMonth = {};
+          futureMonthTxs.forEach(t => {
+            const m = t.billingMonth || t.date.slice(0, 7);
+            if (!futureByMonth[m]) futureByMonth[m] = [];
+            futureByMonth[m].push(t);
+          });
+
+          const futureMonthsSorted = Object.keys(futureByMonth).sort();
+
+          for (const mKey of futureMonthsSorted) {
+            if (pool <= 0) break;
+            const txsInMonth = futureByMonth[mKey];
+            const sumMonth = txsInMonth.reduce((acc, x) => acc + Number(x.amount), 0);
+
+            if (sumMonth >= pool) {
+              // Abate integralmente neste mês e encerra
+              let toDeduct = pool;
+              for (const tx of txsInMonth) {
+                if (toDeduct <= 0) break;
+                const amt = Number(tx.amount);
+                if (toDeduct >= amt) {
+                  tx.status = 'card_paid';
+                  toDeduct -= amt;
+                } else {
+                  tx.amount = Number((amt - toDeduct).toFixed(2));
+                  toDeduct = 0;
+                }
+              }
+              pool = 0;
+              break;
+            } else {
+              // Quita este mês por completo e leva a sobra para o seguinte
+              txsInMonth.forEach(tx => tx.status = 'card_paid');
+              pool -= sumMonth;
+            }
+          }
+        }
+
+        // 5. Se ainda sobrou saldo (por exemplo em cartões com limite inicial manual), abate do initialUsedLimit
         if (pool > 0 && Number(targetCard.initialUsedLimit || 0) > 0) {
           targetCard.initialUsedLimit = Math.max(0, Number(targetCard.initialUsedLimit) - pool);
         }
@@ -1943,14 +1436,14 @@
       last6Keys.forEach(k => {
         const sal = getSalaryForMonth(k), txs = appData.transactions.filter(t => getEffectiveMonthKey(t) === k);
         const inc = sal + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0);
-        const exp = txs.filter(t => t.type === 'expense').reduce((a, b) => a + Number(b.amount), 0);
+        const exp = txs.filter(t => t.type === 'expense' && t.paymentMethod !== 'credit').reduce((a, b) => a + Number(b.amount), 0);
         incomes6.push(inc); expenses6.push(exp); leftovers6.push((sal - exp) + txs.filter(t => t.type === 'income').reduce((a, b) => a + Number(b.amount), 0));
       });
       const ctxBar = document.getElementById('sixMonthsBarChart').getContext('2d');
       if (barChart) barChart.destroy();
       barChart = new Chart(ctxBar, {
         type: 'bar',
-        data: { labels: labels6, datasets: [{ label: 'Salário + Entradas', data: incomes6, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Total de Despesas (c/ Fatura)', data: expenses6, backgroundColor: '#f43f5e', borderRadius: 6 }, { label: 'Saldo', data: leftovers6, backgroundColor: '#6366f1', borderRadius: 6 }] },
+        data: { labels: labels6, datasets: [{ label: 'Salário + Entradas', data: incomes6, backgroundColor: '#10b981', borderRadius: 6 }, { label: 'Saídas Efetivas', data: expenses6, backgroundColor: '#f43f5e', borderRadius: 6 }, { label: 'Saldo', data: leftovers6, backgroundColor: '#6366f1', borderRadius: 6 }] },
         options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8' }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#33415533' } } }, plugins: { legend: { labels: { color: '#94a3b8' } } } }
       });
 
@@ -1959,8 +1452,8 @@
       document.getElementById('thMonthA').textContent = formatMonthLabel(monthA);
       document.getElementById('thMonthB').textContent = formatMonthLabel(monthB);
 
-      const expA = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthA && t.type === 'expense');
-      const expB = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthB && t.type === 'expense');
+      const expA = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthA && t.type === 'expense' && t.paymentMethod !== 'credit');
+      const expB = appData.transactions.filter(t => getEffectiveMonthKey(t) === monthB && t.type === 'expense' && t.paymentMethod !== 'credit');
       const totalA = expA.reduce((a, b) => a + Number(b.amount), 0), totalB = expB.reduce((a, b) => a + Number(b.amount), 0), diffTotal = totalB - totalA;
 
       document.getElementById('comparisonSummaryCards').innerHTML = `
@@ -2129,6 +1622,7 @@
       reader.readAsText(file);
     }
 
+    // LIMPEZA EXCLUSIVA DO MÊS COM BLINDAGEM COMPLETA A CARTÕES E PARCELAS
     function clearCurrentMonthData() {
       const monthLabel = formatMonthLabel(currentMonthKey);
       if (!confirm(`Deseja apagar os lançamentos avulsos de ${monthLabel}?\n\n🛡️ PROTEÇÃO TOTAL ATIVA:\nNenhuma compra no crédito ou parcela de cartão será apagada.`)) {
