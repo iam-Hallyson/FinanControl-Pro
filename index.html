@@ -748,9 +748,15 @@
               <input type="number" step="0.01" min="0.01" id="txAmountInput" required oninput="updateBillingNotice()" placeholder="0,00" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold">
             </div>
             <div>
-              <label id="txDateLabel" class="block text-xs font-semibold uppercase text-slate-400 mb-1">Data</label>
+              <label id="txDateLabel" class="block text-xs font-semibold uppercase text-slate-400 mb-1">Data da Compra</label>
               <input type="date" id="txDateInput" required onchange="updateBillingNotice()" class="w-full px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm">
             </div>
+          </div>
+          
+          <!-- NOVO CAMPO: VENCIMENTO DO BOLETO -->
+          <div id="txBoletoDueDateContainer" class="hidden mt-3 p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
+            <label class="block text-[11px] font-semibold uppercase text-amber-500 mb-1">Data de Vencimento do (1º) Boleto</label>
+            <input type="date" id="txBoletoDueDateInput" onchange="updateBillingNotice()" class="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-sm font-bold focus:outline-none">
           </div>
           <div id="txCategoryContainer">
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Categoria do Gasto</label>
@@ -793,9 +799,13 @@
             <p class="text-[10px] text-amber-300">💡 Ao salvar, o boleto será marcado como pago com o valor integral correto, sem zerar.</p>
           </div>
 
-          <div class="flex justify-end gap-2 pt-3">
-            <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
-            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">Salvar Lançamento</button>
+          <div class="flex flex-col gap-2 pt-3">
+            <button type="submit" class="w-full py-3 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 transition cursor-pointer">
+              Salvar Lançamento
+            </button>
+            <button type="button" onclick="closeTransactionModal()" class="w-full py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition cursor-pointer">
+              Cancelar
+            </button>
           </div>
         </form>
       </div>
@@ -838,9 +848,13 @@
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Escolha um Ícone</label>
             <div id="iconPickerGrid" class="grid grid-cols-6 gap-2 max-h-36 overflow-y-auto p-1"></div>
           </div>
-          <div class="flex justify-end gap-2 pt-2">
-            <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
-            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">Salvar Categoria</button>
+          <div class="flex flex-col gap-2 pt-2">
+            <button type="submit" class="w-full py-3 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 transition cursor-pointer">
+              Salvar Categoria
+            </button>
+            <button type="button" onclick="closeCategoryModal()" class="w-full py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition cursor-pointer">
+              Cancelar
+            </button>
           </div>
         </form>
       </div>
@@ -1688,7 +1702,7 @@
       }).join('');
     }
 
-    // TABELA 2: LANÇAMENTOS FUTUROS (Aparece no mês da compra original)
+    /// TABELA 2: LANÇAMENTOS FUTUROS (Aparece no mês da compra original)
     function renderFutureTransactionsTable() {
       const tbody = document.getElementById('futureTransactionsTableBody');
       
@@ -1717,15 +1731,13 @@
       tbody.innerHTML = uniqueFutureList.map(t => {
         const [y, m, d] = (t.date || '2026-01-01').split('-');
         
-        // Define o mês de vencimento da primeira parcela
+        // Define o mês de vencimento da primeira parcela corretamente
         let firstBillingYear, firstBillingMonth;
         if (t.groupId) {
-          const firstInstallment = appData.transactions.find(tx => tx.groupId === t.groupId && tx.installmentNumber === 1);
-          if (firstInstallment && firstInstallment.billingMonth) {
-            [firstBillingYear, firstBillingMonth] = firstInstallment.billingMonth.split('-').map(Number);
-          } else {
-            [firstBillingYear, firstBillingMonth] = (t.billingMonth || '').split('-').map(Number);
-          }
+          const groupTxs = appData.transactions.filter(tx => tx.groupId === t.groupId);
+          groupTxs.sort((a, b) => (a.billingMonth || '').localeCompare(b.billingMonth || ''));
+          const firstInst = groupTxs[0];
+          [firstBillingYear, firstBillingMonth] = (firstInst.billingMonth || '').split('-').map(Number);
         } else {
           [firstBillingYear, firstBillingMonth] = (t.billingMonth || '').split('-').map(Number);
         }
@@ -1759,7 +1771,7 @@
           </td>
         </tr>`;
       }).join('');
-      }
+    }
 
     function toggleBoletoPayment(id, isChecked) {
       const tx = appData.transactions.find(t => t.id === id);
@@ -1963,24 +1975,29 @@
 
     function updateDynamicLabels() {
       const amountLabel = document.getElementById('txAmountLabel');
-      const dateLabel = document.getElementById('txDateLabel');
-      
+      document.getElementById('txDateLabel').textContent = 'Data da Compra';
       if (paymentMode === 'avista') {
-        if (avistaSubMethod === 'boleto') {
-          amountLabel.textContent = 'Valor do Boleto (R$)';
-          dateLabel.textContent = 'Vencimento do Boleto';
-        } else {
-          amountLabel.textContent = 'Valor (R$)';
-          dateLabel.textContent = 'Data';
+        amountLabel.textContent = 'Valor (R$)';
+      } else {
+        amountLabel.textContent = 'Valor Total da Compra (R$)';
+      }
+    }
+
+    function toggleBoletoDueDateField() {
+      const container = document.getElementById('txBoletoDueDateContainer');
+      const input = document.getElementById('txBoletoDueDateInput');
+      const isBoletoAvista = paymentMode === 'avista' && avistaSubMethod === 'boleto';
+      const isBoletoParcelado = paymentMode === 'parcelado' && parceladoSubType === 'boleto';
+      
+      if (currentTxType === 'expense' && (isBoletoAvista || isBoletoParcelado)) {
+        if (container) container.classList.remove('hidden');
+        if (input) {
+          input.setAttribute('required', 'true');
+          if (!input.value) input.value = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
         }
       } else {
-        if (parceladoSubType === 'boleto') {
-          amountLabel.textContent = 'Valor Total do Carnê / Boleto (R$)';
-          dateLabel.textContent = 'Vencimento do 1º Boleto';
-        } else {
-          amountLabel.textContent = 'Valor Total da Compra (R$)';
-          dateLabel.textContent = 'Data da Compra';
-        }
+        if (container) container.classList.add('hidden');
+        if (input) input.removeAttribute('required');
       }
     }
 
@@ -2006,6 +2023,7 @@
       
       updateDynamicLabels();
       toggleInvoicePaymentFields();
+      toggleBoletoDueDateField();
     }
 
     function setAvistaSubMethod(method) {
@@ -2029,6 +2047,7 @@
       
       updateDynamicLabels();
       toggleInvoicePaymentFields();
+      toggleBoletoDueDateField();
     }
 
     function setParceladoSubType(subType) {
@@ -2049,11 +2068,13 @@
       
       updateDynamicLabels();
       updateBillingNotice();
+      toggleBoletoDueDateField();
     }
 
     function updateBillingNotice() {
       if (paymentMode !== 'parcelado') return;
       const dateVal = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
+      const boletoDueDate = document.getElementById('txBoletoDueDateInput').value || dateVal;
       const installments = Number(document.getElementById('txInstallmentsInput').value || 2);
       const totalAmount = Number(document.getElementById('txAmountInput').value || 0);
       const notice = document.getElementById('txBillingNotice');
@@ -2074,11 +2095,11 @@
         const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
         notice.innerHTML = `📅 Cartão: 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. Limite de ${formatCurrency(totalAmount)} comprometido.`;
       } else {
-        const firstRes = calculateBoletoBilling(dateVal, 0);
+        const firstRes = calculateBoletoBilling(boletoDueDate, 0);
         const [by, bm] = firstRes.billingMonth.split('-').map(Number);
-        const lastRes = calculateBoletoBilling(dateVal, installments - 1);
+        const lastRes = calculateBoletoBilling(boletoDueDate, installments - 1);
         const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
-        notice.innerHTML = `📄 Boleto/Carnê: 1º vencimento em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong> (sem vínculo de limite).`;
+        notice.innerHTML = `📄 Boleto/Carnê: 1º vencimento em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>.`;
       }
     }
 
@@ -2088,6 +2109,7 @@
       document.getElementById('txDescInput').value = '';
       document.getElementById('txAmountInput').value = '';
       document.getElementById('txDateInput').value = `${currentMonthKey}-10`;
+      document.getElementById('txBoletoDueDateInput').value = '';
       document.getElementById('txInstallmentsInput').value = '2';
       setTxType('expense');
       setPaymentMode('avista');
@@ -2095,6 +2117,7 @@
       setParceladoSubType('boleto');
       populateCardSelect();
       toggleInvoicePaymentFields();
+      toggleBoletoDueDateField();
       document.getElementById('transactionModal').classList.remove('hidden');
     }
 
@@ -2105,6 +2128,7 @@
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
       const txDate = document.getElementById('txDateInput').value;
+      const boletoDueDate = document.getElementById('txBoletoDueDateInput').value || txDate;
       const desc = document.getElementById('txDescInput').value.trim();
       const totalAmount = Number(document.getElementById('txAmountInput').value);
       const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
@@ -2136,7 +2160,7 @@
         }
       }
 
-      // QUITAÇÃO DE FATURA: Cria um item de despesa simples, motor matemático cuida do resquício
+      // QUITAÇÃO DE FATURA
       if (currentTxType === 'expense' && categoryId === 'cat_fatura' && paymentMode === 'avista') {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
@@ -2191,7 +2215,7 @@
         for (let i = 0; i < installments; i++) {
           const billing = paymentMethod === 'credit'
             ? calculateCardBilling(cardId, txDate, i).billingMonth
-            : calculateBoletoBilling(txDate, i).billingMonth;
+            : calculateBoletoBilling(boletoDueDate, i).billingMonth;
 
           appData.transactions.push({
             id: 'tx_' + Date.now() + '_' + i,
@@ -2203,7 +2227,7 @@
             description: `${desc} (${i + 1}/${installments})`,
             amount: installmentAmount,
             originalTotalAmount: totalAmount,
-            date: txDate,
+            date: txDate, // Mantém a Data da Compra correta
             categoryId: categoryId,
             installmentsTotal: installments,
             installmentNumber: i + 1,
@@ -2216,7 +2240,7 @@
         if (paymentMethod === 'credit' && cardId) {
           billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
         } else if (paymentMethod === 'boleto') {
-          billingMonth = calculateBoletoBilling(txDate, 0).billingMonth;
+          billingMonth = boletoDueDate.slice(0, 7);
         }
 
         const txObj = {
@@ -2228,7 +2252,7 @@
           description: desc,
           amount: totalAmount,
           originalTotalAmount: totalAmount,
-          date: txDate,
+          date: txDate, // Mantém a Data da Compra correta
           categoryId: categoryId,
           installmentsTotal: 1,
           installmentNumber: 1,
@@ -2252,6 +2276,11 @@
       document.getElementById('txDescInput').value = tx.description.replace(/\s\(\d+\/\d+\)$/, '');
       document.getElementById('txAmountInput').value = tx.originalTotalAmount || tx.amount;
       document.getElementById('txDateInput').value = tx.date;
+      
+      if (tx.paymentMethod === 'boleto') {
+        document.getElementById('txBoletoDueDateInput').value = tx.billingMonth ? `${tx.billingMonth}-10` : tx.date;
+      }
+      
       setTxType(tx.type);
       if (tx.type === 'expense') {
         document.getElementById('txCatInput').value = tx.categoryId;
@@ -2272,6 +2301,7 @@
           }
         }
         toggleInvoicePaymentFields();
+        toggleBoletoDueDateField();
       }
       document.getElementById('transactionModal').classList.remove('hidden');
     }
@@ -2317,6 +2347,7 @@
         document.getElementById('txBoletoPaymentContainer').classList.add('hidden');
         document.getElementById('txCatInput').removeAttribute('required');
       }
+      toggleBoletoDueDateField();
     }
 
     function switchTab(tabName) {
