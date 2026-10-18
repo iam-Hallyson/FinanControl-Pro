@@ -1658,15 +1658,15 @@
       }).join('');
     }
 
-    // TABELA 2: LANÇAMENTOS FUTUROS (Aparece no mês da compra e não nos meses futuros)
+    // TABELA 2: LANÇAMENTOS FUTUROS (Aparece no mês da compra original)
     function renderFutureTransactionsTable() {
       const tbody = document.getElementById('futureTransactionsTableBody');
       
       const futureList = appData.transactions.filter(t => {
         const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
         const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
-        // Só aparece na aba futura do mês em que foi comprado e que o vencimento não é nesse próprio mês!
-        return isPurchasedHere && !isEffectiveHere && (isDeferredMethod(t.paymentMethod) || (t.installmentsTotal && t.installmentsTotal > 1));
+        // Mostra compras a prazo (cartão ou boleto) OU boletos que vencem em meses diferentes da compra
+        return isPurchasedHere && (!isEffectiveHere || (t.installmentsTotal && t.installmentsTotal > 1));
       });
 
       const uniqueMap = new Map();
@@ -1686,7 +1686,20 @@
 
       tbody.innerHTML = uniqueFutureList.map(t => {
         const [y, m, d] = (t.date || '2026-01-01').split('-');
-        const [by, bm] = (t.billingMonth || '').split('-').map(Number);
+        
+        // Define o mês de vencimento da primeira parcela
+        let firstBillingYear, firstBillingMonth;
+        if (t.groupId) {
+          const firstInstallment = appData.transactions.find(tx => tx.groupId === t.groupId && tx.installmentNumber === 1);
+          if (firstInstallment && firstInstallment.billingMonth) {
+            [firstBillingYear, firstBillingMonth] = firstInstallment.billingMonth.split('-').map(Number);
+          } else {
+            [firstBillingYear, firstBillingMonth] = (t.billingMonth || '').split('-').map(Number);
+          }
+        } else {
+          [firstBillingYear, firstBillingMonth] = (t.billingMonth || '').split('-').map(Number);
+        }
+        
         const card = t.cardId ? appData.cards.find(c => c.id === t.cardId) : null;
         
         let typeBadge = t.paymentMethod === 'credit' 
@@ -1703,7 +1716,7 @@
           <td class="py-3 px-2">
             <div class="inline-flex flex-col">
               ${typeBadge}
-              <span class="text-[9px] text-slate-400 mt-0.5">1ª parc. em: ${MONTH_SHORT[bm - 1] || 'Próx'}/${by || y} (${t.installmentsTotal || 1}x)</span>
+              <span class="text-[9px] text-slate-400 mt-0.5">1ª parc. em: ${MONTH_SHORT[firstBillingMonth - 1] || 'Próx'}/${firstBillingYear || y} (${t.installmentsTotal || 1}x)</span>
             </div>
           </td>
           <td class="py-3 px-2 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">${d}/${m}/${y}</td>
@@ -1716,7 +1729,6 @@
           </td>
         </tr>`;
       }).join('');
-    }
 
     function toggleBoletoPayment(id, isChecked) {
       const tx = appData.transactions.find(t => t.id === id);
