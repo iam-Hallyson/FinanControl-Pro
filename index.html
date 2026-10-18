@@ -907,8 +907,20 @@
     }
 
     function initGoogleAuth() {
+      let googleAuthAttempts = 0;
+
+    function initGoogleAuth() {
       if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-        setTimeout(initGoogleAuth, 250);
+        googleAuthAttempts++;
+        if (googleAuthAttempts < 20) { // Tenta carregar por 5 segundos
+          setTimeout(initGoogleAuth, 250);
+        } else {
+          // Se falhar após 5 segundos, avisa o usuário que algo está bloqueando o login
+          const statusEl = document.getElementById('authStatusMsg');
+          if (statusEl) {
+            statusEl.innerHTML = '<span class="text-rose-500 font-bold">Falha ao carregar o Google.</span><br>O seu navegador ou uma extensão (ex: AdBlock) está bloqueando o login. Desative o bloqueador e recarregue a página.';
+          }
+        }
         return;
       }
 
@@ -937,12 +949,25 @@
     }
 
     function handleAuthClick() {
+      const statusEl = document.getElementById('authStatusMsg');
+      
+      // Se o script do Google não existe, avisa imediatamente no clique
+      if (typeof google === 'undefined') {
+         if (statusEl) statusEl.innerHTML = '<span class="text-rose-500 font-bold">O sistema de login foi bloqueado.</span><br>Desative extensões de bloqueio (AdBlock) e recarregue a página.';
+         return;
+      }
+      
       if (!tokenClient) {
         initGoogleAuth();
+        setTimeout(handleAuthClick, 500); // Aguarda inicializar e tenta novamente
+        return;
       }
+      
       try {
         tokenClient.requestAccessToken({ prompt: '' });
-      } catch (err) {}
+      } catch (err) {
+        if (statusEl) statusEl.textContent = 'Erro ao solicitar acesso ao Google: ' + err.message;
+      }
     }
 
     function unlockApp() {
