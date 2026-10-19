@@ -857,7 +857,7 @@
         </form>
       </div>
     </div>
-    <!-- MODAL MANUAL DO USUÁRIO -->
+<!-- MODAL MANUAL DO USUÁRIO -->
     <div id="manualModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
@@ -868,39 +868,73 @@
         </div>
         
         <div class="overflow-y-auto custom-scroll pr-2 space-y-6 text-sm text-slate-600 dark:text-slate-300">
+          
           <div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-500"></i> 1. Segurança e Sincronização</h4>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-500"></i> 1. Primeiros Passos e Segurança</h4>
             <ul class="list-disc pl-5 space-y-1.5 text-xs">
               <li><strong>Privacidade Máxima:</strong> Os seus dados ficam guardados numa pasta oculta do seu próprio Google Drive. Nenhum servidor externo tem acesso.</li>
               <li><strong>Modo Offline:</strong> Pode usar o sistema sem internet. Assim que a ligação voltar, ele sincroniza as alterações.</li>
-              <li><strong>Modo Privacidade:</strong> Clique no ícone do "Olho" no topo da ecrã para ocultar todos os valores (R$ ****) ao usar a aplicação em público.</li>
             </ul>
           </div>
           
           <div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-credit-card text-purple-500"></i> 2. Faturas de Cartão e Boletos</h4>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-line text-blue-500"></i> 2. O Dashboard Principal</h4>
             <ul class="list-disc pl-5 space-y-1.5 text-xs">
-              <li><strong>Bloqueio de Segurança:</strong> Para pagar uma Fatura ou dar baixa num Boleto, use sempre o botão <strong>Novo Lançamento</strong> e selecione a respetiva categoria.</li>
-              <li>Ao fazer isso, o sistema preenche o valor exato a pagar automaticamente e <strong>bloqueia a edição</strong>, garantindo que o seu saldo bate sempre certo sem falhas de digitação.</li>
-              <li>As compras no Crédito só afetam a sua conta no mês do vencimento da fatura.</li>
+              <li><strong>Salário Base (Verde):</strong> Mostra a sua renda fixa e extras. Pode configurar o seu salário clicando em "Configurar Salário".</li>
+              <li><strong>Total de Despesas (Vermelho):</strong> O dinheiro que efetivamente já <strong>saiu</strong> da sua conta neste mês.</li>
+              <li><strong>Saldo Disponível (Azul):</strong> O que sobra na conta bancária (Salário Base + Extras - Despesas Efetivas).</li>
+              <li><strong>Limite dos Cartões (Roxo):</strong> O limite global e individual disponível em tempo real nos seus cartões.</li>
             </ul>
           </div>
 
           <div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-amber-500"></i> 3. Compras Parceladas e Futuras</h4>
-            <ul class="list-disc pl-5 space-y-1.5 text-xs">
-              <li>Qualquer lançamento feito "A Prazo" será dividido e agendado ao longo dos meses.</li>
-              <li><strong>Trava de Edição:</strong> Por segurança, se quiser apagar ou editar o valor de uma compra parcelada, o sistema exige que você navegue até ao <strong>mês em que a compra original foi feita</strong>. Isso protege a integridade do seu banco de dados.</li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 4. Regra 50/30/20</h4>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 3. A Regra Inteligente (50/30/20)</h4>
             <ul class="list-disc pl-5 space-y-1.5 text-xs">
               <li>O sistema distribui o seu salário em: Necessidades (50%), Estilo de Vida (30%) e Metas/Futuro (20%).</li>
-              <li>Para personalizar esta divisão, clique em <strong>Ajustar Regra de Divisão</strong> no painel central. A soma tem de totalizar sempre 100%.</li>
+              <li>Para personalizar esta divisão, clique em <strong>Ajustar Regra de Divisão</strong>. A soma tem de totalizar sempre 100%.</li>
             </ul>
           </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-money-bill-transfer text-teal-500"></i> 4. Gestão de Lançamentos</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>À Vista (Dinheiro, PIX, Débito):</strong> O valor é descontado imediatamente do seu "Saldo Disponível".</li>
+              <li><strong>Boleto / Carnê (Parcelado):</strong> O sistema regista as parcelas para os meses futuros. Só afeta o Saldo no mês em que a parcela vence.</li>
+              <li><strong>Cartão de Crédito:</strong> O valor não sai do saldo bancário na hora. Ele consome o limite do cartão e vai para a fatura.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-credit-card text-purple-500"></i> 5. Cartões de Crédito e Faturas</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>Como Pagar a Fatura:</strong> No botão "Novo Lançamento", escolha a categoria <strong>"Pagamento de Fatura"</strong>. O sistema bloqueia a edição e puxa o valor exato pendente, evitando erros.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-barcode text-amber-500"></i> 6. Gestão de Boletos e Contas</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>Como dar Baixa num Boleto:</strong> Vá a "Novo Lançamento" e escolha a categoria <strong>"Pagamento de Boleto"</strong>. Selecione o boleto pendente e grave para dar baixa. O valor não pode ser alterado.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-orange-500"></i> 7. Lançamentos Futuros (Parceladas)</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li>Na secção "Lançamentos Futuros", pode acompanhar as parcelas a vencer, de forma 100% dinâmica.</li>
+              <li><strong>Trava de Edição:</strong> Por segurança, para apagar ou editar o valor de uma compra parcelada, o sistema obriga que navegue até ao <strong>mês em que a compra original foi feita</strong>.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-bolt text-yellow-500"></i> 8. Funcionalidades Power User</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>Modo Privacidade:</strong> Clique no ícone do "Olho" no topo da ecrã para ocultar todos os valores ao usar a app em público.</li>
+              <li><strong>Dashboard de Comparação:</strong> Compare dois meses lado a lado e veja a evolução dos últimos 6 meses.</li>
+              <li><strong>Limpar Dados do Mês:</strong> Apaga os lançamentos avulsos de um mês (Faturas, crédito e parcelamentos são blindados e protegidos).</li>
+            </ul>
+          </div>
+
         </div>
 
         <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
@@ -910,7 +944,6 @@
         </div>
       </div>
     </div>
-  </div>
 
   <script>
     const CLIENT_ID = '36156789113-4ckjb57b2ulfoebtgm83kqrm29q8cmc1.apps.googleusercontent.com';
