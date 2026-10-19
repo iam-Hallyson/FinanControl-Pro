@@ -955,25 +955,31 @@
       }
     }
 
-    function handleAuthClick() {
+ function handleAuthClick() {
       const statusEl = document.getElementById('authStatusMsg');
       
-      // Se o script do Google não existe, avisa imediatamente no clique
+      if (window.location.protocol === 'file:') {
+         if (statusEl) statusEl.innerHTML = '<span class="text-rose-500 font-bold">Atenção:</span> O Google não permite login abrindo o arquivo direto no navegador.<br>Para testar, você precisa rodar isso via localhost.';
+         return;
+      }
+
       if (typeof google === 'undefined') {
-         if (statusEl) statusEl.innerHTML = '<span class="text-rose-500 font-bold">O sistema de login foi bloqueado.</span><br>Desative extensões de bloqueio (AdBlock) e recarregue a página.';
+         if (statusEl) statusEl.innerHTML = '<span class="text-rose-500 font-bold">Google bloqueado.</span><br>Desative extensões como AdBlock e recarregue a página.';
          return;
       }
       
       if (!tokenClient) {
         initGoogleAuth();
-        setTimeout(handleAuthClick, 500); // Aguarda inicializar e tenta novamente
-        return;
+        if (!tokenClient) {
+           if (statusEl) statusEl.textContent = 'Iniciando serviços do Google... Tente clicar novamente em 1 segundo.';
+           return;
+        }
       }
       
       try {
         tokenClient.requestAccessToken({ prompt: '' });
       } catch (err) {
-        if (statusEl) statusEl.textContent = 'Erro ao solicitar acesso ao Google: ' + err.message;
+        if (statusEl) statusEl.textContent = 'Erro ao solicitar acesso: ' + err.message;
       }
     }
 
@@ -2088,6 +2094,7 @@
       }
     }
 
+    function openTransactionModal() {
       document.getElementById('txModalTitle').textContent = 'Novo Lançamento';
       document.getElementById('txIdInput').value = '';
       document.getElementById('txDescInput').value = '';
