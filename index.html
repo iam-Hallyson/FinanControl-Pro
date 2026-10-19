@@ -1654,24 +1654,16 @@ function populatePendingBoletosSelect() {
           const installmentTag = t.installmentsTotal > 1 ? ` (${t.installmentNumber}/${t.installmentsTotal})` : '';
 
           if (isPaid) {
-            paymentBadge = `
-              <div class="flex items-center gap-2">
-                <input type="checkbox" onchange="toggleBoletoPayment('${t.id}', this.checked)" title="Desmarcar Pagamento" class="w-4 h-4 rounded text-emerald-600 cursor-pointer" checked>
-                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-circle-check"></i> Boleto${installmentTag} (Pago)</span>
-              </div>
-            `;
+            paymentBadge = `<span class="px-2.5 py-1 rounded-full text-[11px] font-semibold inline-flex items-center gap-1 bg-emerald-500/15 text-emerald-400"><i class="fa-solid fa-circle-check"></i> Boleto${installmentTag} (Pago)</span>`;
           } else {
             const badgeBg = isOverdue ? 'bg-rose-500/20 text-rose-400 border-rose-500/30' : 'bg-amber-500/20 text-amber-400 border-amber-500/30 animate-pulse';
             const textAlert = isOverdue ? '❌ Boleto Vencido / Atrasado' : '⚠️ Boleto em aberto (Atenção)';
             paymentBadge = `
-              <div class="flex items-center gap-2">
-                <input type="checkbox" onchange="toggleBoletoPayment('${t.id}', this.checked)" title="Marcar como Pago" class="w-4 h-4 rounded text-emerald-600 cursor-pointer">
-                <div class="inline-flex flex-col">
-                  <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold inline-flex items-center gap-1 border ${badgeBg}">
-                    <i class="fa-solid fa-barcode"></i> Boleto${installmentTag}
-                  </span>
-                  <span class="text-[9px] font-semibold mt-0.5 ${isOverdue ? 'text-rose-400' : 'text-amber-300'}">${textAlert}</span>
-                </div>
+              <div class="inline-flex flex-col">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold inline-flex items-center gap-1 border ${badgeBg}">
+                  <i class="fa-solid fa-barcode"></i> Boleto${installmentTag}
+                </span>
+                <span class="text-[9px] font-semibold mt-0.5 ${isOverdue ? 'text-rose-400' : 'text-amber-300'}">${textAlert}</span>
               </div>
             `;
           }
