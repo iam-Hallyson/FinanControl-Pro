@@ -116,6 +116,11 @@
           <button onclick="togglePrivacyMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Ocultar Valores">
             <i id="privacyIcon" class="fa-solid fa-eye"></i>
           </button>
+          
+          <!-- BOTÃO MANUAL DO USUÁRIO -->
+          <button onclick="openManualModal()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Manual e Ajuda">
+            <i class="fa-solid fa-circle-question"></i>
+          </button>
 
           <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Alternar Tema Claro/Escuro">
             <i id="themeIcon" class="fa-solid fa-sun"></i>
@@ -852,6 +857,59 @@
         </form>
       </div>
     </div>
+    <!-- MODAL MANUAL DO USUÁRIO -->
+    <div id="manualModal" class="hidden fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-darkCard w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-darkBorder shadow-2xl p-6 animate-fade max-h-[90vh] flex flex-col">
+        <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h3 class="font-bold text-lg flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+            <i class="fa-solid fa-book-open"></i> Manual do FinanControl Pro
+          </h3>
+          <button onclick="closeManualModal()" class="text-slate-400 hover:text-rose-500 transition cursor-pointer"><i class="fa-solid fa-xmark text-xl"></i></button>
+        </div>
+        
+        <div class="overflow-y-auto custom-scroll pr-2 space-y-6 text-sm text-slate-600 dark:text-slate-300">
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-500"></i> 1. Segurança e Sincronização</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>Privacidade Máxima:</strong> Os seus dados ficam guardados numa pasta oculta do seu próprio Google Drive. Nenhum servidor externo tem acesso.</li>
+              <li><strong>Modo Offline:</strong> Pode usar o sistema sem internet. Assim que a ligação voltar, ele sincroniza as alterações.</li>
+              <li><strong>Modo Privacidade:</strong> Clique no ícone do "Olho" no topo da ecrã para ocultar todos os valores (R$ ****) ao usar a aplicação em público.</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-credit-card text-purple-500"></i> 2. Faturas de Cartão e Boletos</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li><strong>Bloqueio de Segurança:</strong> Para pagar uma Fatura ou dar baixa num Boleto, use sempre o botão <strong>Novo Lançamento</strong> e selecione a respetiva categoria.</li>
+              <li>Ao fazer isso, o sistema preenche o valor exato a pagar automaticamente e <strong>bloqueia a edição</strong>, garantindo que o seu saldo bate sempre certo sem falhas de digitação.</li>
+              <li>As compras no Crédito só afetam a sua conta no mês do vencimento da fatura.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-clock-rotate-left text-amber-500"></i> 3. Compras Parceladas e Futuras</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li>Qualquer lançamento feito "A Prazo" será dividido e agendado ao longo dos meses.</li>
+              <li><strong>Trava de Edição:</strong> Por segurança, se quiser apagar ou editar o valor de uma compra parcelada, o sistema exige que você navegue até ao <strong>mês em que a compra original foi feita</strong>. Isso protege a integridade do seu banco de dados.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="font-bold text-slate-800 dark:text-slate-100 mb-1 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-500"></i> 4. Regra 50/30/20</h4>
+            <ul class="list-disc pl-5 space-y-1.5 text-xs">
+              <li>O sistema distribui o seu salário em: Necessidades (50%), Estilo de Vida (30%) e Metas/Futuro (20%).</li>
+              <li>Para personalizar esta divisão, clique em <strong>Ajustar Regra de Divisão</strong> no painel central. A soma tem de totalizar sempre 100%.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+          <button onclick="closeManualModal()" class="px-5 py-2.5 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer transition shadow-md">
+            Entendi, fechar manual
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1158,6 +1216,22 @@
       if (isPrivacyMode) return 'R$ ****';
       return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); 
     }
+    
+    function formatCurrency(val) {
+  if (isPrivacyMode) return 'R$ ****';
+  return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function openManualModal() {
+  document.getElementById('manualModal').classList.remove('hidden');
+}
+
+function closeManualModal() {
+  document.getElementById('manualModal').classList.add('hidden');
+}
+
+function formatMonthLabel(monthKey) { const [y, m] = monthKey.split('-').map(Number); return `${MONTH_NAMES[m - 1]} ${y}`; }
+function getSalaryForMonth(monthKey) { return appData.monthlySalaries[monthKey] !== undefined ? Number(appData.monthlySalaries[monthKey]) : Number(appData.defaultSalary || 0); }
     function formatMonthLabel(monthKey) { const [y, m] = monthKey.split('-').map(Number); return `${MONTH_NAMES[m - 1]} ${y}`; }
     function getSalaryForMonth(monthKey) { return appData.monthlySalaries[monthKey] !== undefined ? Number(appData.monthlySalaries[monthKey]) : Number(appData.defaultSalary || 0); }
 
