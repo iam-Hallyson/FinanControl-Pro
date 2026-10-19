@@ -2106,7 +2106,7 @@
 
     function closeTransactionModal() { document.getElementById('transactionModal').classList.add('hidden'); }
 
-    // SALVAR LANÇAMENTO E PRESERVAR HISTÓRICO
+   // SALVAR LANÇAMENTO E PRESERVAR HISTÓRICO
     function saveTransaction(e) {
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
@@ -2115,6 +2115,7 @@
       const totalAmount = Number(document.getElementById('txAmountInput').value);
       const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
       
+      const boletoDueDate = document.getElementById('txBoletoDueDateInput').value || txDate;
 
       let paymentMethod = avistaSubMethod;
       let cardId = null;
@@ -2143,7 +2144,7 @@
         }
       }
 
-      // QUITAÇÃO DE FATURA: Cria um item de despesa simples, motor matemático cuida do resquício
+      // QUITAÇÃO DE FATURA DE CARTÃO
       if (currentTxType === 'expense' && categoryId === 'cat_fatura' && paymentMode === 'avista') {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
@@ -2172,6 +2173,7 @@
         return;
       }
 
+      // BAIXA DE BOLETO PENDENTE
       if (currentTxType === 'expense' && categoryId === 'cat_boleto' && paymentMode === 'avista') {
         const targetBoletoId = document.getElementById('txBoletoTargetSelect').value;
         if (targetBoletoId) {
@@ -2196,7 +2198,7 @@
         const groupId = 'group_' + Date.now();
 
         for (let i = 0; i < installments; i++) {
-         const billing = paymentMethod === 'credit'
+          const billing = paymentMethod === 'credit'
             ? calculateCardBilling(cardId, txDate, i).billingMonth
             : calculateBoletoBilling(boletoDueDate, i).billingMonth;
             
