@@ -111,6 +111,11 @@
             <span id="userEmailLabel" class="text-xs font-medium max-w-[130px] truncate text-slate-600 dark:text-slate-300">Conectado</span>
             <button onclick="handleSignoutClick()" title="Desconectar ou Sair" class="text-slate-400 hover:text-rose-500 text-xs ml-1 cursor-pointer"><i class="fa-solid fa-right-from-bracket"></i></button>
           </div>
+          
+          <!-- MODO PRIVACIDADE -->
+          <button onclick="togglePrivacyMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Ocultar Valores">
+            <i id="privacyIcon" class="fa-solid fa-eye"></i>
+          </button>
 
           <button onclick="toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition cursor-pointer" title="Alternar Tema Claro/Escuro">
             <i id="themeIcon" class="fa-solid fa-sun"></i>
@@ -1140,7 +1145,19 @@
       syncToDrive();
     }
 
-    function formatCurrency(val) { return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+    let isPrivacyMode = false;
+
+    function togglePrivacyMode() {
+      isPrivacyMode = !isPrivacyMode;
+      const icon = document.getElementById('privacyIcon');
+      icon.className = isPrivacyMode ? 'fa-solid fa-eye-slash text-rose-500' : 'fa-solid fa-eye';
+      renderAll(); // Recarrega a tela toda instantaneamente com ou sem censura
+    }
+
+    function formatCurrency(val) { 
+      if (isPrivacyMode) return 'R$ ****';
+      return Number(val || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); 
+    }
     function formatMonthLabel(monthKey) { const [y, m] = monthKey.split('-').map(Number); return `${MONTH_NAMES[m - 1]} ${y}`; }
     function getSalaryForMonth(monthKey) { return appData.monthlySalaries[monthKey] !== undefined ? Number(appData.monthlySalaries[monthKey]) : Number(appData.defaultSalary || 0); }
 
