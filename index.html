@@ -1661,7 +1661,7 @@
           return `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium" style="background:${cat.color}18; color:${cat.color}"><i class="fa-solid ${cat.icon}"></i> ${cat.name}</span>`; 
         })() : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/15 text-emerald-500"><i class="fa-solid fa-chart-line"></i> Extra</span>`;
 
-        const isFutureOrInstallmentChild = (t.installmentsTotal > 1 || t.paymentMethod === 'credit') && !(t.date || '').startsWith(currentMonthKey);
+        const isFutureOrInstallmentChild = !(t.date || '').startsWith(currentMonthKey);
         let actionsHtml = '';
         if (isFutureOrInstallmentChild) {
           actionsHtml = `
