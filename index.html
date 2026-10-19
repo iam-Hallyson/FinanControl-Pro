@@ -53,10 +53,6 @@
         </button>
         
         <!-- BOTÃO DE BYPASS PARA DESENVOLVIMENTO -->
-        <button onclick="unlockApp()" class="w-full py-3 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 font-semibold text-sm hover:bg-slate-200 dark:hover:bg-slate-700 transition flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 cursor-pointer">
-          <i class="fa-solid fa-code text-slate-400"></i>
-          <span>Pular Login (Modo Dev)</span>
-        </button>
       </div>
 
       <p id="authStatusMsg" class="text-xs text-slate-500">Conecte sua conta para acessar e manter seus dados sincronizados e protegidos.</p>
@@ -799,13 +795,9 @@
             <p class="text-[10px] text-amber-300">💡 Ao salvar, o boleto será marcado como pago com o valor integral correto, sem zerar.</p>
           </div>
 
-          <div class="flex flex-col gap-2 pt-3">
-            <button type="submit" class="w-full py-3 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 transition cursor-pointer">
-              Salvar Lançamento
-            </button>
-            <button type="button" onclick="closeTransactionModal()" class="w-full py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition cursor-pointer">
-              Cancelar
-            </button>
+          <div class="flex justify-end gap-2 pt-3">
+            <button type="button" onclick="closeTransactionModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">Salvar Lançamento</button>
           </div>
         </form>
       </div>
@@ -848,13 +840,9 @@
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Escolha um Ícone</label>
             <div id="iconPickerGrid" class="grid grid-cols-6 gap-2 max-h-36 overflow-y-auto p-1"></div>
           </div>
-          <div class="flex flex-col gap-2 pt-2">
-            <button type="submit" class="w-full py-3 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30 transition cursor-pointer">
-              Salvar Categoria
-            </button>
-            <button type="button" onclick="closeCategoryModal()" class="w-full py-2.5 rounded-xl text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition cursor-pointer">
-              Cancelar
-            </button>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer">Salvar Categoria</button>
           </div>
         </form>
       </div>
@@ -1975,29 +1963,24 @@
 
     function updateDynamicLabels() {
       const amountLabel = document.getElementById('txAmountLabel');
-      document.getElementById('txDateLabel').textContent = 'Data da Compra';
-      if (paymentMode === 'avista') {
-        amountLabel.textContent = 'Valor (R$)';
-      } else {
-        amountLabel.textContent = 'Valor Total da Compra (R$)';
-      }
-    }
-
-    function toggleBoletoDueDateField() {
-      const container = document.getElementById('txBoletoDueDateContainer');
-      const input = document.getElementById('txBoletoDueDateInput');
-      const isBoletoAvista = paymentMode === 'avista' && avistaSubMethod === 'boleto';
-      const isBoletoParcelado = paymentMode === 'parcelado' && parceladoSubType === 'boleto';
+      const dateLabel = document.getElementById('txDateLabel');
       
-      if (currentTxType === 'expense' && (isBoletoAvista || isBoletoParcelado)) {
-        if (container) container.classList.remove('hidden');
-        if (input) {
-          input.setAttribute('required', 'true');
-          if (!input.value) input.value = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
+      if (paymentMode === 'avista') {
+        if (avistaSubMethod === 'boleto') {
+          amountLabel.textContent = 'Valor do Boleto (R$)';
+          dateLabel.textContent = 'Vencimento do Boleto';
+        } else {
+          amountLabel.textContent = 'Valor (R$)';
+          dateLabel.textContent = 'Data';
         }
       } else {
-        if (container) container.classList.add('hidden');
-        if (input) input.removeAttribute('required');
+        if (parceladoSubType === 'boleto') {
+          amountLabel.textContent = 'Valor Total do Carnê / Boleto (R$)';
+          dateLabel.textContent = 'Vencimento do 1º Boleto';
+        } else {
+          amountLabel.textContent = 'Valor Total da Compra (R$)';
+          dateLabel.textContent = 'Data da Compra';
+        }
       }
     }
 
@@ -2023,7 +2006,6 @@
       
       updateDynamicLabels();
       toggleInvoicePaymentFields();
-      toggleBoletoDueDateField();
     }
 
     function setAvistaSubMethod(method) {
@@ -2047,7 +2029,6 @@
       
       updateDynamicLabels();
       toggleInvoicePaymentFields();
-      toggleBoletoDueDateField();
     }
 
     function setParceladoSubType(subType) {
@@ -2068,13 +2049,11 @@
       
       updateDynamicLabels();
       updateBillingNotice();
-      toggleBoletoDueDateField();
     }
 
     function updateBillingNotice() {
       if (paymentMode !== 'parcelado') return;
       const dateVal = document.getElementById('txDateInput').value || `${currentMonthKey}-10`;
-      const boletoDueDate = document.getElementById('txBoletoDueDateInput').value || dateVal;
       const installments = Number(document.getElementById('txInstallmentsInput').value || 2);
       const totalAmount = Number(document.getElementById('txAmountInput').value || 0);
       const notice = document.getElementById('txBillingNotice');
@@ -2095,11 +2074,11 @@
         const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
         notice.innerHTML = `📅 Cartão: 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. Limite de ${formatCurrency(totalAmount)} comprometido.`;
       } else {
-        const firstRes = calculateBoletoBilling(boletoDueDate, 0);
+        const firstRes = calculateBoletoBilling(dateVal, 0);
         const [by, bm] = firstRes.billingMonth.split('-').map(Number);
-        const lastRes = calculateBoletoBilling(boletoDueDate, installments - 1);
+        const lastRes = calculateBoletoBilling(dateVal, installments - 1);
         const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
-        notice.innerHTML = `📄 Boleto/Carnê: 1º vencimento em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>.`;
+        notice.innerHTML = `📄 Boleto/Carnê: 1º vencimento em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong> (sem vínculo de limite).`;
       }
     }
 
@@ -2109,7 +2088,6 @@
       document.getElementById('txDescInput').value = '';
       document.getElementById('txAmountInput').value = '';
       document.getElementById('txDateInput').value = `${currentMonthKey}-10`;
-      document.getElementById('txBoletoDueDateInput').value = '';
       document.getElementById('txInstallmentsInput').value = '2';
       setTxType('expense');
       setPaymentMode('avista');
@@ -2117,7 +2095,6 @@
       setParceladoSubType('boleto');
       populateCardSelect();
       toggleInvoicePaymentFields();
-      toggleBoletoDueDateField();
       document.getElementById('transactionModal').classList.remove('hidden');
     }
 
@@ -2128,7 +2105,6 @@
       e.preventDefault();
       const id = document.getElementById('txIdInput').value;
       const txDate = document.getElementById('txDateInput').value;
-      const boletoDueDate = document.getElementById('txBoletoDueDateInput').value || txDate;
       const desc = document.getElementById('txDescInput').value.trim();
       const totalAmount = Number(document.getElementById('txAmountInput').value);
       const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
@@ -2160,7 +2136,7 @@
         }
       }
 
-      // QUITAÇÃO DE FATURA
+      // QUITAÇÃO DE FATURA: Cria um item de despesa simples, motor matemático cuida do resquício
       if (currentTxType === 'expense' && categoryId === 'cat_fatura' && paymentMode === 'avista') {
         const invoiceCardId = document.getElementById('txInvoiceCardSelect').value;
         const invoiceMonth = document.getElementById('txInvoiceMonthInput').value;
@@ -2215,7 +2191,7 @@
         for (let i = 0; i < installments; i++) {
           const billing = paymentMethod === 'credit'
             ? calculateCardBilling(cardId, txDate, i).billingMonth
-            : calculateBoletoBilling(boletoDueDate, i).billingMonth;
+            : calculateBoletoBilling(txDate, i).billingMonth;
 
           appData.transactions.push({
             id: 'tx_' + Date.now() + '_' + i,
@@ -2227,7 +2203,7 @@
             description: `${desc} (${i + 1}/${installments})`,
             amount: installmentAmount,
             originalTotalAmount: totalAmount,
-            date: txDate, // Mantém a Data da Compra correta
+            date: txDate,
             categoryId: categoryId,
             installmentsTotal: installments,
             installmentNumber: i + 1,
@@ -2240,7 +2216,7 @@
         if (paymentMethod === 'credit' && cardId) {
           billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
         } else if (paymentMethod === 'boleto') {
-          billingMonth = boletoDueDate.slice(0, 7);
+          billingMonth = calculateBoletoBilling(txDate, 0).billingMonth;
         }
 
         const txObj = {
@@ -2252,7 +2228,7 @@
           description: desc,
           amount: totalAmount,
           originalTotalAmount: totalAmount,
-          date: txDate, // Mantém a Data da Compra correta
+          date: txDate,
           categoryId: categoryId,
           installmentsTotal: 1,
           installmentNumber: 1,
@@ -2276,11 +2252,6 @@
       document.getElementById('txDescInput').value = tx.description.replace(/\s\(\d+\/\d+\)$/, '');
       document.getElementById('txAmountInput').value = tx.originalTotalAmount || tx.amount;
       document.getElementById('txDateInput').value = tx.date;
-      
-      if (tx.paymentMethod === 'boleto') {
-        document.getElementById('txBoletoDueDateInput').value = tx.billingMonth ? `${tx.billingMonth}-10` : tx.date;
-      }
-      
       setTxType(tx.type);
       if (tx.type === 'expense') {
         document.getElementById('txCatInput').value = tx.categoryId;
@@ -2301,7 +2272,6 @@
           }
         }
         toggleInvoicePaymentFields();
-        toggleBoletoDueDateField();
       }
       document.getElementById('transactionModal').classList.remove('hidden');
     }
@@ -2347,7 +2317,6 @@
         document.getElementById('txBoletoPaymentContainer').classList.add('hidden');
         document.getElementById('txCatInput').removeAttribute('required');
       }
-      toggleBoletoDueDateField();
     }
 
     function switchTab(tabName) {
