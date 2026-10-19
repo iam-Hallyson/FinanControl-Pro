@@ -1694,12 +1694,12 @@
     function renderFutureTransactionsTable() {
       const tbody = document.getElementById('futureTransactionsTableBody');
       
-      const futureList = appData.transactions.filter(t => {
-        const isPurchasedHere = isTxPurchasedInMonth(t, currentMonthKey);
-        const isEffectiveHere = getEffectiveMonthKey(t) === currentMonthKey;
-        // Mostra compras a prazo (cartão ou boleto) OU boletos que vencem em meses diferentes da compra
-        return isPurchasedHere && (!isEffectiveHere || (t.installmentsTotal && t.installmentsTotal > 1));
-      });
+        const futureList = appData.transactions.filter(t => {
+          const purchaseMonth = (t.date || '').slice(0, 7);
+          const effectiveMonth = getEffectiveMonthKey(t);
+          // Exibe se a compra já aconteceu (neste mês ou no passado) E se a parcela/vencimento cai num mês futuro
+          return purchaseMonth <= currentMonthKey && effectiveMonth > currentMonthKey;
+        });
 
       const uniqueMap = new Map();
       futureList.forEach(t => {
@@ -2088,7 +2088,6 @@
       }
     }
 
-    function openTransactionModal() {
       document.getElementById('txModalTitle').textContent = 'Novo Lançamento';
       document.getElementById('txIdInput').value = '';
       document.getElementById('txDescInput').value = '';
