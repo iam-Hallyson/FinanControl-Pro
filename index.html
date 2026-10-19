@@ -1516,7 +1516,7 @@
       if(invoiceCardSelect) invoiceCardSelect.innerHTML = opts;
     }
 
-    function populatePendingBoletosSelect() {
+function populatePendingBoletosSelect() {
       const boletoMonth = document.getElementById('txBoletoMonthInput').value || currentMonthKey;
       const selectEl = document.getElementById('txBoletoTargetSelect');
 
@@ -1526,8 +1526,13 @@
         (t.billingMonth || (t.date || '').slice(0, 7)) === boletoMonth
       );
 
+      const amountInput = document.getElementById('txAmountInput');
+
       if (pendingBoletos.length === 0) {
         selectEl.innerHTML = `<option value="">Nenhum boleto pendente no mês</option>`;
+        amountInput.value = '';
+        amountInput.readOnly = true;
+        amountInput.classList.add('opacity-50', 'pointer-events-none');
         return;
       }
 
@@ -1544,8 +1549,14 @@
       if (selectedOpt && selectedOpt.value) {
         const amt = selectedOpt.getAttribute('data-amt');
         const desc = selectedOpt.getAttribute('data-desc');
-        if (!document.getElementById('txAmountInput').value) document.getElementById('txAmountInput').value = amt;
-        if (!document.getElementById('txDescInput').value) document.getElementById('txDescInput').value = `Pgto Boleto: ${desc}`;
+        
+        const amountInput = document.getElementById('txAmountInput');
+        amountInput.value = amt; // Puxa o valor exato
+        amountInput.readOnly = true; // Bloqueia a edição
+        amountInput.classList.add('opacity-50', 'pointer-events-none'); // Dá aspeto de bloqueado
+        
+        // Atualiza e força a descrição
+        document.getElementById('txDescInput').value = `Pgto Boleto: ${desc}`;
       }
     }
 
@@ -1555,17 +1566,23 @@
       if (!cardId || !monthKey) return;
 
       const status = getCardInvoiceStatus(cardId, monthKey);
+      const amountInput = document.getElementById('txAmountInput');
+      
       if (status.remainingToPayThisMonth > 0) {
-        document.getElementById('txAmountInput').value = status.remainingToPayThisMonth.toFixed(2);
+        amountInput.value = status.remainingToPayThisMonth.toFixed(2);
       } else {
-        document.getElementById('txAmountInput').value = "0.00";
+        amountInput.value = "0.00";
       }
+      
+      amountInput.readOnly = true; // Bloqueia a edição
+      amountInput.classList.add('opacity-50', 'pointer-events-none'); // Dá aspeto de bloqueado
     }
 
     function toggleInvoicePaymentFields() {
       const catVal = document.getElementById('txCatInput').value;
       const invContainer = document.getElementById('txInvoicePaymentContainer');
       const bolContainer = document.getElementById('txBoletoPaymentContainer');
+      const amountInput = document.getElementById('txAmountInput');
 
       if (catVal === 'cat_fatura' && paymentMode === 'avista') {
         invContainer.classList.remove('hidden');
@@ -1580,6 +1597,10 @@
       } else {
         invContainer.classList.add('hidden');
         bolContainer.classList.add('hidden');
+        
+        // Desbloqueia o campo instantaneamente se for um lançamento normal
+        amountInput.readOnly = false;
+        amountInput.classList.remove('opacity-50', 'pointer-events-none');
       }
     }
 
