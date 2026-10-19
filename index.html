@@ -1964,22 +1964,27 @@
     function updateDynamicLabels() {
       const amountLabel = document.getElementById('txAmountLabel');
       const dateLabel = document.getElementById('txDateLabel');
+      const boletoContainer = document.getElementById('txBoletoDueDateContainer');
       
       if (paymentMode === 'avista') {
         if (avistaSubMethod === 'boleto') {
           amountLabel.textContent = 'Valor do Boleto (R$)';
-          dateLabel.textContent = 'Vencimento do Boleto';
+          dateLabel.textContent = 'Data da Emissão (Compra)';
+          boletoContainer.classList.remove('hidden');
         } else {
           amountLabel.textContent = 'Valor (R$)';
           dateLabel.textContent = 'Data';
+          boletoContainer.classList.add('hidden');
         }
       } else {
         if (parceladoSubType === 'boleto') {
-          amountLabel.textContent = 'Valor Total do Carnê / Boleto (R$)';
-          dateLabel.textContent = 'Vencimento do 1º Boleto';
+          amountLabel.textContent = 'Valor Total do Carnê (R$)';
+          dateLabel.textContent = 'Data da Compra';
+          boletoContainer.classList.remove('hidden');
         } else {
           amountLabel.textContent = 'Valor Total da Compra (R$)';
           dateLabel.textContent = 'Data da Compra';
+          boletoContainer.classList.add('hidden');
         }
       }
     }
@@ -2074,9 +2079,10 @@
         const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
         notice.innerHTML = `📅 Cartão: 1ª parcela em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong>. Limite de ${formatCurrency(totalAmount)} comprometido.`;
       } else {
-        const firstRes = calculateBoletoBilling(dateVal, 0);
+        const boletoDue = document.getElementById('txBoletoDueDateInput').value || dateVal;
+        const firstRes = calculateBoletoBilling(boletoDue, 0);
         const [by, bm] = firstRes.billingMonth.split('-').map(Number);
-        const lastRes = calculateBoletoBilling(dateVal, installments - 1);
+        const lastRes = calculateBoletoBilling(boletoDue, installments - 1);
         const [lby, lbm] = lastRes.billingMonth.split('-').map(Number);
         notice.innerHTML = `📄 Boleto/Carnê: 1º vencimento em <strong>${MONTH_NAMES[bm - 1]}/${by}</strong> até <strong>${MONTH_NAMES[lbm - 1]}/${lby}</strong> (sem vínculo de limite).`;
       }
@@ -2108,6 +2114,7 @@
       const desc = document.getElementById('txDescInput').value.trim();
       const totalAmount = Number(document.getElementById('txAmountInput').value);
       const categoryId = currentTxType === 'expense' ? document.getElementById('txCatInput').value : null;
+      
 
       let paymentMethod = avistaSubMethod;
       let cardId = null;
@@ -2189,9 +2196,11 @@
         const groupId = 'group_' + Date.now();
 
         for (let i = 0; i < installments; i++) {
-          const billing = paymentMethod === 'credit'
+         const billing = paymentMethod === 'credit'
             ? calculateCardBilling(cardId, txDate, i).billingMonth
-            : calculateBoletoBilling(txDate, i).billingMonth;
+            : calculateBoletoBilling(boletoDueDate, i).billingMonth;
+            
+          const finalDue = paymentMethod === 'boleto' ? `${billing}-${boletoDueDate.split('-')[2]}` : null;
 
           appData.transactions.push({
             id: 'tx_' + Date.now() + '_' + i,
@@ -2204,6 +2213,7 @@
             amount: installmentAmount,
             originalTotalAmount: totalAmount,
             date: txDate,
+            dueDate: finalDue,
             categoryId: categoryId,
             installmentsTotal: installments,
             installmentNumber: i + 1,
@@ -2213,10 +2223,12 @@
         }
       } else {
         let billingMonth = txDate.slice(0, 7);
+        let finalDue = null;
         if (paymentMethod === 'credit' && cardId) {
           billingMonth = calculateCardBilling(cardId, txDate, 0).billingMonth;
         } else if (paymentMethod === 'boleto') {
-          billingMonth = calculateBoletoBilling(txDate, 0).billingMonth;
+          billingMonth = calculateBoletoBilling(boletoDueDate, 0).billingMonth;
+          finalDue = boletoDueDate;
         }
 
         const txObj = {
@@ -2229,6 +2241,7 @@
           amount: totalAmount,
           originalTotalAmount: totalAmount,
           date: txDate,
+          dueDate: finalDue,
           categoryId: categoryId,
           installmentsTotal: 1,
           installmentNumber: 1,
@@ -2252,6 +2265,7 @@
       document.getElementById('txDescInput').value = tx.description.replace(/\s\(\d+\/\d+\)$/, '');
       document.getElementById('txAmountInput').value = tx.originalTotalAmount || tx.amount;
       document.getElementById('txDateInput').value = tx.date;
+      document.getElementById('txBoletoDueDateInput').value = tx.dueDate || tx.date;
       setTxType(tx.type);
       if (tx.type === 'expense') {
         document.getElementById('txCatInput').value = tx.categoryId;
